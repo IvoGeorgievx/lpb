@@ -1,7 +1,45 @@
-import { ReactElement } from "react";
+import {
+	Select,
+	SelectContent,
+	SelectGroup,
+	SelectItem,
+	SelectLabel,
+	SelectTrigger,
+	SelectValue,
+} from "@/components/ui/select";
 
 interface EditorProps {
-	component: ReactElement;
+	type?: string;
 }
 
-export async function Editor() {}
+export function Editor({ type }: EditorProps) {
+	switch (type) {
+		case "header":
+			return (
+				<div className="p-4">
+					<Select>
+						<SelectTrigger className="w-full max-w-48">
+							<SelectValue placeholder="Select a fruit" />
+						</SelectTrigger>
+						<SelectContent>
+							<SelectGroup>
+								<SelectLabel>Fruits</SelectLabel>
+								<SelectItem value="apple">Apple</SelectItem>
+								<SelectItem value="banana">Banana</SelectItem>
+								<SelectItem value="blueberry">Blueberry</SelectItem>
+								<SelectItem value="grapes">Grapes</SelectItem>
+								<SelectItem value="pineapple">Pineapple</SelectItem>
+							</SelectGroup>
+						</SelectContent>
+					</Select>
+				</div>
+			);
+
+		case "hero":
+			return (
+				<section>
+					<p>test from hero block</p>
+				</section>
+			);
+	}
+}

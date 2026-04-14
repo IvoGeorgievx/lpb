@@ -2,6 +2,7 @@
 import { AppSidebar } from "@/components/app-sidebar";
 import Header from "@/components/blocks/HeaderBlock";
 import HeroBlock from "@/components/blocks/HeroBlock";
+import { Editor } from "@/components/editor/Editor";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { DragDropProvider, useDroppable } from "@dnd-kit/react";
 import { ReactElement, ReactNode, useState } from "react";
@@ -22,7 +23,7 @@ function DroppableZone({
 	selectedItem,
 }: {
 	items: DroppedItem[];
-	selectedItem: (id: string) => void;
+	selectedItem: (item: DroppedItem) => void;
 	children?: ReactNode;
 }) {
 	const { ref } = useDroppable({ id: "droppable" });
@@ -30,7 +31,7 @@ function DroppableZone({
 	return (
 		<div
 			ref={ref}
-			className="flex-1 flex flex-col items-center min-w-[1200px] pt-4 bg-zinc-50 dark:bg-black min-h-screen"
+			className="flex-1 flex flex-col items-center min-w-300 pt-4 bg-zinc-50 dark:bg-black min-h-screen"
 		>
 			{items.length > 0 ? (
 				items.map((item) => (
@@ -38,8 +39,7 @@ function DroppableZone({
 						className="cursor-pointer"
 						key={item.id}
 						onClick={() => {
-							console.log(item.id);
-							selectedItem(item.type);
+							selectedItem(item);
 						}}
 					>
 						{COMPONENT_MAP[item.type]}
@@ -55,7 +55,9 @@ function DroppableZone({
 
 export default function Home() {
 	const [items, setItems] = useState<DroppedItem[]>([]);
-	const [selectedBlock, setSelectedBlock] = useState<string | null>(null);
+	const [selectedBlock, setSelectedBlock] = useState<DroppedItem | undefined>(
+		undefined,
+	);
 
 	const handleDelete = (id: string) => {
 		setItems((prev) => prev.filter((item) => item.id !== id));
@@ -88,7 +90,9 @@ export default function Home() {
 						items={items}
 					></DroppableZone>
 				</div>
-				<div className="flex h-screen">{selectedBlock}</div>
+				<div className="flex h-screen">
+					<Editor type={selectedBlock?.type} />
+				</div>
 			</SidebarProvider>
 		</DragDropProvider>
 	);
