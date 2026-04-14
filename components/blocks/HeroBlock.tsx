@@ -4,3 +4,7 @@ interface HeroBlockProps {
 	fontSize: string;
 	animation?: string;
 }
+
+export default function HeroBlock() {
+	return <>Hero block</>;
+}

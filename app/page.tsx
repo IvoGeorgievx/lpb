@@ -1,30 +1,50 @@
 "use client";
 import { AppSidebar } from "@/components/app-sidebar";
+import Header from "@/components/blocks/HeaderBlock";
+import HeroBlock from "@/components/blocks/HeroBlock";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { DragDropProvider, useDroppable } from "@dnd-kit/react";
-import { ReactNode, useState } from "react";
+import { ReactElement, ReactNode, useState } from "react";
 interface DroppedItem {
 	id: string;
 	type: string;
 	timestamp: number;
 }
 
+const COMPONENT_MAP: Record<string, ReactElement> = {
+	header: <Header />,
+	hero: <HeroBlock />,
+};
+
 function DroppableZone({
 	items,
 	children,
+	selectedItem,
 }: {
 	items: DroppedItem[];
-	children: ReactNode;
+	selectedItem: (id: string) => void;
+	children?: ReactNode;
 }) {
 	const { ref } = useDroppable({ id: "droppable" });
 
 	return (
 		<div
 			ref={ref}
-			className="flex-1 flex flex-col items-center w-[1000px] justify-center bg-zinc-50 dark:bg-black min-h-screen"
+			className="flex-1 flex flex-col items-center min-w-[1200px] pt-4 bg-zinc-50 dark:bg-black min-h-screen"
 		>
 			{items.length > 0 ? (
-				items.map((item) => <div key={item.id}>{item.type}</div>)
+				items.map((item) => (
+					<div
+						className="cursor-pointer"
+						key={item.id}
+						onClick={() => {
+							console.log(item.id);
+							selectedItem(item.type);
+						}}
+					>
+						{COMPONENT_MAP[item.type]}
+					</div>
+				))
 			) : (
 				<div className="text-center text-zinc-500">Drop here</div>
 			)}
@@ -35,6 +55,11 @@ function DroppableZone({
 
 export default function Home() {
 	const [items, setItems] = useState<DroppedItem[]>([]);
+	const [selectedBlock, setSelectedBlock] = useState<string | null>(null);
+
+	const handleDelete = (id: string) => {
+		setItems((prev) => prev.filter((item) => item.id !== id));
+	};
 
 	return (
 		<DragDropProvider
@@ -58,10 +83,12 @@ export default function Home() {
 			<SidebarProvider>
 				<AppSidebar />
 				<div className="flex h-screen">
-					<DroppableZone items={items}>
-						<></>
-					</DroppableZone>
+					<DroppableZone
+						selectedItem={(id) => setSelectedBlock(id)}
+						items={items}
+					></DroppableZone>
 				</div>
+				<div className="flex h-screen">{selectedBlock}</div>
 			</SidebarProvider>
 		</DragDropProvider>
 	);
