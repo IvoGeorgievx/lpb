@@ -1,7 +1,7 @@
 export interface HeroBlockProps {
 	image?: string;
-	text: string;
-	fontSize: string;
+	title: string;
+	fontSize?: string;
 	animation?: string;
 }
 

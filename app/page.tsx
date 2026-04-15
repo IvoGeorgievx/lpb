@@ -38,7 +38,7 @@ function DroppableZone({
 	return (
 		<div
 			ref={ref}
-			className="flex-1 flex flex-col items-center min-w-300 pt-4 bg-zinc-50 dark:bg-black min-h-screen"
+			className="flex-1 flex flex-col items-center min-w-325 pt-4 bg-zinc-50 dark:bg-black min-h-screen"
 		>
 			{items.length > 0 ? (
 				items.map((item) => (
@@ -70,6 +70,16 @@ export default function Home() {
 		setItems((prev) => prev.filter((item) => item.id !== id));
 	};
 
+	const updatePropsData = (data: any) => {
+		setItems((prev) =>
+			prev.map((item) =>
+				item.id === data.id
+					? { ...item, props: { ...item.props, ...data.props } }
+					: item,
+			),
+		);
+	};
+
 	return (
 		<DragDropProvider
 			onDragEnd={(event) => {
@@ -80,8 +90,13 @@ export default function Home() {
 				if (target?.id === "droppable") {
 					const type = String(source!.id) as BlockType;
 
-					const defaultProps = {
-						header: { heightInPx: 60, sticky: false },
+					const defaultProps: BlockPropsMap = {
+						header: {
+							className: "border p-4 rounded-xl",
+							style: {
+								height: 60,
+							},
+						},
 						hero: { title: "Hero section" },
 					};
 
@@ -102,13 +117,13 @@ export default function Home() {
 				<AppSidebar />
 				<div className="flex h-screen">
 					<DroppableZone
-						selectedItem={(id) => setSelectedBlock(id)}
+						selectedItem={(item) => setSelectedBlock(item)}
 						items={items}
 					></DroppableZone>
 				</div>
 				<div className="flex h-screen flex-1">
 					<Editor
-						onPropsChange={(data) => console.log(data)}
+						onPropsChange={(data) => updatePropsData(data)}
 						item={selectedBlock}
 					/>
 				</div>
