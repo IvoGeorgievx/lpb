@@ -20,6 +20,8 @@ export type DroppedItem<T extends BlockType = BlockType> = {
 	props: BlockPropsMap[T];
 };
 
+type UpdatePayload = { id: string } & Pick<DroppedItem, "props">;
+
 export const COMPONENT_MAP = {
 	header: Header,
 	hero: HeroBlock,
@@ -70,15 +72,29 @@ export default function Home() {
 		setItems((prev) => prev.filter((item) => item.id !== id));
 	};
 
-	const updatePropsData = (data: any) => {
+	const updatePropsData = (data: UpdatePayload) => {
 		setItems((prev) =>
-			prev.map((item) =>
-				item.id === data.id
-					? { ...item, props: { ...item.props, ...data.props } }
-					: item,
-			),
+			prev.map((item) => {
+				if (item.id !== data.id) return item;
+				console.log({ ...data.props.style });
+				const newProps = {
+					...item.props,
+					...data.props,
+				};
+
+				if (data.props.style) {
+					newProps.style = {
+						...item.props.style,
+						...data.props.style,
+					};
+				}
+
+				return { ...item, props: newProps };
+			}),
 		);
 	};
+
+	const activeBlock = items.find((it) => it.id === selectedBlock?.id);
 
 	return (
 		<DragDropProvider
@@ -92,9 +108,10 @@ export default function Home() {
 
 					const defaultProps: BlockPropsMap = {
 						header: {
-							className: "border p-4 rounded-xl",
+							className: "border p-4",
 							style: {
 								height: 60,
+								borderRadius: 0,
 							},
 						},
 						hero: { title: "Hero section" },
@@ -119,12 +136,12 @@ export default function Home() {
 					<DroppableZone
 						selectedItem={(item) => setSelectedBlock(item)}
 						items={items}
-					></DroppableZone>
+					/>
 				</div>
 				<div className="flex h-screen flex-1">
 					<Editor
 						onPropsChange={(data) => updatePropsData(data)}
-						item={selectedBlock}
+						item={activeBlock}
 					/>
 				</div>
 			</SidebarProvider>
