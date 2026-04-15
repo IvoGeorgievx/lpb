@@ -1,9 +1,8 @@
 import { BlockPropsMap, BlockType, DroppedItem } from "@/app/page";
+import { HexColorPicker } from "react-colorful";
 import { Label } from "../ui/label";
 import { Slider } from "../ui/slider";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
-import { HexColorPicker } from "react-colorful";
-import { useState } from "react";
 
 type UpdatePayload<T extends BlockType = BlockType> = {
 	id: string;
@@ -16,12 +15,10 @@ interface EditorProps {
 }
 
 export function Editor({ item, onPropsChange }: EditorProps) {
-	const [headerColor, setHeaderColor] = useState("#aabbcc");
 	if (!item) return null;
 
 	if (item.type === "header") {
 		const props = item.props as BlockPropsMap["header"];
-		// console.log(props.style?.height);
 
 		return (
 			<div key={item.id} className="p-4 w-full">
@@ -38,6 +35,7 @@ export function Editor({ item, onPropsChange }: EditorProps) {
 									Height: {props.style?.height}px
 								</Label>
 								<Slider
+									className="mt-2"
 									id="header-height-slider"
 									value={[Number(props.style?.height ?? 0)]}
 									onValueChange={(value) =>
@@ -56,6 +54,7 @@ export function Editor({ item, onPropsChange }: EditorProps) {
 									Border Radius: {props.style?.borderRadius}px
 								</Label>
 								<Slider
+									className="mt-2"
 									id="header-radius-slider"
 									value={[Number(props.style?.borderRadius ?? 0)]}
 									onValueChange={(value) =>
@@ -67,7 +66,30 @@ export function Editor({ item, onPropsChange }: EditorProps) {
 										})
 									}
 									min={0}
-									max={50}
+									max={40}
+									step={1}
+								/>
+							</div>
+						</div>
+						<div className="space-y-2 flex gap-5">
+							<div className="w-full">
+								<Label htmlFor="header-padding-slider">
+									Padding: {props.style?.padding}px
+								</Label>
+								<Slider
+									className="mt-2"
+									id="header-padding-slider"
+									value={[Number(props.style?.padding ?? 0)]}
+									onValueChange={(value) =>
+										onPropsChange({
+											id: item.id,
+											props: {
+												style: { ...props.style, padding: value[0] },
+											},
+										})
+									}
+									min={0}
+									max={40}
 									step={1}
 								/>
 							</div>
@@ -78,7 +100,7 @@ export function Editor({ item, onPropsChange }: EditorProps) {
 						<div className="text-sm text-muted-foreground">
 							<div>
 								<HexColorPicker
-									color={headerColor}
+									color={props.style?.backgroundColor || "#ffffff"}
 									onChange={(value) =>
 										onPropsChange({
 											id: item.id,

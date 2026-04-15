@@ -108,10 +108,11 @@ export default function Home() {
 
 					const defaultProps: BlockPropsMap = {
 						header: {
-							className: "border p-4",
+							className: "border",
 							style: {
 								height: 60,
-								borderRadius: 0,
+								borderRadius: 10,
+								padding: 10,
 							},
 						},
 						hero: { title: "Hero section" },
