@@ -1,37 +1,26 @@
-import {
-	Select,
-	SelectContent,
-	SelectGroup,
-	SelectItem,
-	SelectLabel,
-	SelectTrigger,
-	SelectValue,
-} from "@/components/ui/select";
+import { DroppedItem } from "@/app/page";
+import { Slider } from "../ui/slider";
 
 interface EditorProps {
-	type?: string;
+	item?: DroppedItem;
+	onPropsChange: (props: Record<string, string | number>) => void;
 }
 
-export function Editor({ type }: EditorProps) {
-	switch (type) {
+export function Editor({ item, onPropsChange }: EditorProps) {
+	switch (item?.type) {
 		case "header":
 			return (
-				<div className="p-4">
-					<Select>
-						<SelectTrigger className="w-full max-w-48">
-							<SelectValue placeholder="Select a fruit" />
-						</SelectTrigger>
-						<SelectContent>
-							<SelectGroup>
-								<SelectLabel>Fruits</SelectLabel>
-								<SelectItem value="apple">Apple</SelectItem>
-								<SelectItem value="banana">Banana</SelectItem>
-								<SelectItem value="blueberry">Blueberry</SelectItem>
-								<SelectItem value="grapes">Grapes</SelectItem>
-								<SelectItem value="pineapple">Pineapple</SelectItem>
-							</SelectGroup>
-						</SelectContent>
-					</Select>
+				<div className="p-4 w-full">
+					<Slider
+						onValueChange={(value) =>
+							onPropsChange({ heightInPx: Number(value), blockId: item.id })
+						}
+						defaultValue={[75]}
+						min={45}
+						max={150}
+						step={1}
+						className="mx-auto w-full max-w-xs"
+					/>
 				</div>
 			);
 

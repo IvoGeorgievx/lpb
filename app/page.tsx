@@ -1,22 +1,29 @@
 "use client";
 import { AppSidebar } from "@/components/app-sidebar";
-import Header from "@/components/blocks/HeaderBlock";
-import HeroBlock from "@/components/blocks/HeroBlock";
+import Header, { HeaderProps } from "@/components/blocks/HeaderBlock";
+import HeroBlock, { HeroBlockProps } from "@/components/blocks/HeroBlock";
 import { Editor } from "@/components/editor/Editor";
+import Renderer from "@/components/renderer/Renderer";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { DragDropProvider, useDroppable } from "@dnd-kit/react";
-import { ReactElement, ReactNode, useState } from "react";
-interface DroppedItem {
-	id: string;
-	type: string;
-	timestamp: number;
-}
+import { ReactNode, useState } from "react";
 
-const COMPONENT_MAP: Record<string, ReactElement> = {
-	header: <Header />,
-	hero: <HeroBlock />,
+export type BlockType = "header" | "hero";
+export type BlockPropsMap = {
+	header: HeaderProps;
+	hero: HeroBlockProps;
+};
+export type DroppedItem<T extends BlockType = BlockType> = {
+	id: string;
+	type: T;
+	timestamp: number;
+	props: BlockPropsMap[T];
 };
 
+export const COMPONENT_MAP = {
+	header: Header,
+	hero: HeroBlock,
+};
 function DroppableZone({
 	items,
 	children,
@@ -36,13 +43,13 @@ function DroppableZone({
 			{items.length > 0 ? (
 				items.map((item) => (
 					<div
-						className="cursor-pointer"
+						className="cursor-pointer w-full"
 						key={item.id}
 						onClick={() => {
 							selectedItem(item);
 						}}
 					>
-						{COMPONENT_MAP[item.type]}
+						<Renderer item={item} />
 					</div>
 				))
 			) : (
@@ -71,14 +78,23 @@ export default function Home() {
 				const { source, target } = event.operation;
 
 				if (target?.id === "droppable") {
-					setItems((prev) => [
-						...prev,
-						{
-							id: `${source!.id}-${Date.now()}`,
-							type: String(source!.id),
-							timestamp: Date.now(),
-						},
-					]);
+					const type = String(source!.id) as BlockType;
+
+					const defaultProps = {
+						header: { heightInPx: 60, sticky: false },
+						hero: { title: "Hero section" },
+					};
+
+					const newItem: DroppedItem = {
+						id: `${type}-${Date.now()}`,
+						type,
+						timestamp: Date.now(),
+						props: defaultProps[type],
+					};
+
+					setItems((prev) => [...prev, newItem]);
+
+					setSelectedBlock(newItem);
 				}
 			}}
 		>
@@ -90,8 +106,11 @@ export default function Home() {
 						items={items}
 					></DroppableZone>
 				</div>
-				<div className="flex h-screen">
-					<Editor type={selectedBlock?.type} />
+				<div className="flex h-screen flex-1">
+					<Editor
+						onPropsChange={(data) => console.log(data)}
+						item={selectedBlock}
+					/>
 				</div>
 			</SidebarProvider>
 		</DragDropProvider>

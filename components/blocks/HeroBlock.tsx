@@ -1,4 +1,4 @@
-interface HeroBlockProps {
+export interface HeroBlockProps {
 	image?: string;
 	text: string;
 	fontSize: string;

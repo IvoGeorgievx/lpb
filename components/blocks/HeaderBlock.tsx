@@ -1,7 +1,7 @@
 import Image from "next/image";
 import React from "react";
 
-interface HeaderProps extends React.ComponentPropsWithRef<"header"> {
+export interface HeaderProps extends React.ComponentPropsWithRef<"header"> {
 	heightInPx?: number;
 	heightInPercentage?: number;
 	sticky?: boolean;
@@ -48,7 +48,6 @@ export default function Header({
 	return (
 		<header style={styles} {...props}>
 			{logo && <Image src={logo} alt="logo" className="h-full" />}
-
 			{links && (
 				<nav className="flex items-center gap-4">
 					{links.map((link, i) => (
@@ -58,7 +57,7 @@ export default function Header({
 					))}
 				</nav>
 			)}
-			<p>test</p>
+			test
 			{children}
 		</header>
 	);
