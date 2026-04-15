@@ -1,6 +1,10 @@
-interface HeroBlockProps {
+export interface HeroBlockProps extends React.ComponentPropsWithRef<"div"> {
 	image?: string;
-	text: string;
-	fontSize: string;
+	title: string;
+	fontSize?: string;
 	animation?: string;
+}
+
+export default function HeroBlock() {
+	return <>Hero block</>;
 }

@@ -10,6 +10,15 @@ import {
 	SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { useDraggable } from "@dnd-kit/react";
+import { ReactElement, ReactNode } from "react";
+import Header from "./blocks/HeaderBlock";
+import HeroBlock from "./blocks/HeroBlock";
+
+interface BuildingComponents {
+	id: string;
+	component: ReactElement;
+	label: string;
+}
 
 function DraggableItem({ id, label }: { id: string; label: string }) {
 	const { ref } = useDraggable({ id });
@@ -25,9 +34,9 @@ function DraggableItem({ id, label }: { id: string; label: string }) {
 }
 
 export function AppSidebar() {
-	const components = [
-		{ id: "Hero", label: "Hero" },
-		{ id: "Header", label: "Header" },
+	const components: BuildingComponents[] = [
+		{ component: <Header />, id: "header", label: "Header" },
+		{ component: <HeroBlock />, id: "hero", label: "Hero" },
 	];
 	return (
 		<Sidebar className="border-r">
@@ -37,9 +46,11 @@ export function AppSidebar() {
 					<SidebarGroupLabel>Drag to add</SidebarGroupLabel>
 					<div className="flex flex-col gap-2 p-2">
 						{components.map((component) => (
-							<SidebarMenuItem key={component.id}>
-								<DraggableItem id={component.id} label={component.label} />
-							</SidebarMenuItem>
+							<DraggableItem
+								key={component.id}
+								id={component.id}
+								label={component.label}
+							/>
 						))}
 					</div>
 				</SidebarGroup>
