@@ -5,6 +5,7 @@ import HeroBlock, { HeroBlockProps } from "@/components/blocks/HeroBlock";
 import { Editor } from "@/components/editor/Editor";
 import Renderer from "@/components/renderer/Renderer";
 import { SidebarProvider } from "@/components/ui/sidebar";
+import { EditorContext } from "@/context/EditorContext";
 import { DragDropProvider, useDroppable } from "@dnd-kit/react";
 import { ReactNode, useState } from "react";
 
@@ -76,7 +77,6 @@ export default function Home() {
 		setItems((prev) =>
 			prev.map((item) => {
 				if (item.id !== data.id) return item;
-				console.log({ ...data.props.style });
 				const newProps = {
 					...item.props,
 					...data.props,
@@ -140,10 +140,16 @@ export default function Home() {
 					/>
 				</div>
 				<div className="flex h-screen flex-1">
-					<Editor
-						onPropsChange={(data) => updatePropsData(data)}
-						item={activeBlock}
-					/>
+					<EditorContext.Provider
+						value={{
+							item: activeBlock,
+							onPropsChange(payload) {
+								updatePropsData(payload);
+							},
+						}}
+					>
+						<Editor />
+					</EditorContext.Provider>
 				</div>
 			</SidebarProvider>
 		</DragDropProvider>
