@@ -1,6 +1,11 @@
 import Image from "next/image";
 import React from "react";
 
+interface Link {
+	label: string;
+	url: string;
+}
+
 export interface HeaderProps extends React.ComponentPropsWithRef<"header"> {
 	heightInPx?: number;
 	heightInPercentage?: number;
@@ -9,7 +14,7 @@ export interface HeaderProps extends React.ComponentPropsWithRef<"header"> {
 	blur?: boolean;
 	blurPx?: number;
 	logo?: string;
-	links?: string[];
+	links?: Link[];
 	gap?: number;
 	animation?: string;
 }
@@ -47,17 +52,9 @@ export default function Header({
 
 	return (
 		<header style={styles} {...props}>
-			{logo && <Image src={logo} alt="logo" className="h-full" />}
-			{links && (
-				<nav className="flex items-center gap-4">
-					{links.map((link, i) => (
-						<a key={i} href="#">
-							{link}
-						</a>
-					))}
-				</nav>
-			)}
-			test
+			{/* {logo && <Image src={logo} alt="logo" className="h-full" />} */}
+			{logo && <p className={`w-full ${styles.textAlign}`}>{logo}</p>}
+
 			{children}
 		</header>
 	);
