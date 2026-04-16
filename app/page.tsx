@@ -52,7 +52,7 @@ function DroppableZone({
 							selectedItem(item);
 						}}
 					>
-						<Renderer item={item} />
+						<Renderer key={item.id} item={item} />
 					</div>
 				))
 			) : (
