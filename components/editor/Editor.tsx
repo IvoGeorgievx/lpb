@@ -1,8 +1,8 @@
 import { BlockPropsMap, BlockType } from "@/app/page";
 import { useEditor } from "@/context/EditorContext";
-import { HeaderEditor } from "./HeaderEditor";
-import { HeroEditor } from "./HeroEditor";
+import { HeroEditor } from "./hero/HeroEditor";
 import { HeroBlockProps } from "../blocks/HeroBlock";
+import { HeaderEditor } from "./header/HeaderEditor";
 
 export type UpdatePayload<T extends BlockType = BlockType> = {
 	id: string;
