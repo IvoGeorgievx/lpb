@@ -1,21 +1,33 @@
-import { useEditor } from "@/context/EditorContext";
-import Image from "next/image";
-import { ChangeEvent, useState } from "react";
-import CTA1 from "../../../public/images/CTA1.webp";
-import { Input } from "@/components/ui/input";
-import { Slider } from "@/components/ui/slider";
-import { Label } from "@/components/ui/label";
 import { HeroBlockProps } from "@/components/blocks/HeroBlock";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
 	Popover,
 	PopoverContent,
-	PopoverDescription,
 	PopoverHeader,
 	PopoverTitle,
 	PopoverTrigger,
 } from "@/components/ui/popover";
-import { PaintBucket } from "lucide-react";
+import { Separator } from "@/components/ui/separator";
+import { Slider } from "@/components/ui/slider";
+import { useEditor } from "@/context/EditorContext";
+import { Italic, PaintBucket } from "lucide-react";
+import Image from "next/image";
+import { ChangeEvent, useState } from "react";
 import { HexColorPicker } from "react-colorful";
+import CTA1 from "../../../public/images/CTA1.webp";
+import {
+	Select,
+	SelectContent,
+	SelectGroup,
+	SelectItem,
+	SelectLabel,
+	SelectTrigger,
+	SelectValue,
+} from "@/components/ui/select";
+import { Toggle } from "@/components/ui/toggle";
+
+const WEIGHT_OPTIONS = [100, 200, 300, 400, 500, 600, 700];
 
 export function HeroEditorLayout() {
 	const [showPresetSettings, setShowPresetSettings] = useState<boolean>(false);
@@ -66,25 +78,27 @@ export function HeroEditorLayout() {
 			<div className="h-full mt-5">
 				{showPresetSettings && (
 					<div className="flex flex-col gap-5">
+						<div className="w-full">
+							<h1 className="text-center mb-2">Heading</h1>
+							<Input
+								placeholder="Heading"
+								onChange={(event) =>
+									onPropsChange({
+										id: item.id,
+										props: {
+											heading: event.target.value,
+										},
+									})
+								}
+							/>
+						</div>
 						<div className="w-full flex gap-2 items-center justify-center">
 							<div className="w-full">
-								<Input
-									placeholder="Heading"
-									onChange={(event) =>
-										onPropsChange({
-											id: item.id,
-											props: {
-												heading: event.target.value,
-											},
-										})
-									}
-								/>
-							</div>
-							<div className="w-full">
-								<Label>Font Size</Label>
+								<Label htmlFor="heading-font-size">Font Size</Label>
 								<Slider
+									id="heading-font-size"
 									value={[
-										(item?.props as HeroBlockProps)?.fontSizeHeading || 0,
+										(item?.props as HeroBlockProps)?.headingFontSize || 0,
 									]}
 									min={16}
 									max={60}
@@ -94,13 +108,13 @@ export function HeroEditorLayout() {
 										onPropsChange({
 											id: item.id,
 											props: {
-												fontSizeHeading: v[0],
+												headingFontSize: v[0],
 											},
 										})
 									}
 								/>
 							</div>
-							<div className="w-1/2 pl-2">
+							<div className="w-full flex justify-center items-center gap-2 pl-2">
 								<Popover>
 									<PopoverTrigger asChild>
 										<PaintBucket className="cursor-pointer transition-all duration-100 hover:-translate-y-0.5 ease-in" />
@@ -114,7 +128,7 @@ export function HeroEditorLayout() {
 													onPropsChange({
 														id: item.id,
 														props: {
-															colorHeading: value,
+															headingColor: value,
 														},
 													});
 												}}
@@ -122,27 +136,72 @@ export function HeroEditorLayout() {
 										</PopoverHeader>
 									</PopoverContent>
 								</Popover>
-							</div>
-						</div>
-						<div className="w-full flex gap-2 items-center justify-center">
-							<div className="w-full">
-								<Input
-									placeholder="Subheading"
-									onChange={(event) =>
+								<Toggle
+									pressed={
+										(item?.props as HeroBlockProps)?.headingStyle === "italic"
+									}
+									aria-label="Toggle italic"
+									variant="outline"
+									className="cursor-pointer"
+									onPressedChange={(pressed) =>
 										onPropsChange({
 											id: item.id,
 											props: {
-												subheading: event.target.value,
+												headingStyle: pressed ? "italic" : "normal",
 											},
 										})
 									}
-								/>
+								>
+									<Italic className="group-data-[state=on]/toggle:fill-foreground" />
+								</Toggle>
+								<Select
+									onValueChange={(value) =>
+										onPropsChange({
+											id: item.id,
+											props: {
+												headingWeight: Number(value),
+											},
+										})
+									}
+								>
+									<SelectTrigger className="w-full">
+										<SelectValue placeholder="Weight" />
+									</SelectTrigger>
+									<SelectContent>
+										<SelectGroup>
+											<SelectLabel>Weight</SelectLabel>
+											{WEIGHT_OPTIONS.map((weight, idx) => (
+												<SelectItem key={idx} value={weight.toString()}>
+													{weight}
+												</SelectItem>
+											))}
+										</SelectGroup>
+									</SelectContent>
+								</Select>
 							</div>
+						</div>
+						<Separator />
+						<div className="w-full">
+							<h1 className="text-center mb-2">Subheading</h1>
+							<Input
+								placeholder="Subheading"
+								onChange={(event) =>
+									onPropsChange({
+										id: item.id,
+										props: {
+											subheading: event.target.value,
+										},
+									})
+								}
+							/>
+						</div>
+						<div className="w-full flex gap-2 items-center justify-center">
 							<div className="w-full">
-								<Label>Font Size</Label>
+								<Label htmlFor="subheading-font-size">Font Size</Label>
 								<Slider
+									id="subheading-font-size"
 									value={[
-										(item?.props as HeroBlockProps)?.fontSizeSubheading || 0,
+										(item?.props as HeroBlockProps)?.subheadingFontSize || 0,
 									]}
 									className="mt-3"
 									min={16}
@@ -152,13 +211,13 @@ export function HeroEditorLayout() {
 										onPropsChange({
 											id: item.id,
 											props: {
-												fontSizeSubheading: v[0],
+												subheadingFontSize: v[0],
 											},
 										})
 									}
 								/>
 							</div>
-							<div className="w-1/2 pl-2">
+							<div className="w-full flex items-center gap-2 justify-center ">
 								<Popover>
 									<PopoverTrigger asChild>
 										<PaintBucket className="cursor-pointer transition-all duration-100 hover:-translate-y-0.5 ease-in" />
@@ -172,7 +231,7 @@ export function HeroEditorLayout() {
 													onPropsChange({
 														id: item.id,
 														props: {
-															colorSubHeading: value,
+															subheadingColor: value,
 														},
 													});
 												}}
@@ -180,6 +239,49 @@ export function HeroEditorLayout() {
 										</PopoverHeader>
 									</PopoverContent>
 								</Popover>
+								<Toggle
+									pressed={
+										(item?.props as HeroBlockProps)?.subheadingStyle ===
+										"italic"
+									}
+									aria-label="Toggle italic"
+									variant="outline"
+									className="cursor-pointer"
+									onPressedChange={(pressed) =>
+										onPropsChange({
+											id: item.id,
+											props: {
+												subheadingStyle: pressed ? "italic" : "normal",
+											},
+										})
+									}
+								>
+									<Italic className="group-data-[state=on]/toggle:fill-foreground" />
+								</Toggle>
+								<Select
+									onValueChange={(value) =>
+										onPropsChange({
+											id: item.id,
+											props: {
+												subheadingWeight: Number(value),
+											},
+										})
+									}
+								>
+									<SelectTrigger className="w-full">
+										<SelectValue placeholder="Weight" />
+									</SelectTrigger>
+									<SelectContent>
+										<SelectGroup>
+											<SelectLabel>Weight</SelectLabel>
+											{WEIGHT_OPTIONS.map((weight, idx) => (
+												<SelectItem key={idx} value={weight.toString()}>
+													{weight}
+												</SelectItem>
+											))}
+										</SelectGroup>
+									</SelectContent>
+								</Select>
 							</div>
 						</div>
 						<div className="w-full mt-5">

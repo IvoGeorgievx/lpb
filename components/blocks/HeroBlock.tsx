@@ -9,13 +9,19 @@ interface HeroBlockPresets {
 	imagePosition: ImagePosition;
 }
 
+type FontStyle = "normal" | "italic";
+
 export interface HeroBlockProps extends React.ComponentPropsWithRef<"div"> {
 	image?: string;
 	title?: string;
-	fontSizeHeading?: number;
-	colorHeading?: string;
-	fontSizeSubheading?: number;
-	colorSubHeading?: string;
+	headingFontSize?: number;
+	headingColor?: string;
+	headingWeight?: number;
+	headingStyle?: FontStyle;
+	subheadingFontSize?: number;
+	subheadingColor?: string;
+	subheadingWeight?: number;
+	subheadingStyle?: FontStyle;
 	animation?: string;
 	overlay?: number;
 	bgType?: "color" | "gradient" | "image" | "transparent";
@@ -30,10 +36,14 @@ export default function HeroBlock({
 	preset,
 	heading,
 	subheading,
-	fontSizeHeading,
-	colorHeading,
-	colorSubHeading,
-	fontSizeSubheading,
+	headingFontSize,
+	headingColor,
+	headingWeight,
+	headingStyle,
+	subheadingColor,
+	subheadingFontSize,
+	subheadingWeight,
+	subheadingStyle,
 	...props
 }: HeroBlockProps) {
 	//should render based on the layout preset
@@ -46,13 +56,31 @@ export default function HeroBlock({
 					: "none",
 				backgroundSize: "cover",
 				backgroundPosition: "center",
+				justifyContent: "center",
+				alignItems: "center",
+				display: "flex",
+				flexDirection: "column",
+				gap: 16,
 			}}
-			className=""
 		>
-			<h1 style={{ fontSize: fontSizeHeading, color: colorHeading }}>
+			<h1
+				style={{
+					fontSize: headingFontSize,
+					color: headingColor,
+					fontWeight: headingWeight,
+					fontStyle: headingStyle,
+				}}
+			>
 				{heading}
 			</h1>
-			<h2 style={{ fontSize: fontSizeSubheading, color: colorSubHeading }}>
+			<h2
+				style={{
+					fontSize: subheadingFontSize,
+					color: subheadingColor,
+					fontWeight: subheadingWeight,
+					fontStyle: subheadingStyle,
+				}}
+			>
 				{subheading}
 			</h2>
 		</div>
