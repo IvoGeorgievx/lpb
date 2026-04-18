@@ -22,6 +22,7 @@ export interface HeroBlockProps extends React.ComponentPropsWithRef<"div"> {
 	subheadingColor?: string;
 	subheadingWeight?: number;
 	subheadingStyle?: FontStyle;
+	animationEnabled?: boolean;
 	animation?: string;
 	overlay?: number;
 	bgType?: "color" | "gradient" | "image" | "transparent";
@@ -43,12 +44,14 @@ export default function HeroBlock({
 	subheadingColor,
 	subheadingFontSize,
 	subheadingWeight,
+	animationEnabled,
 	subheadingStyle,
 	...props
 }: HeroBlockProps) {
 	//should render based on the layout preset
 	return (
 		<div
+			className="animate-fade-in"
 			style={{
 				...props.style,
 				backgroundImage: props.style?.backgroundImage

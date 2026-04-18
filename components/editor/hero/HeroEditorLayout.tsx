@@ -148,6 +148,7 @@ export function HeroEditorLayout() {
 											id: item.id,
 											props: {
 												headingStyle: pressed ? "italic" : "normal",
+												animationEnabled: true,
 											},
 										})
 									}
