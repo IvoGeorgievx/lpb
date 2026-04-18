@@ -115,7 +115,14 @@ export default function Home() {
 								padding: 10,
 							},
 						},
-						hero: { title: "Hero section" },
+						hero: {
+							title: "Hero section",
+							style: {
+								height: "50vh",
+							},
+							heading: "Very cool heading",
+							subheading: "Nice",
+						},
 					};
 
 					const newItem: DroppedItem = {

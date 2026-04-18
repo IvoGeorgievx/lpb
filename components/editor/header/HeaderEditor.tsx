@@ -1,3 +1,12 @@
+import { HeaderProps } from "@/components/blocks/HeaderBlock";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Separator } from "@/components/ui/separator";
+import { Slider } from "@/components/ui/slider";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import {
 	Tooltip,
 	TooltipContent,
@@ -6,15 +15,7 @@ import {
 import { useEditor } from "@/context/EditorContext";
 import { TextAlignEnd, TextAlignJustify, TextAlignStart } from "lucide-react";
 import { HexColorPicker } from "react-colorful";
-import { HeaderProps } from "../blocks/HeaderBlock";
-import { Checkbox } from "../ui/checkbox";
-import { Field, FieldGroup, FieldLabel } from "../ui/field";
-import { Input } from "../ui/input";
-import { Label } from "../ui/label";
-import { Separator } from "../ui/separator";
-import { Slider } from "../ui/slider";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
-import { ToggleGroup, ToggleGroupItem } from "../ui/toggle-group";
+
 interface HeaderEditorProps {
 	props: HeaderProps;
 }
