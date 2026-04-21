@@ -50,42 +50,46 @@ export default function HeroBlock({
 }: HeroBlockProps) {
 	//should render based on the layout preset
 	return (
-		<div
-			className="animate-fade-in"
-			style={{
-				...props.style,
-				backgroundImage: props.style?.backgroundImage
-					? `url("${props.style.backgroundImage}")`
-					: "none",
-				backgroundSize: "cover",
-				backgroundPosition: "center",
-				justifyContent: "center",
-				alignItems: "center",
-				display: "flex",
-				flexDirection: "column",
-				gap: 16,
-			}}
-		>
-			<h1
-				style={{
-					fontSize: headingFontSize,
-					color: headingColor,
-					fontWeight: headingWeight,
-					fontStyle: headingStyle,
-				}}
-			>
-				{heading}
-			</h1>
-			<h2
-				style={{
-					fontSize: subheadingFontSize,
-					color: subheadingColor,
-					fontWeight: subheadingWeight,
-					fontStyle: subheadingStyle,
-				}}
-			>
-				{subheading}
-			</h2>
+		<div>
+			{preset?.layout === "center" && (
+				<div
+					className="animate-fade-in"
+					style={{
+						...props.style,
+						backgroundImage: props.style?.backgroundImage
+							? `url("${props.style.backgroundImage}")`
+							: "none",
+						backgroundSize: "cover",
+						backgroundPosition: "center",
+						justifyContent: "center",
+						alignItems: "center",
+						display: "flex",
+						flexDirection: "column",
+						gap: 16,
+					}}
+				>
+					<h1
+						style={{
+							fontSize: headingFontSize,
+							color: headingColor,
+							fontWeight: headingWeight,
+							fontStyle: headingStyle,
+						}}
+					>
+						{heading}
+					</h1>
+					<h2
+						style={{
+							fontSize: subheadingFontSize,
+							color: subheadingColor,
+							fontWeight: subheadingWeight,
+							fontStyle: subheadingStyle,
+						}}
+					>
+						{subheading}
+					</h2>
+				</div>
+			)}
 		</div>
 	);
 }
