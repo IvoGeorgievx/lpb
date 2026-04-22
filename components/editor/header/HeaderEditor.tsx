@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/tooltip";
 import { useEditor } from "@/context/EditorContext";
 import { TextAlignEnd, TextAlignJustify, TextAlignStart } from "lucide-react";
-import { HexColorPicker } from "react-colorful";
+import ColorPicker from "react-best-gradient-color-picker";
 
 interface HeaderEditorProps {
 	props: HeaderProps;
@@ -200,8 +200,8 @@ export function HeaderEditor({ props }: HeaderEditorProps) {
 				<TabsContent value="appearance" className="pt-4">
 					<div className="text-sm text-muted-foreground">
 						<div>
-							<HexColorPicker
-								color={props.style?.backgroundColor || "#ffffff"}
+							<ColorPicker
+								value={props.style?.backgroundColor || "#ffffff"}
 								onChange={(value) =>
 									onPropsChange({
 										id: item.id,
