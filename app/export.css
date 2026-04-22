@@ -34,3 +34,17 @@
 .animate-fade-in {
 	animation: fadeIn 0.8s ease-out forwards;
 }
+
+.animate-slide-in-right {
+	animation: slideInRight 0.8s ease-out forwards;
+}
+.animate-slide-in-left {
+	animation: slideInLeft 0.8s ease-out forwards;
+}
+
+.hero-preset-flex {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	gap: 1rem;
+}
