@@ -8,8 +8,23 @@ interface HeroBlockPresets {
 	showImage: boolean;
 	imagePosition: ImagePosition;
 }
-type HeadingAnimation = "fade-in" | "slide-right" | "slide-left";
+type GenericAnimation = "fade-in" | "slide-right" | "slide-left";
 type FontStyle = "normal" | "italic";
+
+type CtaOptions = {
+	bgColor?: string;
+	paddingX?: number;
+	paddingY?: number;
+	animation?: GenericAnimation;
+	text?: string;
+	border?: boolean;
+	radius?: number;
+	fontSize?: number;
+	boxShadow?: {
+		shadowBlur?: number;
+		shadowIntensity?: number;
+	};
+};
 
 export interface HeroBlockProps extends React.ComponentPropsWithRef<"div"> {
 	image?: string;
@@ -18,12 +33,12 @@ export interface HeroBlockProps extends React.ComponentPropsWithRef<"div"> {
 	headingColor?: string;
 	headingWeight?: number;
 	headingStyle?: FontStyle;
-	headingAnimation?: HeadingAnimation;
+	headingAnimation?: GenericAnimation;
 	subheadingFontSize?: number;
 	subheadingColor?: string;
 	subheadingWeight?: number;
 	subheadingStyle?: FontStyle;
-	subHeadingAnimation?: HeadingAnimation;
+	subHeadingAnimation?: GenericAnimation;
 	animationEnabled?: boolean;
 	animation?: string;
 	overlay?: number;
@@ -31,7 +46,7 @@ export interface HeroBlockProps extends React.ComponentPropsWithRef<"div"> {
 	preset?: HeroBlockPresets;
 	heading?: string;
 	subheading?: string;
-	cta?: string;
+	cta?: CtaOptions;
 	flexReverse?: boolean;
 	overlayStrength?: number;
 	shadowBlur?: number;
@@ -56,11 +71,18 @@ export default function HeroBlock({
 	subheadingColor,
 	subheadingFontSize,
 	subheadingWeight,
-	flexReverse,
+	flexReverse = false,
 	shadowBlur,
 	shadowIntensity,
 	overlayStrength,
 	subheadingStyle,
+	cta = {
+		text: "CTA Button",
+		paddingX: 12,
+		paddingY: 8,
+		border: false,
+		fontSize: 16,
+	},
 	...props
 }: HeroBlockProps) {
 	const animationMap = {
@@ -68,19 +90,36 @@ export default function HeroBlock({
 		"slide-left": "animate-slide-in-left",
 		"slide-right": "animate-slide-in-right",
 	};
+
+	const getCtaButton = () => {
+		return (
+			<button
+				style={{
+					cursor: "pointer",
+					background: cta.bgColor,
+					paddingInline: cta.paddingX,
+					paddingBlock: cta.paddingY,
+					border: cta.border ? "1px solid" : "",
+					borderRadius: cta.radius,
+					fontSize: cta.fontSize,
+					boxShadow: `inset 0 0 ${cta.boxShadow?.shadowBlur}px rgba(0,0,0,${cta.boxShadow?.shadowIntensity})`,
+				}}
+				className={(cta?.animation && animationMap[cta.animation]) || ""}
+			>
+				{cta.text}
+			</button>
+		);
+	};
+
 	return (
 		<div>
 			{preset?.layout === "center" && (
 				<div
-					// className="animate-fade-in"
 					style={{
 						...props.style,
 						backgroundImage: props.style?.backgroundImage
-							? `url("${props.style.backgroundImage}")`
+							? `linear-gradient(rgba(0,0,0,${overlayStrength || 0}), rgba(0,0,0,${overlayStrength || 0})), url("${props.style.backgroundImage}")`
 							: "none",
-						// backgroundImage: props.style?.backgroundImage
-						// 	? `linear-gradient(rgba(0,0,0,${overlayStrength}), rgba(0,0,0,${overlayStrength})), url("${props.style.backgroundImage}")`
-						// 	: "none",
 						backgroundSize: "cover",
 						backgroundPosition: "center",
 						justifyContent: "center",
@@ -117,6 +156,7 @@ export default function HeroBlock({
 					>
 						{subheading}
 					</h2>
+					{getCtaButton()}
 				</div>
 			)}
 			{preset?.layout === "flex" && (
@@ -164,8 +204,20 @@ export default function HeroBlock({
 						>
 							{subheading}
 						</h2>
+						{getCtaButton()}
 					</div>
-					<div style={{ flex: "1 1 50%" }}>Test</div>
+					<div
+						style={{
+							flex: "1 1 50%",
+							flexDirection: "column",
+							gap: 16,
+							display: "flex",
+							justifyContent: "center",
+							alignItems: "center",
+						}}
+					>
+						Test
+					</div>
 				</div>
 			)}
 		</div>

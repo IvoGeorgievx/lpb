@@ -8,6 +8,7 @@ import { SidebarProvider } from "@/components/ui/sidebar";
 import { EditorContext } from "@/context/EditorContext";
 import { DragDropProvider, useDroppable } from "@dnd-kit/react";
 import { ReactNode, useState } from "react";
+import { exportToHTML } from "@/lib/export";
 
 export type BlockType = "header" | "hero";
 export type BlockPropsMap = {
@@ -23,7 +24,9 @@ export type DroppedItem<T extends BlockType = BlockType> = {
 
 type UpdatePayload = { id: string } & Pick<DroppedItem, "props">;
 
-export const COMPONENT_MAP = {
+import { ComponentType } from "react";
+
+export const COMPONENT_MAP: Record<BlockType, ComponentType> = {
 	header: Header,
 	hero: HeroBlock,
 };
@@ -31,10 +34,12 @@ function DroppableZone({
 	items,
 	children,
 	selectedItem,
+	selectedBlock,
 }: {
 	items: DroppedItem[];
 	selectedItem: (item: DroppedItem) => void;
 	children?: ReactNode;
+	selectedBlock?: DroppedItem;
 }) {
 	const { ref } = useDroppable({ id: "droppable" });
 
@@ -46,13 +51,15 @@ function DroppableZone({
 			{items.length > 0 ? (
 				items.map((item) => (
 					<div
-						className="cursor-pointer w-full"
 						key={item.id}
-						onClick={() => {
-							selectedItem(item);
-						}}
+						className={`w-full cursor-pointer transition ${
+							selectedBlock?.id === item.id
+								? "border-2 border-blue-500"
+								: "border border-transparent"
+						}`}
+						onClick={() => selectedItem(item)}
 					>
-						<Renderer key={item.id} item={item} />
+						<Renderer item={item} />
 					</div>
 				))
 			) : (
@@ -144,9 +151,11 @@ export default function Home() {
 					<DroppableZone
 						selectedItem={(item) => setSelectedBlock(item)}
 						items={items}
+						selectedBlock={selectedBlock}
 					/>
 				</div>
-				<div className="flex h-screen flex-1">
+				<div className="flex h-screen flex-1 overflow-x-hidden">
+					<button onClick={() => exportToHTML(items)}>Export</button>
 					<EditorContext.Provider
 						value={{
 							item: activeBlock,
