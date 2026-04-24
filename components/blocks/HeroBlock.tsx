@@ -77,7 +77,7 @@ export default function HeroBlock({
 	overlayStrength,
 	subheadingStyle,
 	cta = {
-		text: "CTA Button",
+		// text: "CTA Button",
 		paddingX: 12,
 		paddingY: 8,
 		border: false,
@@ -164,7 +164,7 @@ export default function HeroBlock({
 					style={{
 						...props.style,
 						padding: 16,
-						flexDirection: flexReverse ? "row-reverse" : "row",
+						// flexDirection: flexReverse ? "row-reverse" : "row",
 					}}
 					className="hero-preset-flex"
 				>

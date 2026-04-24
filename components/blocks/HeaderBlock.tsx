@@ -6,7 +6,7 @@ interface Link {
 	url: string;
 }
 
-export interface HeaderProps extends React.ComponentPropsWithRef<"header"> {
+export interface HeaderBlockProps extends React.ComponentPropsWithRef<"header"> {
 	heightInPx?: number;
 	heightInPercentage?: number;
 	sticky?: boolean;
@@ -32,7 +32,7 @@ export default function Header({
 	children,
 	style,
 	...props
-}: HeaderProps) {
+}: HeaderBlockProps) {
 	const styles: React.CSSProperties = {
 		height: heightInPx
 			? `${heightInPx}px`

@@ -1,4 +1,4 @@
-import { HeaderProps } from "@/components/blocks/HeaderBlock";
+import { HeaderBlockProps } from "@/components/blocks/HeaderBlock";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
@@ -17,7 +17,7 @@ import { TextAlignEnd, TextAlignJustify, TextAlignStart } from "lucide-react";
 import ColorPicker from "react-best-gradient-color-picker";
 
 interface HeaderEditorProps {
-	props: HeaderProps;
+	props: HeaderBlockProps;
 }
 
 export function HeaderEditor({ props }: HeaderEditorProps) {

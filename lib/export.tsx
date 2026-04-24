@@ -4,7 +4,6 @@ import { COMPONENT_MAP } from "@/app/page";
 import { exportCss } from "./exportCss";
 
 export const exportToHTML = (items: DroppedItem[]) => {
-	console.log(exportCss);
 	const htmlContent = items
 		.map((item) => {
 			const Component = COMPONENT_MAP[item.type];

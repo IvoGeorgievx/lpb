@@ -1,6 +1,6 @@
 "use client";
 import { AppSidebar } from "@/components/app-sidebar";
-import Header, { HeaderProps } from "@/components/blocks/HeaderBlock";
+import Header, { HeaderBlockProps } from "@/components/blocks/HeaderBlock";
 import HeroBlock, { HeroBlockProps } from "@/components/blocks/HeroBlock";
 import { Editor } from "@/components/editor/Editor";
 import Renderer from "@/components/renderer/Renderer";
@@ -8,12 +8,12 @@ import { SidebarProvider } from "@/components/ui/sidebar";
 import { EditorContext } from "@/context/EditorContext";
 import { DragDropProvider, useDroppable } from "@dnd-kit/react";
 import { ReactNode, useState } from "react";
-import { exportToHTML } from "@/lib/export";
 
-export type BlockType = "header" | "hero";
+export type BlockType = "header" | "hero" | "product";
 export type BlockPropsMap = {
-	header: HeaderProps;
+	header: HeaderBlockProps;
 	hero: HeroBlockProps;
+	product: ProductBlockProps;
 };
 export type DroppedItem<T extends BlockType = BlockType> = {
 	id: string;
@@ -24,11 +24,15 @@ export type DroppedItem<T extends BlockType = BlockType> = {
 
 type UpdatePayload = { id: string } & Pick<DroppedItem, "props">;
 
+import ProductBlock, {
+	ProductBlockProps,
+} from "@/components/blocks/ProductBlock";
 import { ComponentType } from "react";
 
 export const COMPONENT_MAP: Record<BlockType, ComponentType> = {
 	header: Header,
 	hero: HeroBlock,
+	product: ProductBlock,
 };
 function DroppableZone({
 	items,
@@ -130,6 +134,9 @@ export default function Home() {
 							heading: "Very cool heading",
 							subheading: "Nice",
 						},
+						product: {
+							background: "#ffffff",
+						},
 					};
 
 					const newItem: DroppedItem = {
@@ -155,7 +162,7 @@ export default function Home() {
 					/>
 				</div>
 				<div className="flex h-screen flex-1 overflow-x-hidden">
-					<button onClick={() => exportToHTML(items)}>Export</button>
+					{/* <button onClick={() => exportToHTML(items)}>Export</button> */}
 					<EditorContext.Provider
 						value={{
 							item: activeBlock,

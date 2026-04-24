@@ -4,7 +4,6 @@ import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Slider } from "@/components/ui/slider";
 import { useEditor } from "@/context/EditorContext";
-import { motion } from "framer-motion";
 import { ChangeEvent, useRef } from "react";
 
 export const HeroEditorCenterPreset = () => {
@@ -24,17 +23,7 @@ export const HeroEditorCenterPreset = () => {
 		});
 	};
 	return (
-		<motion.div
-			key="settings-panel"
-			initial={{ opacity: 0, y: 20, scale: 0.95 }}
-			animate={{ opacity: 1, y: 0, scale: 1 }}
-			exit={{ opacity: 0, y: 10, scale: 0.95 }}
-			transition={{
-				duration: 0.2,
-				ease: [0.16, 1, 0.3, 1],
-			}}
-			className="flex flex-col gap-5"
-		>
+		<div className="flex flex-col gap-5">
 			<div className="w-full mt-5">
 				<div className="p-4 rounded-lg border bg-white shadow-sm">
 					<Label htmlFor="upload-div">Background Image</Label>
@@ -116,6 +105,6 @@ export const HeroEditorCenterPreset = () => {
 			</div>
 
 			<Separator />
-		</motion.div>
+		</div>
 	);
 };

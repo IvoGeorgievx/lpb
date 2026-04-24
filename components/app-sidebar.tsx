@@ -7,12 +7,12 @@ import {
 	SidebarGroup,
 	SidebarGroupLabel,
 	SidebarHeader,
-	SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { useDraggable } from "@dnd-kit/react";
-import { ReactElement, ReactNode } from "react";
+import { ReactElement } from "react";
 import Header from "./blocks/HeaderBlock";
 import HeroBlock from "./blocks/HeroBlock";
+import ProductBlock from "./blocks/ProductBlock";
 
 interface BuildingComponents {
 	id: string;
@@ -37,6 +37,7 @@ export function AppSidebar() {
 	const components: BuildingComponents[] = [
 		{ component: <Header />, id: "header", label: "Header" },
 		{ component: <HeroBlock />, id: "hero", label: "Hero" },
+		{ component: <ProductBlock />, id: "product", label: "Product" },
 	];
 	return (
 		<Sidebar className="border-r">

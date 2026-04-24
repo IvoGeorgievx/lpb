@@ -48,3 +48,9 @@
 	align-items: center;
 	gap: 1rem;
 }
+
+@media (max-width: 768px) {
+	.hero-preset-flex {
+		flex-direction: column;
+	}
+}
