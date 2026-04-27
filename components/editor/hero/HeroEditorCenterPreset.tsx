@@ -13,7 +13,6 @@ export const HeroEditorCenterPreset = () => {
 
 	const handleFileUpload = (event: ChangeEvent<HTMLInputElement>) => {
 		const file = event.target.files?.[0];
-		console.log(file);
 		if (!file) return;
 		const tempUrl = URL.createObjectURL(file);
 

@@ -5,31 +5,71 @@ interface TextConfig {
 	color?: string;
 }
 
-interface Card {
+export interface ProductCard {
+	id: string;
 	icon?: string;
 	heading?: TextConfig;
 	subheading?: TextConfig;
+	additionalContent?: TextConfig[];
 	border?: boolean;
 	borderRadius?: number;
-	//animations
+	className?: string;
+	style?: React.CSSProperties;
 }
 
 export interface ProductBlockProps extends React.ComponentPropsWithRef<"section"> {
-	cardCount?: number;
-	card?: Card;
+	cards?: ProductCard[];
 	background?: string;
 }
 
 export default function ProductBlock({
 	background,
+	cards,
 	...props
 }: ProductBlockProps) {
+	console.log(cards);
 	return (
-		<div
+		<section
+			className="product-block"
 			style={{
 				background,
-				height: "50vh",
+				minHeight: "20vh",
 			}}
-		></div>
+		>
+			{cards?.map((card) => (
+				<div
+					key={card.id}
+					className={`product-card ${card.className || ""}`}
+					style={card.style}
+				>
+					{card.heading && (
+						<h3 className="product-card-heading">{card.heading.content}</h3>
+					)}
+
+					{card.subheading && (
+						<p className="product-card-subheading">{card.subheading.content}</p>
+					)}
+					{card.additionalContent &&
+						card.additionalContent.map((contentPiece, idx) => {
+							const { content, color, fontSize, fontWeight } = contentPiece;
+							return (
+								<div className="product-card-additional" key={idx}>
+									<p
+										style={{
+											fontSize,
+											fontWeight,
+											color,
+											textAlign: "center",
+										}}
+									>
+										{content}
+									</p>
+									<hr className="separator" />
+								</div>
+							);
+						})}
+				</div>
+			))}
+		</section>
 	);
 }

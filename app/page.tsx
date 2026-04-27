@@ -136,6 +136,35 @@ export default function Home() {
 						},
 						product: {
 							background: "#ffffff",
+							cards: [
+								{
+									id: String(Date.now()),
+									heading: {
+										content: "Pro Flow Subscription",
+									},
+									subheading: {
+										content: "Price: $29/mo",
+									},
+									style: {
+										background: "#ffffff",
+									},
+									additionalContent: [
+										{
+											content:
+												"Description: Get unlimited access to our entire library of creative assets and templates.",
+											fontSize: 15,
+										},
+										{
+											content: "Best Value",
+											fontSize: 15,
+										},
+										{
+											content: "Get Started",
+											fontSize: 15,
+										},
+									],
+								},
+							],
 						},
 					};
 
