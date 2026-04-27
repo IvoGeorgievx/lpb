@@ -1,6 +1,6 @@
 "use client";
 import { AppSidebar } from "@/components/app-sidebar";
-import Header, { HeaderProps } from "@/components/blocks/HeaderBlock";
+import Header, { HeaderBlockProps } from "@/components/blocks/HeaderBlock";
 import HeroBlock, { HeroBlockProps } from "@/components/blocks/HeroBlock";
 import { Editor } from "@/components/editor/Editor";
 import Renderer from "@/components/renderer/Renderer";
@@ -9,10 +9,11 @@ import { EditorContext } from "@/context/EditorContext";
 import { DragDropProvider, useDroppable } from "@dnd-kit/react";
 import { ReactNode, useState } from "react";
 
-export type BlockType = "header" | "hero";
+export type BlockType = "header" | "hero" | "product";
 export type BlockPropsMap = {
-	header: HeaderProps;
+	header: HeaderBlockProps;
 	hero: HeroBlockProps;
+	product: ProductBlockProps;
 };
 export type DroppedItem<T extends BlockType = BlockType> = {
 	id: string;
@@ -23,18 +24,26 @@ export type DroppedItem<T extends BlockType = BlockType> = {
 
 type UpdatePayload = { id: string } & Pick<DroppedItem, "props">;
 
-export const COMPONENT_MAP = {
+import ProductBlock, {
+	ProductBlockProps,
+} from "@/components/blocks/ProductBlock";
+import { ComponentType } from "react";
+
+export const COMPONENT_MAP: Record<BlockType, ComponentType> = {
 	header: Header,
 	hero: HeroBlock,
+	product: ProductBlock,
 };
 function DroppableZone({
 	items,
 	children,
 	selectedItem,
+	selectedBlock,
 }: {
 	items: DroppedItem[];
 	selectedItem: (item: DroppedItem) => void;
 	children?: ReactNode;
+	selectedBlock?: DroppedItem;
 }) {
 	const { ref } = useDroppable({ id: "droppable" });
 
@@ -46,13 +55,15 @@ function DroppableZone({
 			{items.length > 0 ? (
 				items.map((item) => (
 					<div
-						className="cursor-pointer w-full"
 						key={item.id}
-						onClick={() => {
-							selectedItem(item);
-						}}
+						className={`w-full cursor-pointer transition ${
+							selectedBlock?.id === item.id
+								? "border-2 border-blue-500"
+								: "border border-transparent"
+						}`}
+						onClick={() => selectedItem(item)}
 					>
-						<Renderer key={item.id} item={item} />
+						<Renderer item={item} />
 					</div>
 				))
 			) : (
@@ -123,6 +134,38 @@ export default function Home() {
 							heading: "Very cool heading",
 							subheading: "Nice",
 						},
+						product: {
+							background: "#ffffff",
+							cards: [
+								{
+									id: String(Date.now()),
+									heading: {
+										content: "Pro Flow Subscription",
+									},
+									subheading: {
+										content: "Price: $29/mo",
+									},
+									style: {
+										background: "#ffffff",
+									},
+									additionalContent: [
+										{
+											content:
+												"Description: Get unlimited access to our entire library of creative assets and templates.",
+											fontSize: 15,
+										},
+										{
+											content: "Best Value",
+											fontSize: 15,
+										},
+										{
+											content: "Get Started",
+											fontSize: 15,
+										},
+									],
+								},
+							],
+						},
 					};
 
 					const newItem: DroppedItem = {
@@ -144,9 +187,11 @@ export default function Home() {
 					<DroppableZone
 						selectedItem={(item) => setSelectedBlock(item)}
 						items={items}
+						selectedBlock={selectedBlock}
 					/>
 				</div>
-				<div className="flex h-screen flex-1">
+				<div className="flex h-screen flex-1 overflow-x-hidden">
+					{/* <button onClick={() => exportToHTML(items)}>Export</button> */}
 					<EditorContext.Provider
 						value={{
 							item: activeBlock,

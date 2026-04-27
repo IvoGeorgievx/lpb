@@ -1,8 +1,9 @@
+import { HeroBlockProps } from "@/components/blocks/HeroBlock";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
+import { Slider } from "@/components/ui/slider";
 import { useEditor } from "@/context/EditorContext";
-import { motion } from "framer-motion";
 import { ChangeEvent, useRef } from "react";
 
 export const HeroEditorCenterPreset = () => {
@@ -12,7 +13,6 @@ export const HeroEditorCenterPreset = () => {
 
 	const handleFileUpload = (event: ChangeEvent<HTMLInputElement>) => {
 		const file = event.target.files?.[0];
-		console.log(file);
 		if (!file) return;
 		const tempUrl = URL.createObjectURL(file);
 
@@ -22,22 +22,13 @@ export const HeroEditorCenterPreset = () => {
 		});
 	};
 	return (
-		<motion.div
-			key="settings-panel"
-			initial={{ opacity: 0, y: 20, scale: 0.95 }}
-			animate={{ opacity: 1, y: 0, scale: 1 }}
-			exit={{ opacity: 0, y: 10, scale: 0.95 }}
-			transition={{
-				duration: 0.2,
-				ease: [0.16, 1, 0.3, 1],
-			}}
-			className="flex flex-col gap-5"
-		>
+		<div className="flex flex-col gap-5">
 			<div className="w-full mt-5">
 				<div className="p-4 rounded-lg border bg-white shadow-sm">
-					<Label>Background Image</Label>
+					<Label htmlFor="upload-div">Background Image</Label>
 
 					<div
+						id="upload-div"
 						className="mt-2 border-2 border-dashed rounded-lg p-6 text-center text-gray-400 cursor-pointer hover:bg-gray-100"
 						onClick={() => fileUploadRef.current?.click()}
 					>
@@ -53,7 +44,66 @@ export const HeroEditorCenterPreset = () => {
 					/>
 				</div>
 			</div>
+			<Label htmlFor="overlay-slider">Overlay</Label>
+			<Slider
+				id="overlay-slider"
+				value={[(item?.props as HeroBlockProps)?.overlayStrength || 0]}
+				min={0}
+				max={1}
+				step={0.05}
+				onValueChange={(v) =>
+					onPropsChange({
+						id: item.id,
+						props: {
+							overlayStrength: v[0],
+						},
+					})
+				}
+			/>
+			<div className="w-full flex gap-4">
+				<div className="w-full">
+					<Label htmlFor="shadow-intensity-slider" className="mb-4">
+						Shadow Intensity
+					</Label>
+					<Slider
+						id="shadow-intensity-slider"
+						value={[(item?.props as HeroBlockProps)?.shadowIntensity || 0]}
+						min={0}
+						max={1}
+						step={0.05}
+						onValueChange={(v) =>
+							onPropsChange({
+								id: item.id,
+								props: {
+									shadowIntensity: v[0],
+								},
+							})
+						}
+					/>
+				</div>
+				<div className="w-full">
+					<Label htmlFor="shadow-blur-slider" className="mb-4">
+						Shadow Blur
+					</Label>
+					<Slider
+						id="shadow-blur-slider"
+						value={[(item?.props as HeroBlockProps)?.shadowBlur || 0]}
+						min={0}
+						max={100}
+						step={1}
+						onValueChange={(v) =>
+							onPropsChange({
+								id: item.id,
+								props: {
+									shadowBlur: v[0],
+								},
+							})
+						}
+					/>
+				</div>
+			</div>
+
 			<Separator />
-		</motion.div>
+		</div>
 	);
 };

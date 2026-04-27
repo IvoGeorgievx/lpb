@@ -1,0 +1,52 @@
+export const exportCss = `
+@keyframes fadeIn {
+	from {
+		opacity: 0;
+		transform: translateY(20px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+@keyframes slideInLeft {
+	from {
+		opacity: 0;
+		transform: translateX(-20px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+@keyframes slideInRight {
+	from {
+		opacity: 0;
+		transform: translateX(20px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+.animate-fade-in {
+	animation: fadeIn 0.8s ease-out forwards;
+}
+
+.animate-slide-in-right {
+	animation: slideInRight 0.8s ease-out forwards;
+}
+.animate-slide-in-left {
+	animation: slideInLeft 0.8s ease-out forwards;
+}
+
+.hero-preset-flex {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	gap: 1rem;
+}
+`;
