@@ -5,28 +5,18 @@ import {
 	TextConfig,
 } from "@/components/blocks/ProductBlock";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
 	Popover,
 	PopoverContent,
 	PopoverTrigger,
 } from "@/components/ui/popover";
+import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useEditor } from "@/context/EditorContext";
 import { ChangeEvent, useCallback, useRef, useState } from "react";
 import ColorPicker from "react-best-gradient-color-picker";
-import ProductCardEditor from "./ProductCardEditor";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Separator } from "@/components/ui/separator";
-import {
-	Select,
-	SelectContent,
-	SelectGroup,
-	SelectItem,
-	SelectLabel,
-	SelectTrigger,
-	SelectValue,
-} from "@/components/ui/select";
 interface ProductEditorProps {
 	props: ProductBlockProps;
 }
@@ -255,90 +245,237 @@ export function ProductEditor({ props }: ProductEditorProps) {
 								</Button>
 							) : null}
 						</div>
-						<div className="flex gap-2 w-full flex-wrap">
+						<div className="grid grid-cols-2 gap-3 md:grid-cols-3 mt-2">
 							{cards &&
-								cards.map((card) => (
-									<ProductCardEditor
-										key={card.id}
-										card={card}
-										onSelect={handleCardSelection}
-									/>
-								))}
-						</div>
-					</div>
-					{selectedCard && (
-						<div className="p-2 rounded-md border flex flex-col gap-2">
-							<div className="flex flex-col gap-2 items-center">
-								<Label htmlFor="card-variant">Variant</Label>
-								<Select
-									onValueChange={(value: ProductCardVariants) =>
-										handleCardVariantChange(value)
-									}
-								>
-									<SelectTrigger className="w-full">
-										<SelectValue placeholder="Variant" />
-									</SelectTrigger>
-									<SelectContent id="card-variant">
-										<SelectGroup>
-											<SelectLabel>Variant</SelectLabel>
-											{VARIANTS.map((variant, idx) => (
-												<SelectItem key={idx} value={variant.toString()}>
-													{variant}
-												</SelectItem>
-											))}
-										</SelectGroup>
-									</SelectContent>
-								</Select>
-							</div>
-							<div className="flex gap-2 justify-center items-center">
-								<div className="w-full flex flex-col gap-2 items-center">
-									<Label htmlFor="card-heading">Heading</Label>
-									<Input
-										id="card-heading"
-										placeholder="Card Heading"
-										value={
-											(item.props as ProductBlockProps).cards?.find(
-												(card) => card.id === selectedCard?.id,
-											)?.heading?.content ?? ""
-										}
-										onChange={(e) => handleHeadingChange(e, "heading")}
-									/>
-								</div>
-								<div className="w-full flex flex-col gap-2 items-center mb-2">
-									<Label htmlFor="card-subheading">Subheading</Label>
-									<Input
-										id="card-subheading"
-										placeholder="Card Subheading"
-										value={
-											(item.props as ProductBlockProps)?.cards?.find(
-												(card) => card.id === selectedCard.id,
-											)?.subheading?.content ?? ""
-										}
-										onChange={(e) => handleHeadingChange(e, "subheading")}
-									/>
-								</div>
-							</div>
-							<Separator />
-							<div className="flex flex-col mt-2 gap-2 justify-center items-center">
-								<div className="flex gap-2 justify-between w-full">
-									<Button variant="outline" onClick={addContent}>
-										Add More Content
-									</Button>
-									<Button variant="outline" onClick={removeContent}>
-										Remove Content
-									</Button>
-								</div>
-								{selectedCard?.additionalContent?.map((additionalItem, idx) => {
+								cards.map((card) => {
+									const isSelected = selectedCardId === card.id;
+
 									return (
-										<div key={idx} className="flex w-full gap-2">
-											<Input
-												className="w-full"
-												value={additionalItem.content}
-												onChange={(e) => handleAdditionalContent(e, idx)}
-											/>
+										<div
+											key={card.id}
+											onClick={() => handleCardSelection(card)}
+											className={`
+            rounded-2xl border p-4 text-left transition-all duration-200
+            hover:translate-y-0.5 cursor-pointer
+            ${
+							isSelected
+								? "border-primary bg-primary/10 shadow-md"
+								: "border-border/50 bg-muted/20 hover:border-primary/30"
+						}
+          `}
+										>
+											<div className="space-y-2">
+												<div className="flex items-center justify-between">
+													<h4 className="font-medium line-clamp-1">
+														{card.heading?.content || "Untitled"}
+													</h4>
+
+													{card.variant && (
+														<span className="text-[10px] uppercase tracking-wide text-muted-foreground">
+															{card.variant}
+														</span>
+													)}
+												</div>
+
+												<p className="text-xs text-muted-foreground line-clamp-2">
+													{card.subheading?.content || "No subheading"}
+												</p>
+											</div>
 										</div>
 									);
 								})}
+						</div>
+					</div>
+					{selectedCard && (
+						<div className="rounded-2xl border border-border/40 bg-muted/30 p-5 space-y-6">
+							<div className="flex items-center justify-between">
+								<div>
+									<h3 className="text-lg font-semibold tracking-tight">
+										Edit Card
+									</h3>
+
+									<p className="text-sm text-muted-foreground">
+										Customize content and appearance.
+									</p>
+								</div>
+
+								<div className="rounded-full border border-primary/20 bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
+									{selectedCard.variant || "default"}
+								</div>
+							</div>
+
+							<div className="space-y-3">
+								<Label>Variant</Label>
+
+								<div className="grid grid-cols-2 gap-3">
+									{VARIANTS.map((variant) => {
+										const isActive = selectedCard.variant === variant;
+
+										return (
+											<div
+												key={variant}
+												onClick={() =>
+													handleCardVariantChange(
+														variant as ProductCardVariants,
+													)
+												}
+												className={`
+								rounded-2xl border p-4 text-left transition-all duration-200
+								hover:scale-[1.02]
+								hover:border-primary/40
+								${
+									isActive
+										? "border-primary bg-primary/10 shadow-sm"
+										: "border-border/50 bg-background/40"
+								}
+							`}
+											>
+												<div className="flex flex-col gap-2">
+													<div className="flex items-center justify-between">
+														<span className="text-sm font-medium capitalize">
+															{variant}
+														</span>
+
+														{isActive && (
+															<div className="h-2 w-2 rounded-full bg-primary" />
+														)}
+													</div>
+
+													<div
+														className={`
+										h-14 overflow-hidden rounded-xl border
+										${
+											variant === "glass"
+												? "border-white/10 bg-white/5 backdrop-blur-md"
+												: variant === "outlined"
+													? "border-white/20 bg-transparent"
+													: variant === "ghost"
+														? "border-transparent bg-transparent"
+														: variant === "featured"
+															? "border-primary/30 bg-primary/20"
+															: "bg-muted"
+										}
+									`}
+													>
+														<div className="flex flex-col gap-1 p-2">
+															<div className="h-2 w-16 rounded bg-white/40" />
+															<div className="h-2 w-10 rounded bg-white/20" />
+														</div>
+													</div>
+												</div>
+											</div>
+										);
+									})}
+								</div>
+							</div>
+
+							<Separator />
+
+							<div className="space-y-4">
+								<div>
+									<h4 className="text-sm font-medium">Content</h4>
+
+									<p className="mt-1 text-xs text-muted-foreground">
+										Edit the primary card copy.
+									</p>
+								</div>
+
+								<div className="grid gap-4 md:grid-cols-2">
+									<div className="space-y-2">
+										<Label htmlFor="card-heading">Heading</Label>
+
+										<Input
+											id="card-heading"
+											placeholder="Card Heading"
+											className="h-11 rounded-xl"
+											value={
+												(item.props as ProductBlockProps).cards?.find(
+													(card) => card.id === selectedCard?.id,
+												)?.heading?.content ?? ""
+											}
+											onChange={(e) => handleHeadingChange(e, "heading")}
+										/>
+									</div>
+
+									<div className="space-y-2">
+										<Label htmlFor="card-subheading">Subheading</Label>
+
+										<Input
+											id="card-subheading"
+											placeholder="Card Subheading"
+											className="h-11 rounded-xl"
+											value={
+												(item.props as ProductBlockProps)?.cards?.find(
+													(card) => card.id === selectedCard.id,
+												)?.subheading?.content ?? ""
+											}
+											onChange={(e) => handleHeadingChange(e, "subheading")}
+										/>
+									</div>
+								</div>
+							</div>
+
+							<Separator />
+
+							<div className="space-y-4">
+								<div className="flex items-start justify-between gap-4">
+									<div>
+										<h4 className="text-sm font-medium">Additional Content</h4>
+
+										<p className="mt-1 text-xs text-muted-foreground">
+											Add supporting text, features or metadata.
+										</p>
+									</div>
+
+									<div className="flex gap-2">
+										<Button
+											variant="secondary"
+											size="sm"
+											onClick={addContent}
+											className="rounded-xl"
+										>
+											Add
+										</Button>
+
+										<Button
+											variant="outline"
+											size="sm"
+											onClick={removeContent}
+											className="rounded-xl"
+										>
+											Remove
+										</Button>
+									</div>
+								</div>
+
+								{selectedCard.additionalContent?.length ? (
+									<div className="space-y-3">
+										{selectedCard.additionalContent.map(
+											(additionalItem, idx) => (
+												<div
+													key={idx}
+													className="rounded-xl border border-border/40 bg-background/40 p-3"
+												>
+													<div className="flex items-center gap-3">
+														<div className="h-2 w-2 rounded-full bg-primary" />
+
+														<Input
+															value={additionalItem.content}
+															onChange={(e) => handleAdditionalContent(e, idx)}
+															className="border-none shadow-none focus-visible:ring-0"
+														/>
+													</div>
+												</div>
+											),
+										)}
+									</div>
+								) : (
+									<div className="rounded-xl border border-dashed border-border/60 p-6 text-center">
+										<p className="text-sm text-muted-foreground">
+											No additional content yet.
+										</p>
+									</div>
+								)}
 							</div>
 						</div>
 					)}

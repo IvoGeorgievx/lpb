@@ -28,6 +28,7 @@ import ProductBlock, {
 	ProductBlockProps,
 } from "@/components/blocks/ProductBlock";
 import { ComponentType } from "react";
+import { exportToHTML } from "@/lib/export";
 
 export const COMPONENT_MAP: Record<BlockType, ComponentType> = {
 	header: Header,
@@ -191,7 +192,7 @@ export default function Home() {
 					/>
 				</div>
 				<div className="flex h-screen flex-1 overflow-x-hidden">
-					{/* <button onClick={() => exportToHTML(items)}>Export</button> */}
+					<button onClick={() => exportToHTML(items)}>Export</button>
 					<EditorContext.Provider
 						value={{
 							item: activeBlock,
