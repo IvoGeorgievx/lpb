@@ -28,6 +28,7 @@ import ProductBlock, {
 	ProductBlockProps,
 } from "@/components/blocks/ProductBlock";
 import { ComponentType } from "react";
+import { exportToHTML } from "@/lib/export";
 
 export const COMPONENT_MAP: Record<BlockType, ComponentType> = {
 	header: Header,
