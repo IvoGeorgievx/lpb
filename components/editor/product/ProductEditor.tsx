@@ -58,6 +58,7 @@ export function ProductEditor({ props }: ProductEditorProps) {
 			heading: { content: "New card" },
 			subheading: { content: "Subheading" },
 			style: { background: "#ffffff" },
+			variant: "default",
 		};
 
 		onPropsChange({

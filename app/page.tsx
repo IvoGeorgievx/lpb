@@ -192,7 +192,7 @@ export default function Home() {
 					/>
 				</div>
 				<div className="flex h-screen flex-1 overflow-x-hidden">
-					<button onClick={() => exportToHTML(items)}>Export</button>
+					{/* <button onClick={() => exportToHTML(items)}>Export</button> */}
 					<EditorContext.Provider
 						value={{
 							item: activeBlock,
