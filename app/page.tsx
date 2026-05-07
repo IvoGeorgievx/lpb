@@ -1,19 +1,40 @@
 "use client";
 import { AppSidebar } from "@/components/app-sidebar";
+import { FooterBlock, FooterBlockProps } from "@/components/blocks/FooterBlock";
 import Header, { HeaderBlockProps } from "@/components/blocks/HeaderBlock";
 import HeroBlock, { HeroBlockProps } from "@/components/blocks/HeroBlock";
+import ProductBlock, {
+	ProductBlockProps,
+} from "@/components/blocks/ProductBlock";
+import {
+	SectionSeparatorBlock,
+	SectionSeparatorBlockProps,
+} from "@/components/blocks/SectionSeparatorBlock";
+import {
+	TestimonialBlock,
+	TestimonialBlockProps,
+} from "@/components/blocks/TestimonialBlock";
 import { Editor } from "@/components/editor/Editor";
 import Renderer from "@/components/renderer/Renderer";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { EditorContext } from "@/context/EditorContext";
 import { DragDropProvider, useDroppable } from "@dnd-kit/react";
-import { ReactNode, useState } from "react";
+import { ComponentType, ReactNode, useState } from "react";
 
-export type BlockType = "header" | "hero" | "product";
+export type BlockType =
+	| "header"
+	| "hero"
+	| "product"
+	| "footer"
+	| "separator"
+	| "testimonial";
 export type BlockPropsMap = {
 	header: HeaderBlockProps;
 	hero: HeroBlockProps;
 	product: ProductBlockProps;
+	footer: FooterBlockProps;
+	separator: SectionSeparatorBlockProps;
+	testimonial: TestimonialBlockProps;
 };
 export type DroppedItem<T extends BlockType = BlockType> = {
 	id: string;
@@ -24,16 +45,75 @@ export type DroppedItem<T extends BlockType = BlockType> = {
 
 type UpdatePayload = { id: string } & Pick<DroppedItem, "props">;
 
-import ProductBlock, {
-	ProductBlockProps,
-} from "@/components/blocks/ProductBlock";
-import { ComponentType } from "react";
-import { exportToHTML } from "@/lib/export";
+const defaultProps: BlockPropsMap = {
+	header: {
+		className: "border",
+		style: {
+			height: 60,
+			borderRadius: 10,
+			padding: 10,
+		},
+	},
+	hero: {
+		title: "Hero section",
+		style: {
+			height: "50vh",
+		},
+		heading: "Very cool heading",
+		subheading: "Nice",
+	},
+	product: {
+		background: "#ffffff",
+		cards: [
+			{
+				id: String(Date.now()),
+				heading: {
+					content: "Pro Flow Subscription",
+				},
+				subheading: {
+					content: "Price: $29/mo",
+				},
+				style: {
+					background: "#ffffff",
+				},
+				additionalContent: [
+					{
+						content:
+							"Description: Get unlimited access to our entire library of creative assets and templates.",
+						fontSize: 15,
+					},
+					{
+						content: "Best Value",
+						fontSize: 15,
+					},
+					{
+						content: "Get Started",
+						fontSize: 15,
+					},
+				],
+				variant: "default",
+			},
+		],
+	},
+	footer: {
+		layout: {
+			columns: 2,
+		},
+		style: {
+			height: "20vh",
+		},
+	},
+	separator: {},
+	testimonial: {},
+};
 
 export const COMPONENT_MAP: Record<BlockType, ComponentType> = {
 	header: Header,
 	hero: HeroBlock,
 	product: ProductBlock,
+	footer: FooterBlock,
+	separator: SectionSeparatorBlock,
+	testimonial: TestimonialBlock,
 };
 function DroppableZone({
 	items,
@@ -60,7 +140,7 @@ function DroppableZone({
 						className={`w-full cursor-pointer transition ${
 							selectedBlock?.id === item.id
 								? "border-2 border-blue-500"
-								: "border border-transparent"
+								: "border-transparent"
 						}`}
 						onClick={() => selectedItem(item)}
 					>
@@ -117,57 +197,6 @@ export default function Home() {
 
 				if (target?.id === "droppable") {
 					const type = String(source!.id) as BlockType;
-
-					const defaultProps: BlockPropsMap = {
-						header: {
-							className: "border",
-							style: {
-								height: 60,
-								borderRadius: 10,
-								padding: 10,
-							},
-						},
-						hero: {
-							title: "Hero section",
-							style: {
-								height: "50vh",
-							},
-							heading: "Very cool heading",
-							subheading: "Nice",
-						},
-						product: {
-							background: "#ffffff",
-							cards: [
-								{
-									id: String(Date.now()),
-									heading: {
-										content: "Pro Flow Subscription",
-									},
-									subheading: {
-										content: "Price: $29/mo",
-									},
-									style: {
-										background: "#ffffff",
-									},
-									additionalContent: [
-										{
-											content:
-												"Description: Get unlimited access to our entire library of creative assets and templates.",
-											fontSize: 15,
-										},
-										{
-											content: "Best Value",
-											fontSize: 15,
-										},
-										{
-											content: "Get Started",
-											fontSize: 15,
-										},
-									],
-								},
-							],
-						},
-					};
 
 					const newItem: DroppedItem = {
 						id: `${type}-${Date.now()}`,

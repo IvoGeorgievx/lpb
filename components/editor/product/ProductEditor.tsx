@@ -51,7 +51,6 @@ export function ProductEditor({ props }: ProductEditorProps) {
 
 	const selectedCard = cards.find((card) => card.id === selectedCardId);
 
-	console.log(selectedCard);
 	const addCard = () => {
 		const newCard: ProductCard = {
 			id: String(Date.now()),

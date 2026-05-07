@@ -10,9 +10,11 @@ import {
 } from "@/components/ui/sidebar";
 import { useDraggable } from "@dnd-kit/react";
 import { ReactElement } from "react";
+import { FooterBlock } from "./blocks/FooterBlock";
 import Header from "./blocks/HeaderBlock";
 import HeroBlock from "./blocks/HeroBlock";
 import ProductBlock from "./blocks/ProductBlock";
+import { SectionSeparatorBlock } from "./blocks/SectionSeparatorBlock";
 
 interface BuildingComponents {
 	id: string;
@@ -38,6 +40,12 @@ export function AppSidebar() {
 		{ component: <Header />, id: "header", label: "Header" },
 		{ component: <HeroBlock />, id: "hero", label: "Hero" },
 		{ component: <ProductBlock />, id: "product", label: "Product" },
+		{
+			component: <SectionSeparatorBlock />,
+			id: "separator",
+			label: "Separator",
+		},
+		{ component: <FooterBlock />, id: "footer", label: "Footer" },
 	];
 	return (
 		<Sidebar className="border-r">
