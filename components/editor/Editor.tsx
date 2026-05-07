@@ -7,6 +7,10 @@ import { HeroEditor } from "./hero/HeroEditor";
 import { ProductEditor } from "./product/ProductEditor";
 import { ProductBlockProps } from "../blocks/ProductBlock";
 import { HeaderBlockProps } from "../blocks/HeaderBlock";
+import { FooterEditor } from "./footer/FooterEditor";
+import { FooterBlockProps } from "../blocks/Footer/FooterBlock";
+import { SeparatorEditor } from "./separator/SeparatorEditor";
+import { SectionSeparatorProps } from "../blocks/SectionSeparatorBlock";
 
 export type UpdatePayload<T extends BlockType = BlockType> = {
 	id: string;
@@ -46,6 +50,10 @@ function renderEditorContent(item: DroppedItem) {
 			return <HeroEditor props={props as HeroBlockProps} />;
 		case "product":
 			return <ProductEditor props={props as ProductBlockProps} />;
+		case "footer":
+			return <FooterEditor props={props as FooterBlockProps} />;
+		case "separator":
+			return <SeparatorEditor props={props as SectionSeparatorProps} />;
 		default:
 			return null;
 	}
