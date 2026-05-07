@@ -1,34 +1,35 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 import {
-	Select,
-	SelectContent,
-	SelectItem,
-	SelectTrigger,
-	SelectValue,
-} from "@/components/ui/select";
-import {
 	Popover,
 	PopoverContent,
 	PopoverHeader,
 	PopoverTitle,
 	PopoverTrigger,
 } from "@/components/ui/popover";
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
 
 import { Label } from "@/components/ui/label";
 
 import {
-	SectionSeparatorProps,
+	SectionSeparatorBlockProps,
 	SeparatorType,
 } from "@/components/blocks/SectionSeparatorBlock";
+import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { useEditor } from "@/context/EditorContext";
 import ColorPicker from "react-best-gradient-color-picker";
-import { Button } from "@/components/ui/button";
+import { useCallback, useRef } from "react";
 
 interface SeparatorEditorProps {
-	props: SectionSeparatorProps;
+	props: SectionSeparatorBlockProps;
 }
 
 const separatorTypes = [
@@ -43,6 +44,24 @@ const separatorTypes = [
 
 export const SeparatorEditor = ({ props }: SeparatorEditorProps) => {
 	const { item, onPropsChange } = useEditor();
+	const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+	const handleColorChange = useCallback(
+		(newColor: string) => {
+			if (timeoutRef.current) {
+				clearTimeout(timeoutRef.current);
+			}
+
+			timeoutRef.current = setTimeout(() => {
+				onPropsChange({
+					id: item!.id,
+					props: {
+						fill: newColor,
+					},
+				});
+			}, 150);
+		},
+		[item, onPropsChange],
+	);
 	if (!item) return null;
 	return (
 		<Tabs defaultValue="settings" className="w-full p-4">
@@ -90,7 +109,9 @@ export const SeparatorEditor = ({ props }: SeparatorEditorProps) => {
 						min={40}
 						max={200}
 						step={10}
-						defaultValue={[(item.props as SectionSeparatorProps).height || 80]}
+						defaultValue={[
+							(item.props as SectionSeparatorBlockProps).height || 80,
+						]}
 						onValueChange={(value) => {
 							onPropsChange({
 								id: item.id,
@@ -113,7 +134,7 @@ export const SeparatorEditor = ({ props }: SeparatorEditorProps) => {
 					</div>
 
 					<Switch
-						checked={(item.props as SectionSeparatorProps).flipX || false}
+						checked={(item.props as SectionSeparatorBlockProps).flipX || false}
 						onCheckedChange={(checked) => {
 							onPropsChange({
 								id: item.id,
@@ -136,7 +157,7 @@ export const SeparatorEditor = ({ props }: SeparatorEditorProps) => {
 					</div>
 
 					<Switch
-						checked={(item.props as SectionSeparatorProps).flipY || false}
+						checked={(item.props as SectionSeparatorBlockProps).flipY || false}
 						onCheckedChange={(checked) => {
 							onPropsChange({
 								id: item.id,
@@ -169,16 +190,10 @@ export const SeparatorEditor = ({ props }: SeparatorEditorProps) => {
 									<ColorPicker
 										hidePresets
 										hideControls
-										value={(item.props as SectionSeparatorProps).fill || ""}
-										onChange={(color) => {
-											onPropsChange({
-												id: item.id,
-												props: {
-													...props,
-													fill: color,
-												},
-											});
-										}}
+										value={
+											(item.props as SectionSeparatorBlockProps).fill || ""
+										}
+										onChange={handleColorChange}
 									/>
 								</PopoverHeader>
 							</PopoverContent>

@@ -8,9 +8,11 @@ import { ProductEditor } from "./product/ProductEditor";
 import { ProductBlockProps } from "../blocks/ProductBlock";
 import { HeaderBlockProps } from "../blocks/HeaderBlock";
 import { FooterEditor } from "./footer/FooterEditor";
-import { FooterBlockProps } from "../blocks/Footer/FooterBlock";
+import { FooterBlockProps } from "../blocks/FooterBlock";
 import { SeparatorEditor } from "./separator/SeparatorEditor";
-import { SectionSeparatorProps } from "../blocks/SectionSeparatorBlock";
+import { SectionSeparatorBlockProps } from "../blocks/SectionSeparatorBlock";
+import { TestimonialEditor } from "./testimonial/TestimonialEditor";
+import { TestimonialBlockProps } from "../blocks/TestimonialBlock";
 
 export type UpdatePayload<T extends BlockType = BlockType> = {
 	id: string;
@@ -53,7 +55,9 @@ function renderEditorContent(item: DroppedItem) {
 		case "footer":
 			return <FooterEditor props={props as FooterBlockProps} />;
 		case "separator":
-			return <SeparatorEditor props={props as SectionSeparatorProps} />;
+			return <SeparatorEditor props={props as SectionSeparatorBlockProps} />;
+		case "testimonial":
+			return <TestimonialEditor props={props as TestimonialBlockProps} />;
 		default:
 			return null;
 	}

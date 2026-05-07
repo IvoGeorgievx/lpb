@@ -1,19 +1,16 @@
-import { SectionSeparatorProps } from "../SectionSeparatorBlock";
-import { FooterSectionRenderer } from "./FooterSectionRenderer";
-
 type FooterSectionType = "links" | "brand" | "newsletter" | "socials";
 
-export interface FooterSection {
-	id: string;
-	title?: string;
-	type: FooterSectionType;
-	links?: {
-		label: string;
-		href: string;
-	}[];
-	text?: string;
-	align?: "left" | "center" | "right";
-}
+// export interface FooterSection {
+// 	id: string;
+// 	title?: string;
+// 	type: FooterSectionType;
+// 	links?: {
+// 		label: string;
+// 		href: string;
+// 	}[];
+// 	text?: string;
+// 	align?: "left" | "center" | "right";
+// }
 
 interface LayoutPreset {
 	columns: number;
@@ -21,7 +18,7 @@ interface LayoutPreset {
 
 export interface FooterBlockProps extends React.ComponentPropsWithRef<"footer"> {
 	layout?: LayoutPreset;
-	sections?: FooterSection[];
+	// sections?: FooterSection[];
 	logo?: string;
 	links?: string[];
 	copyright?: string;
@@ -30,7 +27,7 @@ export interface FooterBlockProps extends React.ComponentPropsWithRef<"footer"> 
 export const FooterBlock = ({
 	style: footerStyles,
 	layout,
-	sections = [],
+	// sections = [],
 }: FooterBlockProps) => {
 	const columns = layout?.columns || 2;
 
@@ -42,11 +39,7 @@ export const FooterBlock = ({
 					gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))`,
 					...footerStyles,
 				}}
-			>
-				{sections.map((section) => (
-					<FooterSectionRenderer section={section} key={section.id} />
-				))}
-			</div>
+			></div>
 		</footer>
 	);
 };

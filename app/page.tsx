@@ -1,18 +1,19 @@
 "use client";
 import { AppSidebar } from "@/components/app-sidebar";
-import {
-	FooterBlock,
-	FooterBlockProps,
-} from "@/components/blocks/Footer/FooterBlock";
+import { FooterBlock, FooterBlockProps } from "@/components/blocks/FooterBlock";
 import Header, { HeaderBlockProps } from "@/components/blocks/HeaderBlock";
 import HeroBlock, { HeroBlockProps } from "@/components/blocks/HeroBlock";
 import ProductBlock, {
 	ProductBlockProps,
 } from "@/components/blocks/ProductBlock";
 import {
-	SectionSeparator,
-	SectionSeparatorProps,
+	SectionSeparatorBlock,
+	SectionSeparatorBlockProps,
 } from "@/components/blocks/SectionSeparatorBlock";
+import {
+	TestimonialBlock,
+	TestimonialBlockProps,
+} from "@/components/blocks/TestimonialBlock";
 import { Editor } from "@/components/editor/Editor";
 import Renderer from "@/components/renderer/Renderer";
 import { SidebarProvider } from "@/components/ui/sidebar";
@@ -20,13 +21,20 @@ import { EditorContext } from "@/context/EditorContext";
 import { DragDropProvider, useDroppable } from "@dnd-kit/react";
 import { ComponentType, ReactNode, useState } from "react";
 
-export type BlockType = "header" | "hero" | "product" | "footer" | "separator";
+export type BlockType =
+	| "header"
+	| "hero"
+	| "product"
+	| "footer"
+	| "separator"
+	| "testimonial";
 export type BlockPropsMap = {
 	header: HeaderBlockProps;
 	hero: HeroBlockProps;
 	product: ProductBlockProps;
 	footer: FooterBlockProps;
-	separator: SectionSeparatorProps;
+	separator: SectionSeparatorBlockProps;
+	testimonial: TestimonialBlockProps;
 };
 export type DroppedItem<T extends BlockType = BlockType> = {
 	id: string;
@@ -96,6 +104,7 @@ const defaultProps: BlockPropsMap = {
 		},
 	},
 	separator: {},
+	testimonial: {},
 };
 
 export const COMPONENT_MAP: Record<BlockType, ComponentType> = {
@@ -103,7 +112,8 @@ export const COMPONENT_MAP: Record<BlockType, ComponentType> = {
 	hero: HeroBlock,
 	product: ProductBlock,
 	footer: FooterBlock,
-	separator: SectionSeparator,
+	separator: SectionSeparatorBlock,
+	testimonial: TestimonialBlock,
 };
 function DroppableZone({
 	items,

@@ -1,6 +1,6 @@
 import { Check } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { FooterBlockProps } from "@/components/blocks/Footer/FooterBlock";
+import { FooterBlockProps } from "@/components/blocks/FooterBlock";
 import { useEditor } from "@/context/EditorContext";
 import clsx from "clsx";
 

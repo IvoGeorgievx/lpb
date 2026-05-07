@@ -7,7 +7,7 @@ export type SeparatorType =
 	| "zigzag"
 	| "line";
 
-export interface SectionSeparatorProps extends React.ComponentPropsWithRef<"div"> {
+export interface SectionSeparatorBlockProps extends React.ComponentPropsWithRef<"div"> {
 	type?: SeparatorType;
 	fill?: string;
 	height?: number;
@@ -15,15 +15,15 @@ export interface SectionSeparatorProps extends React.ComponentPropsWithRef<"div"
 	flipY?: boolean;
 }
 
-export const SectionSeparator = ({
-	type = "wave",
+export const SectionSeparatorBlock = ({
+	type = "waves",
 	fill = "#3b82f6",
 	height = 80,
 	flipX = false,
 	flipY = false,
 	style,
 	...props
-}: SectionSeparatorProps) => {
+}: SectionSeparatorBlockProps) => {
 	const svgStyle: React.CSSProperties = {
 		display: "block",
 		width: "100%",
