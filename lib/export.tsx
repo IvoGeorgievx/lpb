@@ -3,7 +3,7 @@ import { DroppedItem } from "@/app/page";
 import { COMPONENT_MAP } from "@/app/page";
 import { exportCss } from "./exportCss";
 
-export const exportToHTML = (items: DroppedItem[]) => {
+export const generateHTML = (items: DroppedItem[]) => {
 	const htmlContent = items
 		.map((item) => {
 			const Component = COMPONENT_MAP[item.type];
@@ -14,31 +14,43 @@ export const exportToHTML = (items: DroppedItem[]) => {
 		})
 		.join("\n");
 
-	const fullDocument = `
+	return `
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<link rel="stylesheet" href="https://unpkg.com/lucide-static@latest/font/lucide.css" />
-  <title>Export</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <script src="https://cdn.tailwindcss.com"></script>
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/lucide-static@latest/font/lucide.css"
+  />
+
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
 
   <style>
     ${exportCss}
   </style>
 </head>
+
 <body style="margin:0;">
 ${htmlContent}
 </body>
 </html>
 `;
+};
 
-	const blob = new Blob([fullDocument], { type: "text/html" });
+export const exportToHTML = (items: DroppedItem[]) => {
+	const html = generateHTML(items);
+
+	const blob = new Blob([html], { type: "text/html" });
+
 	const url = URL.createObjectURL(blob);
 
 	const a = document.createElement("a");
+
 	a.href = url;
 	a.download = "index.html";
 	a.click();

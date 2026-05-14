@@ -18,6 +18,7 @@ import { Editor } from "@/components/editor/Editor";
 import Renderer from "@/components/renderer/Renderer";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { EditorContext } from "@/context/EditorContext";
+import { exportToHTML } from "@/lib/export";
 import { DragDropProvider, useDroppable } from "@dnd-kit/react";
 import { ComponentType, ReactNode, useState } from "react";
 
@@ -47,7 +48,6 @@ type UpdatePayload = { id: string } & Pick<DroppedItem, "props">;
 
 const defaultProps: BlockPropsMap = {
 	header: {
-		className: "border",
 		style: {
 			height: 60,
 			borderRadius: 10,
@@ -131,7 +131,10 @@ function DroppableZone({
 	return (
 		<div
 			ref={ref}
-			className="flex-1 flex flex-col items-center min-w-325 pt-4 bg-zinc-50 dark:bg-black min-h-screen"
+			className="flex-1 flex flex-col items-center min-w-325 pt-4 bg-zinc-50 dark:bg-black min-h-screen relative"
+			style={{
+				maxWidth: "1200px",
+			}}
 		>
 			{items.length > 0 ? (
 				items.map((item) => (
@@ -212,16 +215,16 @@ export default function Home() {
 			}}
 		>
 			<SidebarProvider>
-				<AppSidebar />
-				<div className="flex h-screen">
+				<AppSidebar items={items} />
+				<div className="flex h-screen ">
 					<DroppableZone
 						selectedItem={(item) => setSelectedBlock(item)}
 						items={items}
 						selectedBlock={selectedBlock}
 					/>
 				</div>
-				<div className="flex h-screen flex-1 overflow-x-hidden">
-					{/* <button onClick={() => exportToHTML(items)}>Export</button> */}
+				<div className="flex h-screen flex-1 overflow-x-hidden flex-col">
+					<button onClick={() => exportToHTML(items)}>Export</button>
 					<EditorContext.Provider
 						value={{
 							item: activeBlock,

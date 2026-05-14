@@ -13,6 +13,7 @@ import { SeparatorEditor } from "./separator/SeparatorEditor";
 import { SectionSeparatorBlockProps } from "../blocks/SectionSeparatorBlock";
 import { TestimonialEditor } from "./testimonial/TestimonialEditor";
 import { TestimonialBlockProps } from "../blocks/TestimonialBlock";
+import { GlobalEditor } from "./global/GlobalEditor";
 
 export type UpdatePayload<T extends BlockType = BlockType> = {
 	id: string;
@@ -38,7 +39,9 @@ export function Editor() {
 				>
 					{renderEditorContent(item)}
 				</motion.div>
-			) : null}
+			) : (
+				<GlobalEditor />
+			)}
 		</AnimatePresence>
 	);
 }
