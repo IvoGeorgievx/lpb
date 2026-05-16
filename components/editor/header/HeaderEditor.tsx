@@ -1,4 +1,4 @@
-import { HeaderBlockProps } from "@/components/blocks/HeaderBlock";
+﻿import { HeaderBlockProps } from "@/components/blocks/HeaderBlock";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
@@ -296,6 +296,7 @@ export function HeaderEditor({ props }: HeaderEditorProps) {
 							<Checkbox
 								id="cta-checkbox"
 								name="cta"
+								checked={cta}
 								onCheckedChange={() => setCta(!cta)}
 							/>
 							<FieldLabel htmlFor="cta-checkbox">CTA button?</FieldLabel>

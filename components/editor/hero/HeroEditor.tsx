@@ -205,6 +205,10 @@ export function HeroEditor({ props }: HeroEditorProps) {
 										<Italic className="group-data-[state=on]/toggle:fill-foreground" />
 									</Toggle>
 									<Select
+										value={
+											String((item.props as HeroBlockProps).headingWeight) ||
+											undefined
+										}
 										onValueChange={(value) =>
 											onPropsChange({
 												id: item.id,
@@ -340,6 +344,10 @@ export function HeroEditor({ props }: HeroEditorProps) {
 										<Italic className="group-data-[state=on]/toggle:fill-foreground" />
 									</Toggle>
 									<Select
+										value={
+											String((item.props as HeroBlockProps).subheadingWeight) ||
+											undefined
+										}
 										onValueChange={(value) =>
 											onPropsChange({
 												id: item.id,

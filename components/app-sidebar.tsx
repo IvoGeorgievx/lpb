@@ -77,7 +77,7 @@ export function AppSidebar({ items }: { items: DroppedItem[] }) {
 	];
 	return (
 		<>
-			<Sidebar className="border-r">
+			<Sidebar className="app-sidebar fixed left-0 top-0 z-50 h-screen border-r border-slate-200/70 bg-background/95 backdrop-blur-xl dark:border-zinc-800 dark:bg-slate-950/95">
 				<SidebarHeader />
 				<SidebarContent>
 					<SidebarGroup>
