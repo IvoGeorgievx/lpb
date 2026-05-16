@@ -15,7 +15,7 @@ export type ProductCardVariants =
 
 export interface ProductCard {
 	id: string;
-	icon?: string;
+	iconClass?: string;
 	heading?: TextConfig;
 	subheading?: TextConfig;
 	additionalContent?: TextConfig[];
