@@ -1,3 +1,16 @@
+html,
+body {
+	width: 100%;
+	max-width: 100%;
+	overflow-x: hidden;
+}
+
+*,
+*::before,
+*::after {
+	box-sizing: border-box;
+}
+
 @keyframes fadeIn {
 	from {
 		opacity: 0;
@@ -316,6 +329,24 @@
 	align-items: center;
 }
 
+.cta-block {
+	box-sizing: border-box;
+}
+
+.cta-block * {
+	box-sizing: border-box;
+}
+
+.cta-block-link {
+	max-width: 100%;
+}
+
+.cta-block-button {
+	max-width: 100%;
+	white-space: normal;
+	word-break: break-word;
+}
+
 @media (max-width: 768px) {
 	.hero-preset-flex {
 		flex-direction: column;
@@ -323,5 +354,32 @@
 
 	.page-footer {
 		flex-direction: column;
+	}
+
+	.cta-block {
+		padding: 22px 12px !important;
+	}
+
+	.cta-block-inner {
+		padding: 16px !important;
+		gap: 10px !important;
+	}
+
+	.cta-block-heading {
+		font-size: 1.5rem !important;
+		line-height: 1.2 !important;
+	}
+
+	.cta-block-subheading {
+		font-size: 0.95rem !important;
+		line-height: 1.45 !important;
+	}
+
+	.cta-block-link {
+		width: 100%;
+	}
+
+	.cta-block-button {
+		width: 100%;
 	}
 }

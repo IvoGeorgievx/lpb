@@ -1,5 +1,6 @@
 "use client";
 import { AppSidebar } from "@/components/app-sidebar";
+import { CtaBlock, CtaBlockProps } from "@/components/blocks/CtaBlock";
 import { FooterBlock, FooterBlockProps } from "@/components/blocks/FooterBlock";
 import Header, { HeaderBlockProps } from "@/components/blocks/HeaderBlock";
 import HeroBlock, { HeroBlockProps } from "@/components/blocks/HeroBlock";
@@ -33,6 +34,7 @@ import {
 export type BlockType =
 	| "header"
 	| "hero"
+	| "cta"
 	| "product"
 	| "footer"
 	| "separator"
@@ -40,6 +42,7 @@ export type BlockType =
 export type BlockPropsMap = {
 	header: HeaderBlockProps;
 	hero: HeroBlockProps;
+	cta: CtaBlockProps;
 	product: ProductBlockProps;
 	footer: FooterBlockProps;
 	separator: SectionSeparatorBlockProps;
@@ -56,27 +59,44 @@ type UpdatePayload = { id: string } & Pick<DroppedItem, "props">;
 
 export const defaultProps: BlockPropsMap = {
 	header: {
+		logoText: "Aether Studio",
+		cta: {
+			text: "Start Free",
+			paddingX: 18,
+			paddingY: 10,
+			backgroundColor: "#ffffff",
+			radius: 999,
+			link: "#",
+			color: "#0f172a",
+		},
 		style: {
-			height: 60,
-			padding: 10,
-			background: "#1565C0",
+			height: 80,
+			padding: 12,
+			color: "#ffffff",
+			background:
+				"radial-gradient(800px 220px at 10% -40%, rgba(148,163,184,0.35), transparent), linear-gradient(120deg, #0f172a, #1e293b 60%, #334155)",
+			border: "1px solid rgba(255,255,255,0.14)",
+			boxShadow: "0 16px 34px rgba(15,23,42,0.22)",
 		},
 	},
 	hero: {
 		title: "Hero section",
 		style: {
 			height: "50vh",
+			background:
+				"radial-gradient(1200px 320px at 15% -40%, rgba(148,163,184,0.32), transparent), linear-gradient(120deg, #0f172a, #1e293b 58%, #334155)",
 		},
-		heading: "Beautiful landing page",
-		subheading: "Fast, flexible hero sections with real-time editing",
+		heading: "Design pages that feel undeniably premium",
+		subheading:
+			"Build high-converting, editorial-grade landing pages with complete control.",
 		headingAnimation: "fade-in",
 		headingFontSize: 44,
 		subheadingFontSize: 22,
 		subHeadingAnimation: "fade-in",
 		headingWeight: 700,
 		subheadingWeight: 400,
-		headingColor: "#111827",
-		subheadingColor: "#4b5563",
+		headingColor: "#ffffff",
+		subheadingColor: "#e2e8f0",
 		preset: {
 			layout: "center",
 			textAlign: "center",
@@ -84,17 +104,38 @@ export const defaultProps: BlockPropsMap = {
 			imagePosition: "background",
 		},
 		cta: {
-			text: "Get Started",
-			bgColor: "#2563eb",
+			text: "Start Free",
+			bgColor: "#ffffff",
 			paddingX: 20,
 			paddingY: 12,
 			radius: 999,
 			fontSize: 16,
-			border: false,
+			border: true,
+			textColor: "#00000",
 			boxShadow: {
-				shadowBlur: 12,
-				shadowIntensity: 0.12,
+				shadowBlur: 16,
+				shadowIntensity: 0.24,
 			},
+		},
+	},
+	cta: {
+		heading: "Ship a stronger first impression in hours",
+		subheading:
+			"Start from polished sections, refine your story quickly, and launch with confidence.",
+		button: {
+			text: "Start Free",
+			link: "#",
+			backgroundColor: "#ffffff",
+			color: "#0f172a",
+			radius: 999,
+			paddingX: 24,
+			paddingY: 12,
+		},
+		style: {
+			background:
+				"radial-gradient(900px 280px at 15% -35%, rgba(148,163,184,0.25), transparent), linear-gradient(120deg, #0b1220 0%, #1e293b 62%, #334155 100%)",
+			borderTop: "1px solid rgba(255,255,255,0.15)",
+			borderBottom: "1px solid rgba(255,255,255,0.15)",
 		},
 	},
 	product: {
@@ -120,6 +161,7 @@ export const defaultProps: BlockPropsMap = {
 					borderRadius: 24,
 					padding: 24,
 					minHeight: 320,
+					boxShadow: "0 16px 36px rgba(15,23,42,0.08)",
 				},
 				additionalContent: [
 					{
@@ -154,6 +196,7 @@ export const defaultProps: BlockPropsMap = {
 					borderRadius: 24,
 					padding: 24,
 					minHeight: 300,
+					boxShadow: "0 16px 36px rgba(15,23,42,0.08)",
 				},
 				additionalContent: [
 					{
@@ -188,6 +231,7 @@ export const defaultProps: BlockPropsMap = {
 					borderRadius: 24,
 					padding: 24,
 					minHeight: 300,
+					boxShadow: "0 16px 36px rgba(15,23,42,0.08)",
 				},
 				additionalContent: [
 					{
@@ -209,12 +253,23 @@ export const defaultProps: BlockPropsMap = {
 		layout: {
 			columns: 2,
 		},
+		copyright: "(c) 2026 Aether Studio. All rights reserved.",
 		style: {
-			height: "20vh",
+			height: "22vh",
+			color: "#e2e8f0",
 		},
+		background:
+			"radial-gradient(820px 220px at 12% -35%, rgba(148,163,184,0.2), transparent), linear-gradient(120deg, #020617, #0f172a 62%, #1e293b)",
 	},
-	separator: {},
+	separator: {
+		flipY: true,
+		fill: "",
+	},
 	testimonial: {
+		style: {
+			background:
+				"radial-gradient(820px 220px at 12% -35%, rgba(148,163,184,0.2), transparent), linear-gradient(120deg, #020617, #0f172a 62%, #1e293b)",
+		},
 		carousel: {
 			type: "default",
 			slides: [
@@ -223,14 +278,14 @@ export const defaultProps: BlockPropsMap = {
 					subheading:
 						"Every team member can update content, and the polished testimonial section now feels like a product page.",
 					author: "Maya Carter, VP of Marketing",
-					bgColor: "#eef2ff",
+					bgColor: "linear-gradient(160deg, #ffffff 0%, #f8fafc 100%)",
 				},
 				{
 					heading: "“We shipped assets faster with the new content blocks.”",
 					subheading:
 						"The carousel helps stories land stronger and gives our homepage a much more confident rhythm.",
 					author: "Jordan Kim, Design Lead",
-					bgColor: "#f8fafc",
+					bgColor: "linear-gradient(160deg, #f8fafc 0%, #eef2ff 100%)",
 				},
 				{
 					heading:
@@ -238,7 +293,7 @@ export const defaultProps: BlockPropsMap = {
 					subheading:
 						"Clients love the visual polish, and our team can keep the page updated without design support.",
 					author: "Lila Patel, Founder",
-					bgColor: "#fff7ed",
+					bgColor: "linear-gradient(160deg, #ffffff 0%, #f1f5f9 100%)",
 				},
 			],
 		},
@@ -248,6 +303,7 @@ export const defaultProps: BlockPropsMap = {
 export const COMPONENT_MAP: Record<BlockType, ComponentType> = {
 	header: Header,
 	hero: HeroBlock,
+	cta: CtaBlock,
 	product: ProductBlock,
 	footer: FooterBlock,
 	separator: SectionSeparatorBlock,
@@ -308,10 +364,7 @@ function DroppableZone({
 	return (
 		<div
 			ref={ref}
-			className="flex-1 flex flex-col items-center min-w-325 pt-4 bg-zinc-50 dark:bg-black min-h-screen relative"
-			style={{
-				maxWidth: "1200px",
-			}}
+			className="w-full flex flex-col items-center pt-4 bg-zinc-50 dark:bg-black min-h-[90vh] relative"
 		>
 			{items.length > 0 ? (
 				items.map((item) => (
@@ -335,6 +388,15 @@ export default function Home() {
 	const [selectedBlock, setSelectedBlock] = useState<DroppedItem | undefined>(
 		undefined,
 	);
+	const [isDesktop, setIsDesktop] = useState<boolean | null>(null);
+
+	useEffect(() => {
+		const media = window.matchMedia("(min-width: 1024px)");
+		const update = () => setIsDesktop(media.matches);
+		update();
+		media.addEventListener("change", update);
+		return () => media.removeEventListener("change", update);
+	}, []);
 
 	const updatePropsData = (data: UpdatePayload) => {
 		setItems((prev) =>
@@ -378,6 +440,30 @@ export default function Home() {
 		[],
 	);
 
+	if (isDesktop === null) {
+		return (
+			<div className="min-h-screen w-full bg-slate-950 text-slate-100 flex items-center justify-center">
+				<div className="text-sm text-slate-300">Loading editor...</div>
+			</div>
+		);
+	}
+
+	if (!isDesktop) {
+		return (
+			<div className="min-h-screen w-full bg-slate-950 text-slate-100 flex items-center justify-center p-6">
+				<div className="max-w-xl w-full rounded-2xl border border-slate-800 bg-slate-900/70 p-8 text-center">
+					<h1 className="text-3xl font-bold tracking-tight">
+						Desktop Required
+					</h1>
+					<p className="mt-3 text-slate-300 leading-relaxed">
+						This landing page builder is currently optimized for desktop only.
+						Please open it on a larger screen to continue editing.
+					</p>
+				</div>
+			</div>
+		);
+	}
+
 	return (
 		<PageContext.Provider
 			value={{ page: { blocks: items }, setPage: syncItemsFromPage }}
@@ -393,6 +479,14 @@ export default function Home() {
 					const targetIsCanvasItem = items.some((item) => item.id === targetId);
 
 					if (sourceIsCanvasItem) {
+						if (targetId === "sidebar-remove") {
+							setItems((prev) => prev.filter((item) => item.id !== sourceId));
+							setSelectedBlock((prev) =>
+								prev?.id === sourceId ? undefined : prev,
+							);
+							return;
+						}
+
 						setItems((prev) => {
 							const sourceIndex = prev.findIndex(
 								(item) => item.id === sourceId,
@@ -447,14 +541,16 @@ export default function Home() {
 			>
 				<SidebarProvider>
 					<AppSidebar items={items} />
-					<div className="flex h-screen relative ml-72.5">
-						<DroppableZone
-							selectedItem={(item) => setSelectedBlock(item)}
-							items={items}
-							selectedBlock={selectedBlock}
-						/>
+					<div className="app-canvas-shell">
+						<div className="app-canvas w-full">
+							<DroppableZone
+								selectedItem={(item) => setSelectedBlock(item)}
+								items={items}
+								selectedBlock={selectedBlock}
+							/>
+						</div>
 					</div>
-					<div className="flex h-screen flex-1 overflow-x-hidden flex-col fixed right-0 w-[530px] ">
+					<div className="app-editor-panel flex flex-col">
 						<button onClick={() => exportToHTML(items)}>Export</button>
 						<EditorContext.Provider
 							value={{

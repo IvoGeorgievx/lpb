@@ -16,6 +16,7 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/components/ui/select";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Toggle } from "@/components/ui/toggle";
 import { useEditor } from "@/context/EditorContext";
 import { Italic, PaintBucket } from "lucide-react";
@@ -27,8 +28,7 @@ import { Label } from "../../ui/label";
 import { RadioGroup, RadioGroupItem } from "../../ui/radio-group";
 import { Separator } from "../../ui/separator";
 import { Slider } from "../../ui/slider";
-import { HeroEditorLayout } from "./HeroEditorLayout";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { HeroEditorCenterPreset } from "./HeroEditorCenterPreset";
 const WEIGHT_OPTIONS = [100, 200, 300, 400, 500, 600, 700];
 
 const ANIMATIONS = [
@@ -50,7 +50,6 @@ interface HeroEditorProps {
 }
 
 export function HeroEditor({ props }: HeroEditorProps) {
-	const [heightUnit, setHeightUnit] = useState<"px" | "vh">("px");
 	const { item, onPropsChange } = useEditor();
 	const color = "#000000";
 	let currentHeight;
@@ -64,67 +63,35 @@ export function HeroEditor({ props }: HeroEditorProps) {
 	return (
 		<div key={item.id} className="p-4 w-full">
 			<Tabs defaultValue="appearance" className="w-full">
-				<TabsList className="grid w-full grid-cols-2">
+				<TabsList className="grid w-full grid-cols-1">
 					<TabsTrigger value="appearance">Appearance</TabsTrigger>
-					<TabsTrigger value="layout">Layout</TabsTrigger>
 				</TabsList>
 
 				<div className="w-full p-4 flex flex-col gap-5">
 					<TabsContent value="appearance" className="space-y-4 pt-4">
 						<div className="w-full flex gap-5 items-center justify-center">
-							<div className="w-full">
-								{heightUnit === "px" ? (
-									<Input
-										value={currentHeight}
-										type="number"
-										onChange={(event) =>
-											onPropsChange({
-												id: item.id,
-												props: {
-													style: {
-														height: Number(event.target.value),
-													},
+							<div className="w-full flex flex-col gap-4">
+								<Label>Height</Label>
+								<Slider
+									value={[currentHeight as number]}
+									min={60}
+									max={100}
+									step={1}
+									onValueChange={(v) =>
+										onPropsChange({
+											id: item.id,
+											props: {
+												style: {
+													height: `${v[0]}vh`,
 												},
-											})
-										}
-									/>
-								) : (
-									<Slider
-										value={[currentHeight as number]}
-										min={60}
-										max={100}
-										step={1}
-										onValueChange={(v) =>
-											onPropsChange({
-												id: item.id,
-												props: {
-													style: {
-														height: `${v[0]}vh`,
-													},
-												},
-											})
-										}
-									/>
-								)}
-							</div>
-							<div className="w-full">
-								<RadioGroup
-									onValueChange={(v) => setHeightUnit(v as "px" | "vh")}
-									defaultValue="px"
-									className="w-fit"
-								>
-									<div className="flex items-center gap-3">
-										<RadioGroupItem value="px" id="px" />
-										<Label htmlFor="px">px</Label>
-									</div>
-									<div className="flex items-center gap-3">
-										<RadioGroupItem value="vh" id="vh" />
-										<Label htmlFor="vh">vh</Label>
-									</div>
-								</RadioGroup>
+											},
+										})
+									}
+								/>
 							</div>
 						</div>
 						<div className="w-full flex flex-col p-2 gap-4 rounded-md border-2">
+							<HeroEditorCenterPreset />
 							<div className="w-full">
 								<h1 className="text-center mb-2">Heading</h1>
 								<Input
@@ -675,12 +642,6 @@ export function HeroEditor({ props }: HeroEditorProps) {
 						</div>
 					</TabsContent>
 					<Separator />
-					<TabsContent value="layout" className="space-y-4 pt-4">
-						<div className="w-full flex flex-col gap-5">
-							<h2 className="text-center">Layout</h2>
-							<HeroEditorLayout />
-						</div>
-					</TabsContent>
 				</div>
 			</Tabs>
 		</div>

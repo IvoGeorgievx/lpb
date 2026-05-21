@@ -12,6 +12,7 @@ import { Page, usePage } from "@/context/PageContext";
 const THEME_BLOCK_ORDER: BlockType[] = [
 	"header",
 	"hero",
+	"cta",
 	"product",
 	"testimonial",
 	"footer",
@@ -32,6 +33,7 @@ export type AnyDroppedItem = {
 		props: BlockPropsMap[K];
 	};
 }[BlockType];
+
 const cloneDefaultProps = <T extends BlockType>(type: T) => {
 	return structuredClone(defaultProps[type]);
 };
@@ -123,7 +125,9 @@ export const GlobalEditor = () => {
 									cta: {
 										...block.props.cta,
 										bgColor: "#111827",
+										textColor: "#fff",
 										radius: 999,
+										fontSize: 15,
 									},
 								},
 							};
@@ -157,6 +161,34 @@ export const GlobalEditor = () => {
 									})),
 								},
 							};
+						case "cta":
+							return {
+								...block,
+								props: {
+									...block.props,
+									heading: "Build Your Signature Page Today",
+									subheading:
+										"Elegant layouts, crisp typography, and conversion-ready sections in one editor.",
+									button: {
+										...(block.props.button ?? {}),
+										text: "Request Access",
+										link: "#",
+										backgroundColor: "#0f172a",
+										color: "#ffffff",
+										radius: 999,
+										paddingX: 26,
+										paddingY: 12,
+									},
+									style: {
+										...block.props.style,
+										fontFamily: THEME_FONTS.elegant,
+										background:
+											"linear-gradient(120deg, #f8fafc 0%, #eef2ff 55%, #e2e8f0 100%)",
+										borderTop: "1px solid rgba(15,23,42,0.06)",
+										borderBottom: "1px solid rgba(15,23,42,0.06)",
+									},
+								},
+							};
 
 						case "testimonial":
 							return {
@@ -170,11 +202,30 @@ export const GlobalEditor = () => {
 									carousel: {
 										...(block.props.carousel ?? { type: "default" as const }),
 										slides: (block.props.carousel?.slides ?? []).map(
-											(slide) => ({
+											(slide, index) => ({
 												...slide,
-												bgColor: "#ffffff",
+												bgColor:
+													index % 2 === 0
+														? "linear-gradient(160deg, #ffffff 0%, #f8fafc 100%)"
+														: "linear-gradient(160deg, #f8fafc 0%, #eef2ff 100%)",
 											}),
 										),
+									},
+								},
+							};
+						case "footer":
+							return {
+								...block,
+								props: {
+									...block.props,
+									copyright: "(c) 2026 Atelier Studio. Crafted with intention.",
+									background:
+										"linear-gradient(120deg, #e2e8f0 0%, #f8fafc 48%, #eef2ff 100%)",
+									style: {
+										...block.props.style,
+										height: "22vh",
+										fontFamily: THEME_FONTS.elegant,
+										color: "#0f172a",
 									},
 								},
 							};
@@ -270,15 +321,49 @@ export const GlobalEditor = () => {
 									})),
 								},
 							};
+						case "cta":
+							return {
+								...block,
+								props: {
+									...block.props,
+									heading: "Ship Faster. Convert Harder.",
+									subheading:
+										"High-contrast components crafted for modern product launches.",
+									button: {
+										...(block.props.button ?? {}),
+										text: "Deploy Now",
+										link: "#",
+										backgroundColor: "#7c3aed",
+										color: "#ffffff",
+										radius: 10,
+										paddingX: 24,
+										paddingY: 11,
+									},
+									style: {
+										...block.props.style,
+										fontFamily: THEME_FONTS.dark,
+										background:
+											"linear-gradient(120deg, #020617 0%, #111827 65%, #1f2937 100%)",
+										borderTop: "1px solid rgba(124,58,237,0.45)",
+										borderBottom: "1px solid rgba(124,58,237,0.35)",
+									},
+								},
+							};
 
 						case "footer":
 							return {
 								...block,
 								props: {
 									...block.props,
+									copyright:
+										"(c) 2026 NEON/CTRL. High-performance launch experiences.",
+									background:
+										"linear-gradient(120deg, #020617 0%, #111827 62%, #1f2937 100%)",
 									style: {
 										...block.props.style,
+										height: "22vh",
 										fontFamily: THEME_FONTS.dark,
+										color: "#e2e8f0",
 									},
 								},
 							};
@@ -291,6 +376,35 @@ export const GlobalEditor = () => {
 									style: {
 										...block.props.style,
 										fontFamily: THEME_FONTS.dark,
+									},
+									carousel: {
+										...(block.props.carousel ?? { type: "default" as const }),
+										slides: (block.props.carousel?.slides ?? []).map(
+											(slide, index) => ({
+												...slide,
+												bgColor:
+													index % 2 === 0
+														? "linear-gradient(160deg, rgba(248,250,252,0.96) 0%, rgba(241,245,249,0.96) 100%)"
+														: "linear-gradient(160deg, rgba(226,232,240,0.94) 0%, rgba(241,245,249,0.96) 100%)",
+											}),
+										),
+									},
+								},
+							};
+						case "footer":
+							return {
+								...block,
+								props: {
+									...block.props,
+									copyright:
+										"(c) 2026 BOLD/BUILD. Brutal clarity. Real outcomes.",
+									background: "#facc15",
+									style: {
+										...block.props.style,
+										height: "22vh",
+										fontFamily: THEME_FONTS.brutalist,
+										color: "#000000",
+										borderTop: "3px solid #000000",
 									},
 								},
 							};
@@ -325,7 +439,8 @@ export const GlobalEditor = () => {
 									headingWeight: 900,
 									cta: {
 										...block.props.cta,
-										bgColor: "#000",
+										bgColor: "#fff",
+										textColor: "#000",
 										radius: 0,
 									},
 								},
@@ -358,6 +473,33 @@ export const GlobalEditor = () => {
 											color: "#111",
 										},
 									})),
+								},
+							};
+						case "cta":
+							return {
+								...block,
+								props: {
+									...block.props,
+									heading: "NO FLUFF. JUST RESULTS.",
+									subheading:
+										"Loud layout, hard contrast, and a direct call to action that lands.",
+									button: {
+										...(block.props.button ?? {}),
+										text: "START PROJECT",
+										link: "#",
+										backgroundColor: "#000000",
+										color: "#ffffff",
+										radius: 0,
+										paddingX: 24,
+										paddingY: 10,
+									},
+									style: {
+										...block.props.style,
+										fontFamily: THEME_FONTS.brutalist,
+										background: "#f4f4f5",
+										borderTop: "3px solid #000000",
+										borderBottom: "3px solid #000000",
+									},
 								},
 							};
 
@@ -398,6 +540,34 @@ export const GlobalEditor = () => {
 									style: {
 										...block.props.style,
 										fontFamily: THEME_FONTS.brutalist,
+									},
+									carousel: {
+										...(block.props.carousel ?? { type: "default" as const }),
+										slides: (block.props.carousel?.slides ?? []).map(
+											(slide, index) => ({
+												...slide,
+												bgColor:
+													index % 2 === 0
+														? "linear-gradient(160deg, #ffffff 0%, #f5f5f5 100%)"
+														: "linear-gradient(160deg, #fef9c3 0%, #fde68a 100%)",
+											}),
+										),
+									},
+								},
+							};
+						case "footer":
+							return {
+								...block,
+								props: {
+									...block.props,
+									copyright: "(c) 2026 JoyPixel. Build pages people remember.",
+									background:
+										"linear-gradient(90deg, #f472b6 0%, #a855f7 55%, #6366f1 100%)",
+									style: {
+										...block.props.style,
+										height: "22vh",
+										fontFamily: THEME_FONTS.playful,
+										color: "#ffffff",
 									},
 								},
 							};
@@ -462,6 +632,34 @@ export const GlobalEditor = () => {
 									})),
 								},
 							};
+						case "cta":
+							return {
+								...block,
+								props: {
+									...block.props,
+									heading: "Create Something People Remember",
+									subheading:
+										"Bold gradients, playful spacing, and conversion-focused storytelling.",
+									button: {
+										...(block.props.button ?? {}),
+										text: "Join Free",
+										link: "#",
+										backgroundColor: "#ffffff",
+										color: "#7c3aed",
+										radius: 999,
+										paddingX: 28,
+										paddingY: 12,
+									},
+									style: {
+										...block.props.style,
+										fontFamily: THEME_FONTS.playful,
+										background:
+											"linear-gradient(90deg, #f472b6 0%, #a855f7 55%, #6366f1 100%)",
+										borderTop: "1px solid rgba(255,255,255,0.3)",
+										borderBottom: "1px solid rgba(255,255,255,0.3)",
+									},
+								},
+							};
 
 						case "header":
 							return {
@@ -500,6 +698,18 @@ export const GlobalEditor = () => {
 									style: {
 										...block.props.style,
 										fontFamily: THEME_FONTS.playful,
+									},
+									carousel: {
+										...(block.props.carousel ?? { type: "default" as const }),
+										slides: (block.props.carousel?.slides ?? []).map(
+											(slide, index) => ({
+												...slide,
+												bgColor:
+													index % 2 === 0
+														? "linear-gradient(160deg, #ffffff 0%, #fdf4ff 100%)"
+														: "linear-gradient(160deg, #fae8ff 0%, #ede9fe 100%)",
+											}),
+										),
 									},
 								},
 							};

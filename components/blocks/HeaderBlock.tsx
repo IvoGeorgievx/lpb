@@ -62,6 +62,7 @@ export default function Header({
 		position: sticky ? "sticky" : undefined,
 		top: sticky ? 0 : undefined,
 		padding: padding ? `${padding}px` : "10px 16px",
+		zIndex: sticky ? 9999 : "auto",
 		backdropFilter: blur ? `blur(${blurPx || 8}px)` : undefined,
 		display: "flex",
 		alignItems: "stretch",

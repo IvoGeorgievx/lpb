@@ -177,10 +177,7 @@ export function HeaderEditor({ props }: HeaderEditorProps) {
 										onPropsChange({
 											id: item.id,
 											props: {
-												style: {
-													position: v ? "sticky" : undefined,
-													top: v ? 0 : undefined,
-												},
+												sticky: v ? true : undefined,
 											},
 										})
 									}

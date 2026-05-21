@@ -52,6 +52,8 @@
 }
 
 :root {
+	--app-sidebar-width: clamp(13.5rem, 16vw, 18rem);
+	--app-editor-width: clamp(20rem, 29vw, 33.125rem);
 	--background: oklch(0.98 0.01 260);
 	--foreground: oklch(0.2 0.02 260);
 
@@ -138,11 +140,9 @@
 	}
 
 	.app-canvas {
-		padding: 1.5rem 1rem;
-		min-height: 100vh;
+		padding: 1.5rem 0;
+		min-height: 100%;
 		min-width: 0;
-		margin-left: 280px;
-		margin-right: 420px;
 		background: linear-gradient(
 			180deg,
 			rgba(255, 255, 255, 0.94),
@@ -150,14 +150,24 @@
 		);
 	}
 
+	.app-canvas-shell {
+		position: fixed;
+		inset-block: 0;
+		left: var(--app-sidebar-width);
+		right: var(--app-editor-width);
+		overflow-y: auto;
+		overflow-x: hidden;
+	}
+
 	.app-editor-panel {
 		position: fixed;
 		right: 0;
 		top: 0;
 		height: 100vh;
-		width: 420px;
-		min-width: 420px;
+		width: var(--app-editor-width);
+		min-width: 0;
 		overflow-x: hidden;
+		overflow-y: auto;
 		border-left: 1px solid var(--border);
 		background: rgba(255, 255, 255, 0.96);
 		backdrop-filter: blur(20px);
@@ -172,7 +182,14 @@
 		left: 0;
 		top: 0;
 		height: 100vh;
-		width: 280px;
+		width: var(--app-sidebar-width);
 		z-index: 40;
+	}
+
+	@media (max-width: 1200px) {
+		:root {
+			--app-sidebar-width: 13.5rem;
+			--app-editor-width: 20rem;
+		}
 	}
 }

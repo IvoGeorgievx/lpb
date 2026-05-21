@@ -1,4 +1,4 @@
-type Layout = "center" | "flex" | "flex-col";
+type Layout = "center";
 type ImagePosition = "left" | "right" | "background";
 type TextAlign = "center" | "right" | "left";
 
@@ -17,6 +17,7 @@ type CtaOptions = {
 	paddingY?: number;
 	animation?: GenericAnimation;
 	text?: string;
+	textColor?: string;
 	border?: boolean;
 	radius?: number;
 	fontSize?: number;
@@ -47,7 +48,6 @@ export interface HeroBlockProps extends React.ComponentPropsWithRef<"div"> {
 	heading?: string;
 	subheading?: string;
 	cta?: CtaOptions;
-	flexReverse?: boolean;
 	overlayStrength?: number;
 	shadowBlur?: number;
 	shadowIntensity?: number;
@@ -71,11 +71,10 @@ export default function HeroBlock({
 	subheadingColor,
 	subheadingFontSize,
 	subheadingWeight,
-	flexReverse = false,
 	shadowBlur,
 	shadowIntensity,
-	overlayStrength,
 	subheadingStyle,
+
 	cta = {
 		// text: "CTA Button",
 		paddingX: 12,
@@ -103,6 +102,8 @@ export default function HeroBlock({
 					borderRadius: cta.radius,
 					fontSize: cta.fontSize,
 					boxShadow: `inset 0 0 ${cta.boxShadow?.shadowBlur}px rgba(0,0,0,${cta.boxShadow?.shadowIntensity})`,
+					color: cta.textColor,
+					fontWeight: 700,
 				}}
 				className={(cta?.animation && animationMap[cta.animation]) || ""}
 			>
@@ -112,115 +113,49 @@ export default function HeroBlock({
 	};
 
 	return (
-		<div className={props.className ? `hero-block ${props.className}` : "hero-block"}>
-			{preset?.layout === "center" && (
-				<div
-					className="hero-block-surface"
+		<div
+			className={
+				props.className ? `hero-block ${props.className}` : "hero-block"
+			}
+		>
+			<div
+				className="hero-block-surface"
+				style={{
+					...props.style,
+					justifyContent: "center",
+					alignItems: "center",
+					display: "flex",
+					flexDirection: "column",
+					gap: 16,
+					boxShadow: `inset 0 0 ${shadowBlur}px rgba(0,0,0,${shadowIntensity})`,
+				}}
+			>
+				<h1
 					style={{
-						...props.style,
-						// backgroundImage: props.style?.backgroundImage
-						// 	? `linear-gradient(rgba(0,0,0,${overlayStrength || 0}), rgba(0,0,0,${overlayStrength || 0})), url("${props.style.backgroundImage}")`
-						// 	: "none",
-						// backgroundSize: "cover",
-						// backgroundPosition: "center",
-						justifyContent: "center",
-						alignItems: "center",
-						display: "flex",
-						flexDirection: "column",
-						gap: 16,
-						boxShadow: `inset 0 0 ${shadowBlur}px rgba(0,0,0,${shadowIntensity})`,
+						fontSize: headingFontSize,
+						color: headingColor,
+						fontWeight: headingWeight,
+						fontStyle: headingStyle,
 					}}
+					className={(headingAnimation && animationMap[headingAnimation]) || ""}
 				>
-					<h1
-						style={{
-							fontSize: headingFontSize,
-							color: headingColor,
-							fontWeight: headingWeight,
-							fontStyle: headingStyle,
-						}}
-						className={
-							(headingAnimation && animationMap[headingAnimation]) || ""
-						}
-					>
-						{heading}
-					</h1>
-					<h2
-						style={{
-							fontSize: subheadingFontSize,
-							color: subheadingColor,
-							fontWeight: subheadingWeight,
-							fontStyle: subheadingStyle,
-						}}
-						className={
-							(subHeadingAnimation && animationMap[subHeadingAnimation]) || ""
-						}
-					>
-						{subheading}
-					</h2>
-					{getCtaButton()}
-				</div>
-			)}
-			{preset?.layout === "flex" && (
-				<div
+					{heading}
+				</h1>
+				<h2
 					style={{
-						...props.style,
-						padding: 16,
-						// flexDirection: flexReverse ? "row-reverse" : "row",
+						fontSize: subheadingFontSize,
+						color: subheadingColor,
+						fontWeight: subheadingWeight,
+						fontStyle: subheadingStyle,
 					}}
-					className="hero-preset-flex hero-block-surface"
+					className={
+						(subHeadingAnimation && animationMap[subHeadingAnimation]) || ""
+					}
 				>
-					<div
-						style={{
-							flex: "1 1 50%",
-							flexDirection: "column",
-							gap: 16,
-							display: "flex",
-							justifyContent: "center",
-							alignItems: "center",
-						}}
-					>
-						<h1
-							style={{
-								fontSize: headingFontSize,
-								color: headingColor,
-								fontWeight: headingWeight,
-								fontStyle: headingStyle,
-							}}
-							className={
-								(headingAnimation && animationMap[headingAnimation]) || ""
-							}
-						>
-							{heading}
-						</h1>
-						<h2
-							style={{
-								fontSize: subheadingFontSize,
-								color: subheadingColor,
-								fontWeight: subheadingWeight,
-								fontStyle: subheadingStyle,
-							}}
-							className={
-								(subHeadingAnimation && animationMap[subHeadingAnimation]) || ""
-							}
-						>
-							{subheading}
-						</h2>
-						{getCtaButton()}
-					</div>
-					<div
-						style={{
-							flex: "1 1 50%",
-							flexDirection: "column",
-							gap: 16,
-							display: "flex",
-							justifyContent: "center",
-							alignItems: "center",
-						}}
-					>
-						Test
-					</div>
-				</div>
-			)}
+					{subheading}
+				</h2>
+				{getCtaButton()}
+			</div>
 		</div>
 	);
 }

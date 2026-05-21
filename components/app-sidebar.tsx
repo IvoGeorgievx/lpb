@@ -8,18 +8,19 @@ import {
 	SidebarGroupLabel,
 	SidebarHeader,
 } from "@/components/ui/sidebar";
-import { useDraggable } from "@dnd-kit/react";
+import { useDraggable, useDroppable } from "@dnd-kit/react";
 import { ReactElement, useEffect, useState } from "react";
 import { FooterBlock } from "./blocks/FooterBlock";
 import Header from "./blocks/HeaderBlock";
 import HeroBlock from "./blocks/HeroBlock";
+import { CtaBlock } from "./blocks/CtaBlock";
 import ProductBlock from "./blocks/ProductBlock";
 import { SectionSeparatorBlock } from "./blocks/SectionSeparatorBlock";
 import { TestimonialBlock } from "./blocks/TestimonialBlock";
 import { DroppedItem } from "@/app/page";
 import { generateHTML } from "@/lib/export";
 import { Button } from "./ui/button";
-import { Eye, Monitor, Smartphone, X } from "lucide-react";
+import { Eye, Monitor, Smartphone } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 interface BuildingComponents {
 	id: string;
@@ -43,6 +44,7 @@ function DraggableItem({ id, label }: { id: string; label: string }) {
 export function AppSidebar({ items }: { items: DroppedItem[] }) {
 	const [open, setOpen] = useState(false);
 	const [mode, setMode] = useState<"desktop" | "mobile">("desktop");
+	const sidebarDrop = useDroppable({ id: "sidebar-remove" });
 
 	useEffect(() => {
 		const handleKeyDown = (e: KeyboardEvent) => {
@@ -62,6 +64,7 @@ export function AppSidebar({ items }: { items: DroppedItem[] }) {
 	const components: BuildingComponents[] = [
 		{ component: <Header />, id: "header", label: "Header" },
 		{ component: <HeroBlock />, id: "hero", label: "Hero" },
+		{ component: <CtaBlock />, id: "cta", label: "CTA Section" },
 		{ component: <ProductBlock />, id: "product", label: "Product" },
 		{
 			component: <SectionSeparatorBlock />,
@@ -77,34 +80,46 @@ export function AppSidebar({ items }: { items: DroppedItem[] }) {
 	];
 	return (
 		<>
-			<Sidebar className="app-sidebar fixed left-0 top-0 z-50 h-screen border-r border-slate-200/70 bg-background/95 backdrop-blur-xl dark:border-zinc-800 dark:bg-slate-950/95">
-				<SidebarHeader />
-				<SidebarContent>
-					<SidebarGroup>
-						<SidebarGroupLabel>Drag to add</SidebarGroupLabel>
-						<div className="flex flex-col gap-2 p-2">
-							{components.map((component) => (
-								<DraggableItem
-									key={component.id}
-									id={component.id}
-									label={component.label}
-								/>
-							))}
-						</div>
-					</SidebarGroup>
-					<SidebarGroup />
-				</SidebarContent>
-				<SidebarFooter>
-					<Button
-						className="w-full"
-						variant="outline"
-						onClick={() => setOpen(true)}
-					>
-						<Eye className="mr-2 h-4 w-4" />
-						Preview
-					</Button>
-				</SidebarFooter>
-			</Sidebar>
+			<div ref={sidebarDrop.ref}>
+				<Sidebar className="app-sidebar fixed left-0 top-0 z-50 h-screen border-r border-slate-200/70 bg-background/95 backdrop-blur-xl dark:border-zinc-800 dark:bg-slate-950/95">
+					<SidebarHeader />
+					<SidebarContent>
+						<SidebarGroup>
+							<SidebarGroupLabel>Drag to add</SidebarGroupLabel>
+							<div className="flex flex-col gap-2 p-2">
+								{components.map((component) => (
+									<DraggableItem
+										key={component.id}
+										id={component.id}
+										label={component.label}
+									/>
+								))}
+							</div>
+						</SidebarGroup>
+						<SidebarGroup>
+							<div
+								className={`mx-2 mt-2 rounded-lg border border-dashed px-3 py-2 text-xs transition ${
+									sidebarDrop.isDropTarget
+										? "border-red-500 bg-red-50 text-red-700"
+										: "border-slate-300 text-slate-500 dark:border-slate-700 dark:text-slate-400"
+								}`}
+							>
+								Drop block here to remove
+							</div>
+						</SidebarGroup>
+					</SidebarContent>
+					<SidebarFooter>
+						<Button
+							className="w-full"
+							variant="outline"
+							onClick={() => setOpen(true)}
+						>
+							<Eye className="mr-2 h-4 w-4" />
+							Preview
+						</Button>
+					</SidebarFooter>
+				</Sidebar>
+			</div>
 			<AnimatePresence>
 				{open && (
 					<motion.div
