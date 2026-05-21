@@ -16,6 +16,9 @@ export interface TestimonialBlockProps extends React.ComponentPropsWithRef<"div"
 
 export const TestimonialBlock = ({
 	carousel = { type: "default", slides: [] },
+	style,
+	className,
+	...props
 }: TestimonialBlockProps) => {
 	const containerStyles: React.CSSProperties = {
 		display: "flex",
@@ -23,10 +26,16 @@ export const TestimonialBlock = ({
 		alignItems: "center",
 		gap: 8,
 		flexDirection: "column",
+		marginTop: 24,
+		borderRadius: 16,
 	};
 
 	return (
-		<>
+		<div
+			style={style}
+			className={className ? `testimonial-block ${className}` : "testimonial-block"}
+			{...props}
+		>
 			{carousel?.type === "default" ? (
 				<div className="default-carousel">
 					<div className="default-carousel-slides">
@@ -90,6 +99,6 @@ export const TestimonialBlock = ({
 					</div>
 				</div>
 			)}
-		</>
+		</div>
 	);
 };

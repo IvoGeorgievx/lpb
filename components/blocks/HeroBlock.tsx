@@ -40,7 +40,7 @@ export interface HeroBlockProps extends React.ComponentPropsWithRef<"div"> {
 	subheadingStyle?: FontStyle;
 	subHeadingAnimation?: GenericAnimation;
 	animationEnabled?: boolean;
-	animation?: string;
+	animation?: GenericAnimation;
 	overlay?: number;
 	bgType?: "color" | "gradient" | "image" | "transparent";
 	preset?: HeroBlockPresets;
@@ -112,16 +112,17 @@ export default function HeroBlock({
 	};
 
 	return (
-		<div>
+		<div className={props.className ? `hero-block ${props.className}` : "hero-block"}>
 			{preset?.layout === "center" && (
 				<div
+					className="hero-block-surface"
 					style={{
 						...props.style,
-						backgroundImage: props.style?.backgroundImage
-							? `linear-gradient(rgba(0,0,0,${overlayStrength || 0}), rgba(0,0,0,${overlayStrength || 0})), url("${props.style.backgroundImage}")`
-							: "none",
-						backgroundSize: "cover",
-						backgroundPosition: "center",
+						// backgroundImage: props.style?.backgroundImage
+						// 	? `linear-gradient(rgba(0,0,0,${overlayStrength || 0}), rgba(0,0,0,${overlayStrength || 0})), url("${props.style.backgroundImage}")`
+						// 	: "none",
+						// backgroundSize: "cover",
+						// backgroundPosition: "center",
 						justifyContent: "center",
 						alignItems: "center",
 						display: "flex",
@@ -166,7 +167,7 @@ export default function HeroBlock({
 						padding: 16,
 						// flexDirection: flexReverse ? "row-reverse" : "row",
 					}}
-					className="hero-preset-flex"
+					className="hero-preset-flex hero-block-surface"
 				>
 					<div
 						style={{

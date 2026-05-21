@@ -31,7 +31,7 @@ export function HeaderEditor({ props }: HeaderEditorProps) {
 	const { item, onPropsChange } = useEditor();
 	const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 	const [logo, setLogo] = useState<"image" | "text">("image");
-	const [cta, setCta] = useState(false);
+	const [cta, setCta] = useState(!!(item?.props as HeaderBlockProps).cta?.text);
 
 	const handleColorChange = useCallback(
 		(newColor: string) => {

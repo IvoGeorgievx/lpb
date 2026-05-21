@@ -51,6 +51,19 @@ export function ProductEditor({ props }: ProductEditorProps) {
 
 	const selectedCard = cards.find((card) => card.id === selectedCardId);
 
+	const updateSelectedCard = (updater: (card: ProductCard) => ProductCard) => {
+		if (!selectedCardId) return;
+		onPropsChange({
+			id: item.id,
+			props: {
+				...props,
+				cards: cards.map((card) =>
+					card.id === selectedCardId ? updater(card) : card,
+				),
+			},
+		});
+	};
+
 	const addCard = () => {
 		const newCard: ProductCard = {
 			id: String(Date.now()),
@@ -196,18 +209,10 @@ export function ProductEditor({ props }: ProductEditorProps) {
 	};
 
 	const handleCardVariantChange = (variant: ProductCardVariants) => {
-		onPropsChange({
-			id: item.id,
-			props: {
-				cards: cards.map((card) => {
-					if (card.id !== selectedCardId) return card;
-					return {
-						...card,
-						variant,
-					};
-				}),
-			},
-		});
+		updateSelectedCard((card) => ({
+			...card,
+			variant,
+		}));
 	};
 
 	return (
@@ -373,6 +378,75 @@ export function ProductEditor({ props }: ProductEditorProps) {
 
 							<div className="space-y-4">
 								<div>
+									<h4 className="text-sm font-medium">Card Style</h4>
+									<p className="mt-1 text-xs text-muted-foreground">
+										These override any values applied by global presets.
+									</p>
+								</div>
+
+								<div className="grid gap-4 md:grid-cols-2">
+									<div className="space-y-2">
+										<Label>Card Background</Label>
+										<Input
+											type="color"
+											value={selectedCard.style?.background?.toString() || "#ffffff"}
+											onChange={(e) =>
+												updateSelectedCard((card) => ({
+													...card,
+													style: { ...card.style, background: e.target.value },
+												}))
+											}
+										/>
+									</div>
+									<div className="space-y-2">
+										<Label>Card Border</Label>
+										<Input
+											value={selectedCard.style?.border?.toString() || ""}
+											placeholder="1px solid #e2e8f0"
+											onChange={(e) =>
+												updateSelectedCard((card) => ({
+													...card,
+													style: { ...card.style, border: e.target.value },
+												}))
+											}
+										/>
+									</div>
+									<div className="space-y-2">
+										<Label>Border Radius (px)</Label>
+										<Input
+											type="number"
+											value={Number(selectedCard.style?.borderRadius || 0)}
+											onChange={(e) =>
+												updateSelectedCard((card) => ({
+													...card,
+													style: {
+														...card.style,
+														borderRadius: Number(e.target.value || 0),
+													},
+												}))
+											}
+										/>
+									</div>
+									<div className="space-y-2">
+										<Label>Card Shadow</Label>
+										<Input
+											value={selectedCard.style?.boxShadow?.toString() || ""}
+											placeholder="0 10px 30px rgba(0,0,0,0.04)"
+											onChange={(e) =>
+												updateSelectedCard((card) => ({
+													...card,
+													style: { ...card.style, boxShadow: e.target.value },
+												}))
+											}
+										/>
+									</div>
+								</div>
+							</div>
+
+							<Separator />
+
+							<div className="space-y-4">
+								<div>
 									<h4 className="text-sm font-medium">Content</h4>
 
 									<p className="mt-1 text-xs text-muted-foreground">
@@ -410,6 +484,55 @@ export function ProductEditor({ props }: ProductEditorProps) {
 												)?.subheading?.content ?? ""
 											}
 											onChange={(e) => handleHeadingChange(e, "subheading")}
+										/>
+									</div>
+								</div>
+
+								<div className="grid gap-4 md:grid-cols-3">
+									<div className="space-y-2">
+										<Label>Heading Color</Label>
+										<Input
+											type="color"
+											value={selectedCard.heading?.color || "#0f172a"}
+											onChange={(e) =>
+												updateSelectedCard((card) => ({
+													...card,
+													heading: { ...card.heading, content: card.heading?.content || "", color: e.target.value },
+												}))
+											}
+										/>
+									</div>
+									<div className="space-y-2">
+										<Label>Subheading Color</Label>
+										<Input
+											type="color"
+											value={selectedCard.subheading?.color || "#475569"}
+											onChange={(e) =>
+												updateSelectedCard((card) => ({
+													...card,
+													subheading: { ...card.subheading, content: card.subheading?.content || "", color: e.target.value },
+												}))
+											}
+										/>
+									</div>
+									<div className="space-y-2">
+										<Label>Heading Weight</Label>
+										<Input
+											type="number"
+											min={300}
+											max={900}
+											step={100}
+											value={Number(selectedCard.heading?.fontWeight || 700)}
+											onChange={(e) =>
+												updateSelectedCard((card) => ({
+													...card,
+													heading: {
+														...card.heading,
+														content: card.heading?.content || "",
+														fontWeight: Number(e.target.value || 700),
+													},
+												}))
+											}
 										/>
 									</div>
 								</div>
@@ -463,6 +586,50 @@ export function ProductEditor({ props }: ProductEditorProps) {
 															value={additionalItem.content}
 															onChange={(e) => handleAdditionalContent(e, idx)}
 															className="border-none shadow-none focus-visible:ring-0"
+														/>
+													</div>
+													<div className="mt-3 grid gap-3 md:grid-cols-3">
+														<Input
+															type="color"
+															value={additionalItem.color || "#64748b"}
+															onChange={(e) =>
+																updateSelectedCard((card) => {
+																	const next = [...(card.additionalContent || [])];
+																	next[idx] = { ...next[idx], color: e.target.value };
+																	return { ...card, additionalContent: next };
+																})
+															}
+														/>
+														<Input
+															type="number"
+															value={Number(additionalItem.fontSize || 14)}
+															onChange={(e) =>
+																updateSelectedCard((card) => {
+																	const next = [...(card.additionalContent || [])];
+																	next[idx] = {
+																		...next[idx],
+																		fontSize: Number(e.target.value || 14),
+																	};
+																	return { ...card, additionalContent: next };
+																})
+															}
+														/>
+														<Input
+															type="number"
+															min={300}
+															max={900}
+															step={100}
+															value={Number(additionalItem.fontWeight || 500)}
+															onChange={(e) =>
+																updateSelectedCard((card) => {
+																	const next = [...(card.additionalContent || [])];
+																	next[idx] = {
+																		...next[idx],
+																		fontWeight: Number(e.target.value || 500),
+																	};
+																	return { ...card, additionalContent: next };
+																})
+															}
 														/>
 													</div>
 												</div>

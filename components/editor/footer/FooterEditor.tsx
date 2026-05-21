@@ -151,6 +151,26 @@ export function FooterEditor({ props }: FooterEditorProps) {
 						<h3 className="font-medium">Logo</h3>
 
 						<div className="flex flex-col gap-2">
+							<Label>Logo Text</Label>
+							<Input
+								value={props.logo?.text || ""}
+								onChange={(e) =>
+									onPropsChange({
+										id: item.id,
+										props: {
+											...props,
+											logo: {
+												...props.logo,
+												text: e.target.value,
+											},
+										},
+									})
+								}
+								placeholder="Your Brand"
+							/>
+						</div>
+
+						<div className="flex flex-col gap-2">
 							<Label>Logo Image URL</Label>
 
 							<Input
@@ -170,6 +190,43 @@ export function FooterEditor({ props }: FooterEditorProps) {
 								placeholder="https://example.com/logo.png"
 							/>
 						</div>
+					</div>
+
+					<div className="flex flex-col gap-2">
+						<Label>Copyright</Label>
+						<Input
+							value={props.copyright || ""}
+							onChange={(e) =>
+								onPropsChange({
+									id: item.id,
+									props: {
+										...props,
+										copyright: e.target.value,
+									},
+								})
+							}
+							placeholder="© 2026 Your Company. All rights reserved."
+						/>
+					</div>
+
+					<div className="flex flex-col gap-2">
+						<Label>Text Color</Label>
+						<Input
+							value={(props.style?.color as string) || "#e2e8f0"}
+							onChange={(e) =>
+								onPropsChange({
+									id: item.id,
+									props: {
+										...props,
+										style: {
+											...props.style,
+											color: e.target.value,
+										},
+									},
+								})
+							}
+							placeholder="#e2e8f0"
+						/>
 					</div>
 
 					<div className="flex flex-col gap-4">

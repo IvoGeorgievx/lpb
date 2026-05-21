@@ -31,6 +31,19 @@ export interface ProductBlockProps extends React.ComponentPropsWithRef<"section"
 	background?: string;
 }
 
+const resolveLucideIconClass = (iconClass?: string) => {
+	if (!iconClass) return "";
+	const tokens = iconClass.trim().split(/\s+/);
+	const iconToken = tokens.find((token) => token.startsWith("icon-"));
+	if (iconToken) return iconToken;
+
+	const lucideToken = tokens.find((token) => token.startsWith("lucide-"));
+	if (lucideToken) return `icon-${lucideToken.replace("lucide-", "")}`;
+
+	if (tokens.length === 1) return `icon-${tokens[0]}`;
+	return "";
+};
+
 export default function ProductBlock({
 	background,
 	cards,
@@ -52,33 +65,55 @@ export default function ProductBlock({
 					style={card.style}
 				>
 					{card.heading && (
-						<h3 className="product-card-heading">{card.heading.content}</h3>
+						<h3
+							className="product-card-heading"
+							style={{
+								color: card.heading.color,
+								fontSize: card.heading.fontSize,
+								fontWeight: card.heading.fontWeight,
+							}}
+						>
+							{card.heading.content}
+						</h3>
 					)}
 
 					{card.subheading && (
-						<p className="product-card-subheading">{card.subheading.content}</p>
+						<p
+							className="product-card-subheading"
+							style={{
+								color: card.subheading.color,
+								fontSize: card.subheading.fontSize,
+								fontWeight: card.subheading.fontWeight,
+							}}
+						>
+							{card.subheading.content}
+						</p>
 					)}
-					{card.additionalContent &&
-						card.additionalContent.map((contentPiece, idx) => {
-							const { content, color, fontSize, fontWeight, iconClass } =
-								contentPiece;
-							return (
-								<div className="product-card-additional" key={idx}>
-									{iconClass && <i className={iconClass} />}
-									<p
-										style={{
-											fontSize,
-											fontWeight,
-											color,
-											textAlign: "center",
-										}}
-									>
-										{content}
-									</p>
-									<hr className="separator" />
-								</div>
-							);
-						})}
+					{card.additionalContent && card.additionalContent.length > 0 && (
+						<div className="product-card-additional">
+							{card.additionalContent.map((contentPiece, idx) => {
+								const { content, color, fontSize, fontWeight, iconClass } =
+									contentPiece;
+								return (
+									<div className="product-card-additional-item" key={idx}>
+									{iconClass && (
+										<i className={resolveLucideIconClass(iconClass)} aria-hidden="true" />
+									)}
+										<p
+											style={{
+												fontSize,
+												fontWeight,
+												color,
+												textAlign: "center",
+											}}
+										>
+											{content}
+										</p>
+									</div>
+								);
+							})}
+						</div>
+					)}
 				</div>
 			))}
 		</section>

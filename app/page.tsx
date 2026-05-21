@@ -18,9 +18,17 @@ import { Editor } from "@/components/editor/Editor";
 import Renderer from "@/components/renderer/Renderer";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { EditorContext } from "@/context/EditorContext";
+import { PageContext, usePage } from "@/context/PageContext";
 import { exportToHTML } from "@/lib/export";
 import { DragDropProvider, useDraggable, useDroppable } from "@dnd-kit/react";
-import { ComponentType, ReactNode, useState } from "react";
+import {
+	ComponentType,
+	ReactNode,
+	type SetStateAction,
+	useCallback,
+	useEffect,
+	useState,
+} from "react";
 
 export type BlockType =
 	| "header"
@@ -46,11 +54,10 @@ export type DroppedItem<T extends BlockType = BlockType> = {
 
 type UpdatePayload = { id: string } & Pick<DroppedItem, "props">;
 
-const defaultProps: BlockPropsMap = {
+export const defaultProps: BlockPropsMap = {
 	header: {
 		style: {
 			height: 60,
-			borderRadius: 10,
 			padding: 10,
 			background: "#1565C0",
 		},
@@ -292,6 +299,11 @@ function DroppableZone({
 	selectedBlock?: DroppedItem;
 }) {
 	const { ref } = useDroppable({ id: "droppable" });
+	const { setPage } = usePage();
+
+	useEffect(() => {
+		setPage((prev) => ({ ...prev, blocks: items }));
+	}, [items, setPage]);
 
 	return (
 		<div
@@ -347,91 +359,116 @@ export default function Home() {
 
 	const activeBlock = items.find((it) => it.id === selectedBlock?.id);
 
+	const syncItemsFromPage = useCallback(
+		(nextPage: SetStateAction<{ blocks: DroppedItem[] }>) => {
+			if (typeof nextPage === "function") {
+				setItems((prevItems) => {
+					const resolved = (
+						nextPage as (prevState: { blocks: DroppedItem[] }) => {
+							blocks: DroppedItem[];
+						}
+					)({ blocks: prevItems });
+					return resolved.blocks;
+				});
+				return;
+			}
+
+			setItems(nextPage.blocks);
+		},
+		[],
+	);
+
 	return (
-		<DragDropProvider
-			onDragEnd={(event) => {
-				if (event.canceled) return;
-
-				const { source, target } = event.operation;
-				const sourceId = String(source?.id || "");
-				const targetId = String(target?.id || "");
-				const sourceIsCanvasItem = items.some((item) => item.id === sourceId);
-				const targetIsCanvasItem = items.some((item) => item.id === targetId);
-
-				if (sourceIsCanvasItem) {
-					setItems((prev) => {
-						const sourceIndex = prev.findIndex((item) => item.id === sourceId);
-						const targetIndex = targetIsCanvasItem
-							? prev.findIndex((item) => item.id === targetId)
-							: prev.length - 1;
-
-						if (
-							sourceIndex === -1 ||
-							targetIndex === -1 ||
-							sourceIndex === targetIndex
-						) {
-							return prev;
-						}
-
-						const next = [...prev];
-						const [moved] = next.splice(sourceIndex, 1);
-						next.splice(targetIndex, 0, moved);
-						return next;
-					});
-					return;
-				}
-
-				if (target?.id === "droppable" || targetIsCanvasItem) {
-					const type = String(source!.id) as BlockType;
-					const newItem: DroppedItem = {
-						id: `${type}-${Date.now()}`,
-						type,
-						timestamp: Date.now(),
-						props: defaultProps[type],
-					};
-
-					setItems((prev) => {
-						if (targetIsCanvasItem) {
-							const targetIndex = prev.findIndex(
-								(item) => item.id === targetId,
-							);
-							if (targetIndex >= 0) {
-								const next = [...prev];
-								next.splice(targetIndex, 0, newItem);
-								return next;
-							}
-						}
-
-						return [...prev, newItem];
-					});
-
-					setSelectedBlock(newItem);
-				}
-			}}
+		<PageContext.Provider
+			value={{ page: { blocks: items }, setPage: syncItemsFromPage }}
 		>
-			<SidebarProvider>
-				<AppSidebar items={items} />
-				<div className="flex h-screen relative ml-72.5">
-					<DroppableZone
-						selectedItem={(item) => setSelectedBlock(item)}
-						items={items}
-						selectedBlock={selectedBlock}
-					/>
-				</div>
-				<div className="flex h-screen flex-1 overflow-x-hidden flex-col fixed right-0 w-[530px] ">
-					<button onClick={() => exportToHTML(items)}>Export</button>
-					<EditorContext.Provider
-						value={{
-							item: activeBlock,
-							onPropsChange(payload) {
-								updatePropsData(payload);
-							},
-						}}
-					>
-						<Editor />
-					</EditorContext.Provider>
-				</div>
-			</SidebarProvider>
-		</DragDropProvider>
+			<DragDropProvider
+				onDragEnd={(event) => {
+					if (event.canceled) return;
+
+					const { source, target } = event.operation;
+					const sourceId = String(source?.id || "");
+					const targetId = String(target?.id || "");
+					const sourceIsCanvasItem = items.some((item) => item.id === sourceId);
+					const targetIsCanvasItem = items.some((item) => item.id === targetId);
+
+					if (sourceIsCanvasItem) {
+						setItems((prev) => {
+							const sourceIndex = prev.findIndex(
+								(item) => item.id === sourceId,
+							);
+							const targetIndex = targetIsCanvasItem
+								? prev.findIndex((item) => item.id === targetId)
+								: prev.length - 1;
+
+							if (
+								sourceIndex === -1 ||
+								targetIndex === -1 ||
+								sourceIndex === targetIndex
+							) {
+								return prev;
+							}
+
+							const next = [...prev];
+							const [moved] = next.splice(sourceIndex, 1);
+							next.splice(targetIndex, 0, moved);
+							return next;
+						});
+						return;
+					}
+
+					if (target?.id === "droppable" || targetIsCanvasItem) {
+						const type = String(source!.id) as BlockType;
+						const newItem: DroppedItem = {
+							id: `${type}-${Date.now()}`,
+							type,
+							timestamp: Date.now(),
+							props: defaultProps[type],
+						};
+
+						setItems((prev) => {
+							if (targetIsCanvasItem) {
+								const targetIndex = prev.findIndex(
+									(item) => item.id === targetId,
+								);
+								if (targetIndex >= 0) {
+									const next = [...prev];
+									next.splice(targetIndex, 0, newItem);
+									return next;
+								}
+							}
+
+							return [...prev, newItem];
+						});
+
+						setSelectedBlock(newItem);
+					}
+				}}
+			>
+				<SidebarProvider>
+					<AppSidebar items={items} />
+					<div className="flex h-screen relative ml-72.5">
+						<DroppableZone
+							selectedItem={(item) => setSelectedBlock(item)}
+							items={items}
+							selectedBlock={selectedBlock}
+						/>
+					</div>
+					<div className="flex h-screen flex-1 overflow-x-hidden flex-col fixed right-0 w-[530px] ">
+						<button onClick={() => exportToHTML(items)}>Export</button>
+						<EditorContext.Provider
+							value={{
+								item: activeBlock,
+								onPropsChange(payload) {
+									updatePropsData(payload);
+								},
+							}}
+						>
+							<Editor />
+						</EditorContext.Provider>
+					</div>
+				</SidebarProvider>
+			</DragDropProvider>
+		</PageContext.Provider>
 	);
 }

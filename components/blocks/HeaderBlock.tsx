@@ -48,65 +48,109 @@ export default function Header({
 	logoText,
 	...props
 }: HeaderBlockProps) {
-	const styles: React.CSSProperties = {
-		height: heightInPx
+	const hasLogoImage = Boolean(logo && style?.backgroundImage && !logoText);
+	const hasLogoText = Boolean(logoText && logoText.trim().length > 0);
+	const resolvedHeight =
+		heightInPx !== undefined
 			? `${heightInPx}px`
-			: heightInPercentage
+			: heightInPercentage !== undefined
 				? `${heightInPercentage}%`
-				: 50,
+				: "72px";
+
+	const styles: React.CSSProperties = {
+		height: resolvedHeight,
 		position: sticky ? "sticky" : undefined,
 		top: sticky ? 0 : undefined,
-		padding: padding ? `${padding}px` : undefined,
+		padding: padding ? `${padding}px` : "10px 16px",
 		backdropFilter: blur ? `blur(${blurPx || 8}px)` : undefined,
 		display: "flex",
-		alignItems: "center",
-		justifyContent: "space-between",
+		alignItems: "stretch",
+		justifyContent: "center",
+		boxSizing: "border-box",
+		width: "100%",
 		gap: gap ? `${gap}px` : undefined,
 		...style,
 	};
 
 	return (
 		<header style={styles} {...props}>
-			{logo && style?.backgroundImage && (
-				<img
-					src={style.backgroundImage}
-					alt="Logo"
+			<div
+				style={{
+					width: "100%",
+					maxWidth: 1160,
+					display: "flex",
+					alignItems: "center",
+					justifyContent: "space-between",
+					gap: 16,
+					margin: "0 auto",
+				}}
+			>
+				<div
 					style={{
-						height: "80%",
-						maxHeight: "100%",
-						width: "auto",
-						objectFit: "contain",
-						flexShrink: 0,
-					}}
-				/>
-			)}
-			{logoText && (
-				<p
-					style={{
-						textAlign: style?.textAlign,
-						width: "100%",
-					}}
-				>
-					{logoText}
-				</p>
-			)}
-			{cta && (
-				<button
-					style={{
-						paddingInline: cta.paddingX,
-						paddingBlock: cta.paddingY,
-						background: cta.backgroundColor,
-						borderRadius: cta.radius,
+						display: "flex",
+						alignItems: "center",
+						gap: 12,
+						minWidth: 0,
 					}}
 				>
+					{hasLogoImage ? (
+						<img
+							src={style?.backgroundImage}
+							alt="Logo"
+							style={{
+								height: 40,
+								width: "auto",
+								maxWidth: 180,
+								objectFit: "contain",
+								display: "block",
+								flexShrink: 0,
+							}}
+						/>
+					) : null}
+					{hasLogoText ? (
+						<p
+							style={{
+								margin: 0,
+								fontSize: 22,
+								fontWeight: 700,
+								letterSpacing: 0.2,
+								lineHeight: 1.1,
+								color: style?.color ?? "#0f172a",
+								whiteSpace: "nowrap",
+								overflow: "hidden",
+								textOverflow: "ellipsis",
+							}}
+						>
+							{logoText}
+						</p>
+					) : null}
+				</div>
+				{cta ? (
 					<a
 						href={cta.link}
-						style={{ textDecoration: "none", color: cta.color }}
+						style={{
+							textDecoration: "none",
+						}}
 					>
-						{cta.text}
+						<button
+							style={{
+								paddingInline: cta.paddingX,
+								paddingBlock: cta.paddingY,
+								background: cta.backgroundColor,
+								borderRadius: cta.radius,
+								border: "none",
+								color: cta.color,
+								fontWeight: 600,
+								fontSize: 14,
+								cursor: "pointer",
+								boxShadow: "0 8px 20px rgba(15, 23, 42, 0.18)",
+							}}
+						>
+							{cta.text}
+						</button>
 					</a>
-				</button>
-			)}
+				) : null}
+			</div>
 
 			{children}
 		</header>
