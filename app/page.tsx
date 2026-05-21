@@ -1,6 +1,7 @@
 "use client";
 import { AppSidebar } from "@/components/app-sidebar";
 import { CtaBlock, CtaBlockProps } from "@/components/blocks/CtaBlock";
+import { EmbedBlock, EmbedBlockProps } from "@/components/blocks/EmbedBlock";
 import { FooterBlock, FooterBlockProps } from "@/components/blocks/FooterBlock";
 import Header, { HeaderBlockProps } from "@/components/blocks/HeaderBlock";
 import HeroBlock, { HeroBlockProps } from "@/components/blocks/HeroBlock";
@@ -35,6 +36,7 @@ export type BlockType =
 	| "header"
 	| "hero"
 	| "cta"
+	| "embed"
 	| "product"
 	| "footer"
 	| "separator"
@@ -43,6 +45,7 @@ export type BlockPropsMap = {
 	header: HeaderBlockProps;
 	hero: HeroBlockProps;
 	cta: CtaBlockProps;
+	embed: EmbedBlockProps;
 	product: ProductBlockProps;
 	footer: FooterBlockProps;
 	separator: SectionSeparatorBlockProps;
@@ -137,6 +140,22 @@ export const defaultProps: BlockPropsMap = {
 			borderTop: "1px solid rgba(255,255,255,0.15)",
 			borderBottom: "1px solid rgba(255,255,255,0.15)",
 		},
+	},
+	embed: {
+		src: "",
+		title: "Embedded content",
+		height: 520,
+		loading: "lazy",
+		allowFullScreen: true,
+		showContentPanel: false,
+		contentHeading: "Why this embed matters",
+		contentParagraph:
+			"Use this area to add context before users interact with the embedded content.",
+		contentBullets: [
+			"Highlight key outcomes",
+			"Add short setup notes",
+			"Include one clear call to action",
+		],
 	},
 	product: {
 		background: "#f8fafc",
@@ -304,6 +323,7 @@ export const COMPONENT_MAP: Record<BlockType, ComponentType> = {
 	header: Header,
 	hero: HeroBlock,
 	cta: CtaBlock,
+	embed: EmbedBlock,
 	product: ProductBlock,
 	footer: FooterBlock,
 	separator: SectionSeparatorBlock,

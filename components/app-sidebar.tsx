@@ -14,6 +14,7 @@ import { FooterBlock } from "./blocks/FooterBlock";
 import Header from "./blocks/HeaderBlock";
 import HeroBlock from "./blocks/HeroBlock";
 import { CtaBlock } from "./blocks/CtaBlock";
+import { EmbedBlock } from "./blocks/EmbedBlock";
 import ProductBlock from "./blocks/ProductBlock";
 import { SectionSeparatorBlock } from "./blocks/SectionSeparatorBlock";
 import { TestimonialBlock } from "./blocks/TestimonialBlock";
@@ -65,6 +66,7 @@ export function AppSidebar({ items }: { items: DroppedItem[] }) {
 		{ component: <Header />, id: "header", label: "Header" },
 		{ component: <HeroBlock />, id: "hero", label: "Hero" },
 		{ component: <CtaBlock />, id: "cta", label: "CTA Section" },
+		{ component: <EmbedBlock />, id: "embed", label: "Embed" },
 		{ component: <ProductBlock />, id: "product", label: "Product" },
 		{
 			component: <SectionSeparatorBlock />,

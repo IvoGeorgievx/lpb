@@ -3,9 +3,11 @@ import { useEditor } from "@/context/EditorContext";
 import { AnimatePresence, motion } from "motion/react";
 import { HeroBlockProps } from "../blocks/HeroBlock";
 import { CtaBlockProps } from "../blocks/CtaBlock";
+import { EmbedBlockProps } from "../blocks/EmbedBlock";
 import { HeaderEditor } from "./header/HeaderEditor";
 import { HeroEditor } from "./hero/HeroEditor";
 import { CtaEditor } from "./cta/CtaEditor";
+import { EmbedEditor } from "./embed/EmbedEditor";
 import { ProductEditor } from "./product/ProductEditor";
 import { ProductBlockProps } from "../blocks/ProductBlock";
 import { HeaderBlockProps } from "../blocks/HeaderBlock";
@@ -59,6 +61,8 @@ function renderEditorContent(item: DroppedItem) {
 			return <ProductEditor props={props as ProductBlockProps} />;
 		case "cta":
 			return <CtaEditor props={props as CtaBlockProps} />;
+		case "embed":
+			return <EmbedEditor props={props as EmbedBlockProps} />;
 		case "footer":
 			return <FooterEditor props={props as FooterBlockProps} />;
 		case "separator":
