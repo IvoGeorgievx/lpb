@@ -157,16 +157,6 @@ export function HeaderEditor({ props }: HeaderEditorProps) {
 					</div>
 					<Separator />
 					<div className="flex items-center space-x-2">
-						{/* <Switch
-							id="logo-switch"
-							checked={logo === "image"}
-							onCheckedChange={() => {
-								setLogo((prev) => (prev === "image" ? "text" : "image"));
-							}}
-						/>
-						<Label htmlFor="logo-switch">
-							{logo === "image" ? "Image" : "Text"}
-						</Label> */}
 						<FieldGroup className="mx-auto w-56">
 							<Field orientation="horizontal">
 								<Checkbox
