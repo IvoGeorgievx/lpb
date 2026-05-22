@@ -425,7 +425,9 @@ export function ProductEditor({ props }: ProductEditorProps) {
 										<Label>Card Background</Label>
 										<Input
 											type="color"
-											value={selectedCard.style?.background?.toString() || "#ffffff"}
+											value={
+												selectedCard.style?.background?.toString() || "#ffffff"
+											}
 											onChange={(e) =>
 												updateSelectedCard((card) => ({
 													...card,
@@ -498,7 +500,9 @@ export function ProductEditor({ props }: ProductEditorProps) {
 											placeholder="lucide lucide-award"
 											className="h-11 rounded-xl"
 											value={selectedCard.iconClass || ""}
-											onChange={(e) => handleCardIconClassChange(e.target.value)}
+											onChange={(e) =>
+												handleCardIconClassChange(e.target.value)
+											}
 										/>
 									</div>
 									<div className="space-y-2">
@@ -506,8 +510,10 @@ export function ProductEditor({ props }: ProductEditorProps) {
 										<Input
 											id="card-icon-color"
 											type="color"
-											value={selectedCard.iconColor || "#2563eb"}
-											onChange={(e) => handleCardIconColorChange(e.target.value)}
+											value={selectedCard.iconColor || "#ffffff"}
+											onChange={(e) =>
+												handleCardIconColorChange(e.target.value)
+											}
 										/>
 									</div>
 									<div className="space-y-2">
@@ -552,7 +558,11 @@ export function ProductEditor({ props }: ProductEditorProps) {
 											onChange={(e) =>
 												updateSelectedCard((card) => ({
 													...card,
-													heading: { ...card.heading, content: card.heading?.content || "", color: e.target.value },
+													heading: {
+														...card.heading,
+														content: card.heading?.content || "",
+														color: e.target.value,
+													},
 												}))
 											}
 										/>
@@ -565,7 +575,11 @@ export function ProductEditor({ props }: ProductEditorProps) {
 											onChange={(e) =>
 												updateSelectedCard((card) => ({
 													...card,
-													subheading: { ...card.subheading, content: card.subheading?.content || "", color: e.target.value },
+													subheading: {
+														...card.subheading,
+														content: card.subheading?.content || "",
+														color: e.target.value,
+													},
 												}))
 											}
 										/>
@@ -650,7 +664,9 @@ export function ProductEditor({ props }: ProductEditorProps) {
 																value={additionalItem.color || "#64748b"}
 																onChange={(e) =>
 																	updateSelectedCard((card) => {
-																		const next = [...(card.additionalContent || [])];
+																		const next = [
+																			...(card.additionalContent || []),
+																		];
 																		next[idx] = {
 																			...next[idx],
 																			color: e.target.value,
@@ -664,7 +680,9 @@ export function ProductEditor({ props }: ProductEditorProps) {
 																value={Number(additionalItem.fontSize || 14)}
 																onChange={(e) =>
 																	updateSelectedCard((card) => {
-																		const next = [...(card.additionalContent || [])];
+																		const next = [
+																			...(card.additionalContent || []),
+																		];
 																		next[idx] = {
 																			...next[idx],
 																			fontSize: Number(e.target.value || 14),
@@ -681,7 +699,9 @@ export function ProductEditor({ props }: ProductEditorProps) {
 																value={Number(additionalItem.fontWeight || 500)}
 																onChange={(e) =>
 																	updateSelectedCard((card) => {
-																		const next = [...(card.additionalContent || [])];
+																		const next = [
+																			...(card.additionalContent || []),
+																		];
 																		next[idx] = {
 																			...next[idx],
 																			fontWeight: Number(e.target.value || 500),

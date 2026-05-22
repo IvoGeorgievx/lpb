@@ -592,7 +592,6 @@ export default function Home() {
 					</div>
 					<div className="app-editor-panel p-4 flex flex-col">
 						<Button
-							size="lg"
 							variant="outline"
 							onClick={() => exportToHTML(items)}
 							className="mb-4"

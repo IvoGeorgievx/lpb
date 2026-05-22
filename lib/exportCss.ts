@@ -100,7 +100,7 @@ header,
 	font-size: 26px;
 	border-radius: 14px;
 	background: rgba(59, 130, 246, 0.12);
-	color: #2563eb;
+	color: ##ffffff;
 }
 
 .product-card--featured {

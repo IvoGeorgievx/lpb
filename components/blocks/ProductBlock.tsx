@@ -74,7 +74,7 @@ export default function ProductBlock({
 					{card.iconClass && (
 						<i
 							className={resolveLucideIconClass(card.iconClass)}
-							style={{ color: card.iconColor || "#2563eb" }}
+							style={{ color: card.iconColor || "#ffffff" }}
 							aria-hidden="true"
 						/>
 					)}
@@ -113,17 +113,16 @@ export default function ProductBlock({
 									fontWeight,
 									iconClass,
 									iconColor,
-								} =
-									contentPiece;
+								} = contentPiece;
 								return (
 									<div className="product-card-additional-item" key={idx}>
-									{iconClass && (
-										<i
-											className={resolveLucideIconClass(iconClass)}
-											style={{ color: iconColor || "#334155" }}
-											aria-hidden="true"
-										/>
-									)}
+										{iconClass && (
+											<i
+												className={resolveLucideIconClass(iconClass)}
+												style={{ color: iconColor || "#334155" }}
+												aria-hidden="true"
+											/>
+										)}
 										<p
 											style={{
 												fontSize,
