@@ -4,6 +4,7 @@ export interface TextConfig {
 	fontWeight?: "normal" | "bold" | number;
 	color?: string;
 	iconClass?: string;
+	iconColor?: string;
 }
 
 export type ProductCardVariants =
@@ -16,6 +17,7 @@ export type ProductCardVariants =
 export interface ProductCard {
 	id: string;
 	iconClass?: string;
+	iconColor?: string;
 	heading?: TextConfig;
 	subheading?: TextConfig;
 	additionalContent?: TextConfig[];
@@ -35,12 +37,17 @@ const resolveLucideIconClass = (iconClass?: string) => {
 	if (!iconClass) return "";
 	const tokens = iconClass.trim().split(/\s+/);
 	const iconToken = tokens.find((token) => token.startsWith("icon-"));
-	if (iconToken) return iconToken;
+	if (iconToken) return `icon ${iconToken}`;
 
 	const lucideToken = tokens.find((token) => token.startsWith("lucide-"));
-	if (lucideToken) return `icon-${lucideToken.replace("lucide-", "")}`;
+	if (lucideToken) return `icon icon-${lucideToken.replace("lucide-", "")}`;
 
-	if (tokens.length === 1) return `icon-${tokens[0]}`;
+	if (tokens.length === 1) {
+		const single = tokens[0].startsWith("lucide")
+			? tokens[0].replace("lucide-", "")
+			: tokens[0];
+		return `icon icon-${single}`;
+	}
 	return "";
 };
 
@@ -64,6 +71,13 @@ export default function ProductBlock({
 					className={`product-card ${card.variant && `product-card--${card.variant}`}`}
 					style={card.style}
 				>
+					{card.iconClass && (
+						<i
+							className={resolveLucideIconClass(card.iconClass)}
+							style={{ color: card.iconColor || "#2563eb" }}
+							aria-hidden="true"
+						/>
+					)}
 					{card.heading && (
 						<h3
 							className="product-card-heading"
@@ -92,12 +106,23 @@ export default function ProductBlock({
 					{card.additionalContent && card.additionalContent.length > 0 && (
 						<div className="product-card-additional">
 							{card.additionalContent.map((contentPiece, idx) => {
-								const { content, color, fontSize, fontWeight, iconClass } =
+								const {
+									content,
+									color,
+									fontSize,
+									fontWeight,
+									iconClass,
+									iconColor,
+								} =
 									contentPiece;
 								return (
 									<div className="product-card-additional-item" key={idx}>
 									{iconClass && (
-										<i className={resolveLucideIconClass(iconClass)} aria-hidden="true" />
+										<i
+											className={resolveLucideIconClass(iconClass)}
+											style={{ color: iconColor || "#334155" }}
+											aria-hidden="true"
+										/>
 									)}
 										<p
 											style={{

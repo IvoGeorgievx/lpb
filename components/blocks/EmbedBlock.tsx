@@ -96,7 +96,6 @@ export const EmbedBlock = ({
 			style={{
 				width: "100%",
 				padding: "24px 16px",
-				background: "transparent",
 				...style,
 			}}
 			{...props}

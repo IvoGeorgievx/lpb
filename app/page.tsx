@@ -18,11 +18,13 @@ import {
 } from "@/components/blocks/TestimonialBlock";
 import { Editor } from "@/components/editor/Editor";
 import Renderer from "@/components/renderer/Renderer";
+import { Button } from "@/components/ui/button";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { EditorContext } from "@/context/EditorContext";
 import { PageContext, usePage } from "@/context/PageContext";
 import { exportToHTML } from "@/lib/export";
 import { DragDropProvider, useDraggable, useDroppable } from "@dnd-kit/react";
+import { label } from "motion/react-client";
 import {
 	ComponentType,
 	ReactNode,
@@ -277,6 +279,24 @@ export const defaultProps: BlockPropsMap = {
 			height: "22vh",
 			color: "#e2e8f0",
 		},
+		links: [
+			{
+				label: "Facebook",
+				href: "",
+			},
+			{
+				label: "Instagram",
+				href: "",
+			},
+			{
+				label: "LinkedIn",
+				href: "",
+			},
+			{
+				label: "Youtube",
+				href: "",
+			},
+		],
 		background:
 			"radial-gradient(820px 220px at 12% -35%, rgba(148,163,184,0.2), transparent), linear-gradient(120deg, #020617, #0f172a 62%, #1e293b)",
 	},
@@ -570,8 +590,15 @@ export default function Home() {
 							/>
 						</div>
 					</div>
-					<div className="app-editor-panel flex flex-col">
-						<button onClick={() => exportToHTML(items)}>Export</button>
+					<div className="app-editor-panel p-4 flex flex-col">
+						<Button
+							size="lg"
+							variant="outline"
+							onClick={() => exportToHTML(items)}
+							className="mb-4"
+						>
+							Export
+						</Button>
 						<EditorContext.Provider
 							value={{
 								item: activeBlock,

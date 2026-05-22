@@ -848,13 +848,15 @@ export const GlobalEditor = () => {
 									},
 									carousel: {
 										...(block.props.carousel ?? { type: "default" as const }),
-										slides: (block.props.carousel?.slides ?? []).map((slide, idx) => ({
-											...slide,
-											bgColor:
-												idx % 2 === 0
-													? "linear-gradient(160deg, #ffffff 0%, #f8fafc 100%)"
-													: "linear-gradient(160deg, #f8fafc 0%, #f1f5f9 100%)",
-										})),
+										slides: (block.props.carousel?.slides ?? []).map(
+											(slide, idx) => ({
+												...slide,
+												bgColor:
+													idx % 2 === 0
+														? "linear-gradient(160deg, #ffffff 0%, #f8fafc 100%)"
+														: "linear-gradient(160deg, #f8fafc 0%, #f1f5f9 100%)",
+											}),
+										),
 									},
 								},
 							};
@@ -1008,13 +1010,15 @@ export const GlobalEditor = () => {
 									},
 									carousel: {
 										...(block.props.carousel ?? { type: "default" as const }),
-										slides: (block.props.carousel?.slides ?? []).map((slide, idx) => ({
-											...slide,
-											bgColor:
-												idx % 2 === 0
-													? "linear-gradient(160deg, #fff7ed 0%, #ffedd5 100%)"
-													: "linear-gradient(160deg, #ffedd5 0%, #ffe4e6 100%)",
-										})),
+										slides: (block.props.carousel?.slides ?? []).map(
+											(slide, idx) => ({
+												...slide,
+												bgColor:
+													idx % 2 === 0
+														? "linear-gradient(160deg, #fff7ed 0%, #ffedd5 100%)"
+														: "linear-gradient(160deg, #ffedd5 0%, #ffe4e6 100%)",
+											}),
+										),
 									},
 								},
 							};
@@ -1169,13 +1173,15 @@ export const GlobalEditor = () => {
 									},
 									carousel: {
 										...(block.props.carousel ?? { type: "default" as const }),
-										slides: (block.props.carousel?.slides ?? []).map((slide, idx) => ({
-											...slide,
-											bgColor:
-												idx % 2 === 0
-													? "linear-gradient(160deg, #ecfeff 0%, #e0f2fe 100%)"
-													: "linear-gradient(160deg, #cffafe 0%, #e0f2fe 100%)",
-										})),
+										slides: (block.props.carousel?.slides ?? []).map(
+											(slide, idx) => ({
+												...slide,
+												bgColor:
+													idx % 2 === 0
+														? "linear-gradient(160deg, #ecfeff 0%, #e0f2fe 100%)"
+														: "linear-gradient(160deg, #cffafe 0%, #e0f2fe 100%)",
+											}),
+										),
 									},
 								},
 							};

@@ -215,6 +215,42 @@ export function ProductEditor({ props }: ProductEditorProps) {
 		}));
 	};
 
+	const handleCardIconClassChange = (value: string) => {
+		updateSelectedCard((card) => ({
+			...card,
+			iconClass: value,
+		}));
+	};
+
+	const handleCardIconColorChange = (value: string) => {
+		updateSelectedCard((card) => ({
+			...card,
+			iconColor: value,
+		}));
+	};
+
+	const handleAdditionalIconClassChange = (index: number, value: string) => {
+		updateSelectedCard((card) => {
+			const next = [...(card.additionalContent || [])];
+			next[index] = {
+				...next[index],
+				iconClass: value,
+			};
+			return { ...card, additionalContent: next };
+		});
+	};
+
+	const handleAdditionalIconColorChange = (index: number, value: string) => {
+		updateSelectedCard((card) => {
+			const next = [...(card.additionalContent || [])];
+			next[index] = {
+				...next[index],
+				iconColor: value,
+			};
+			return { ...card, additionalContent: next };
+		});
+	};
+
 	return (
 		<Tabs defaultValue="appearance" className="w-full p-4">
 			<TabsList className="grid w-full grid-cols-2">
@@ -456,6 +492,25 @@ export function ProductEditor({ props }: ProductEditorProps) {
 
 								<div className="grid gap-4 md:grid-cols-2">
 									<div className="space-y-2">
+										<Label htmlFor="card-icon-class">Card Icon Class</Label>
+										<Input
+											id="card-icon-class"
+											placeholder="lucide lucide-award"
+											className="h-11 rounded-xl"
+											value={selectedCard.iconClass || ""}
+											onChange={(e) => handleCardIconClassChange(e.target.value)}
+										/>
+									</div>
+									<div className="space-y-2">
+										<Label htmlFor="card-icon-color">Card Icon Color</Label>
+										<Input
+											id="card-icon-color"
+											type="color"
+											value={selectedCard.iconColor || "#2563eb"}
+											onChange={(e) => handleCardIconColorChange(e.target.value)}
+										/>
+									</div>
+									<div className="space-y-2">
 										<Label htmlFor="card-heading">Heading</Label>
 
 										<Input
@@ -588,49 +643,76 @@ export function ProductEditor({ props }: ProductEditorProps) {
 															className="border-none shadow-none focus-visible:ring-0"
 														/>
 													</div>
-													<div className="mt-3 grid gap-3 md:grid-cols-3">
-														<Input
-															type="color"
-															value={additionalItem.color || "#64748b"}
-															onChange={(e) =>
-																updateSelectedCard((card) => {
-																	const next = [...(card.additionalContent || [])];
-																	next[idx] = { ...next[idx], color: e.target.value };
-																	return { ...card, additionalContent: next };
-																})
-															}
-														/>
-														<Input
-															type="number"
-															value={Number(additionalItem.fontSize || 14)}
-															onChange={(e) =>
-																updateSelectedCard((card) => {
-																	const next = [...(card.additionalContent || [])];
-																	next[idx] = {
-																		...next[idx],
-																		fontSize: Number(e.target.value || 14),
-																	};
-																	return { ...card, additionalContent: next };
-																})
-															}
-														/>
-														<Input
-															type="number"
-															min={300}
-															max={900}
-															step={100}
-															value={Number(additionalItem.fontWeight || 500)}
-															onChange={(e) =>
-																updateSelectedCard((card) => {
-																	const next = [...(card.additionalContent || [])];
-																	next[idx] = {
-																		...next[idx],
-																		fontWeight: Number(e.target.value || 500),
-																	};
-																	return { ...card, additionalContent: next };
-																})
-															}
-														/>
+													<div className="mt-3 space-y-3">
+														<div className="grid gap-3 md:grid-cols-3">
+															<Input
+																type="color"
+																value={additionalItem.color || "#64748b"}
+																onChange={(e) =>
+																	updateSelectedCard((card) => {
+																		const next = [...(card.additionalContent || [])];
+																		next[idx] = {
+																			...next[idx],
+																			color: e.target.value,
+																		};
+																		return { ...card, additionalContent: next };
+																	})
+																}
+															/>
+															<Input
+																type="number"
+																value={Number(additionalItem.fontSize || 14)}
+																onChange={(e) =>
+																	updateSelectedCard((card) => {
+																		const next = [...(card.additionalContent || [])];
+																		next[idx] = {
+																			...next[idx],
+																			fontSize: Number(e.target.value || 14),
+																		};
+																		return { ...card, additionalContent: next };
+																	})
+																}
+															/>
+															<Input
+																type="number"
+																min={300}
+																max={900}
+																step={100}
+																value={Number(additionalItem.fontWeight || 500)}
+																onChange={(e) =>
+																	updateSelectedCard((card) => {
+																		const next = [...(card.additionalContent || [])];
+																		next[idx] = {
+																			...next[idx],
+																			fontWeight: Number(e.target.value || 500),
+																		};
+																		return { ...card, additionalContent: next };
+																	})
+																}
+															/>
+														</div>
+														<div className="grid gap-3 md:grid-cols-2">
+															<Input
+																placeholder="lucide lucide-check"
+																value={additionalItem.iconClass || ""}
+																onChange={(e) =>
+																	handleAdditionalIconClassChange(
+																		idx,
+																		e.target.value,
+																	)
+																}
+															/>
+															<Input
+																type="color"
+																value={additionalItem.iconColor || "#334155"}
+																onChange={(e) =>
+																	handleAdditionalIconColorChange(
+																		idx,
+																		e.target.value,
+																	)
+																}
+															/>
+														</div>
 													</div>
 												</div>
 											),

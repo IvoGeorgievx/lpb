@@ -30,7 +30,6 @@ interface HeaderEditorProps {
 export function HeaderEditor({ props }: HeaderEditorProps) {
 	const { item, onPropsChange } = useEditor();
 	const timeoutRef = useRef<NodeJS.Timeout | null>(null);
-	const [logo, setLogo] = useState<"image" | "text">("image");
 	const [cta, setCta] = useState(!!(item?.props as HeaderBlockProps).cta?.text);
 
 	const handleColorChange = useCallback(
@@ -158,7 +157,7 @@ export function HeaderEditor({ props }: HeaderEditorProps) {
 					</div>
 					<Separator />
 					<div className="flex items-center space-x-2">
-						<Switch
+						{/* <Switch
 							id="logo-switch"
 							checked={logo === "image"}
 							onCheckedChange={() => {
@@ -167,7 +166,7 @@ export function HeaderEditor({ props }: HeaderEditorProps) {
 						/>
 						<Label htmlFor="logo-switch">
 							{logo === "image" ? "Image" : "Text"}
-						</Label>
+						</Label> */}
 						<FieldGroup className="mx-auto w-56">
 							<Field orientation="horizontal">
 								<Checkbox
@@ -187,106 +186,86 @@ export function HeaderEditor({ props }: HeaderEditorProps) {
 						</FieldGroup>
 					</div>
 
-					{logo === "text" ? (
-						<div className="space-y-2 flex gap-5">
-							<div className="w-full m-0">
-								<Input
-									placeholder="Logo"
-									value={props.logoText || ""}
-									onChange={(e) =>
-										onPropsChange({
-											id: item.id,
-											props: {
-												...props,
-												style: {
-													backgroundImage: undefined,
-												},
-												logoText: e.target.value,
+					<div className="space-y-2 flex gap-5">
+						<div className="w-full m-0">
+							<Input
+								placeholder="Logo"
+								value={props.logoText || ""}
+								onChange={(e) =>
+									onPropsChange({
+										id: item.id,
+										props: {
+											...props,
+											style: {
+												backgroundImage: undefined,
 											},
-										})
-									}
-								/>
-							</div>
-							<div className="w-full flex justify-center items-center gap-5">
-								<ToggleGroup
-									variant="outline"
-									type="single"
-									onValueChange={(value) => {
-										console.log(value);
-										onPropsChange({
-											id: item.id,
-											props: {
-												style: {
-													textAlign: value as React.CSSProperties["textAlign"],
-												},
-											},
-										});
-									}}
-								>
-									<Tooltip>
-										<TooltipTrigger asChild>
-											<ToggleGroupItem
-												className="cursor-pointer"
-												value="start"
-												aria-label="Toggle align left"
-											>
-												<TextAlignStart />
-											</ToggleGroupItem>
-										</TooltipTrigger>
-										<TooltipContent side="left">
-											<p>Align Logo Left</p>
-										</TooltipContent>
-									</Tooltip>
-									<Tooltip>
-										<TooltipTrigger asChild>
-											<ToggleGroupItem
-												className="cursor-pointer"
-												value="center"
-												aria-label="Toggle align center"
-											>
-												<TextAlignJustify />
-											</ToggleGroupItem>
-										</TooltipTrigger>
-										<TooltipContent>
-											<p>Align Logo Middle</p>
-										</TooltipContent>
-									</Tooltip>
-									<Tooltip>
-										<TooltipTrigger asChild>
-											<ToggleGroupItem
-												className="cursor-pointer"
-												value="end"
-												aria-label="Toggle align right"
-											>
-												<TextAlignEnd />
-											</ToggleGroupItem>
-										</TooltipTrigger>
-										<TooltipContent side="right">
-											<p>Align Logo Right</p>
-										</TooltipContent>
-									</Tooltip>
-								</ToggleGroup>
-							</div>
-						</div>
-					) : (
-						<Input
-							placeholder="Logo Image Url"
-							value={props.style?.backgroundImage || ""}
-							onChange={(e) =>
-								onPropsChange({
-									id: item.id,
-									props: {
-										...props,
-										logoText: "",
-										logo: true,
-										style: {
-											backgroundImage: e.target.value,
+											logoText: e.target.value,
 										},
-									},
-								})
-							}
-						/>
-					)}
+									})
+								}
+							/>
+						</div>
+						<div className="w-full flex justify-center items-center gap-5">
+							<ToggleGroup
+								variant="outline"
+								type="single"
+								onValueChange={(value) => {
+									console.log(value);
+									onPropsChange({
+										id: item.id,
+										props: {
+											style: {
+												textAlign: value as React.CSSProperties["textAlign"],
+											},
+										},
+									});
+								}}
+							>
+								<Tooltip>
+									<TooltipTrigger asChild>
+										<ToggleGroupItem
+											className="cursor-pointer"
+											value="start"
+											aria-label="Toggle align left"
+										>
+											<TextAlignStart />
+										</ToggleGroupItem>
+									</TooltipTrigger>
+									<TooltipContent side="left">
+										<p>Align Logo Left</p>
+									</TooltipContent>
+								</Tooltip>
+								<Tooltip>
+									<TooltipTrigger asChild>
+										<ToggleGroupItem
+											className="cursor-pointer"
+											value="center"
+											aria-label="Toggle align center"
+										>
+											<TextAlignJustify />
+										</ToggleGroupItem>
+									</TooltipTrigger>
+									<TooltipContent>
+										<p>Align Logo Middle</p>
+									</TooltipContent>
+								</Tooltip>
+								<Tooltip>
+									<TooltipTrigger asChild>
+										<ToggleGroupItem
+											className="cursor-pointer"
+											value="end"
+											aria-label="Toggle align right"
+										>
+											<TextAlignEnd />
+										</ToggleGroupItem>
+									</TooltipTrigger>
+									<TooltipContent side="right">
+										<p>Align Logo Right</p>
+									</TooltipContent>
+								</Tooltip>
+							</ToggleGroup>
+						</div>
+					</div>
 
 					<FieldGroup className="w-56">
 						<Field orientation="horizontal">

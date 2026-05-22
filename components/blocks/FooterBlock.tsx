@@ -16,7 +16,7 @@ export interface FooterBlockProps extends React.ComponentPropsWithRef<"footer"> 
 }
 
 export const FooterBlock = ({
-	logo = { text: "Paste image url in the editor" },
+	logo = { text: "Edit this." },
 	links,
 	background,
 	copyright = "(c) 2026 Your Company. All rights reserved.",
