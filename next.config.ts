@@ -1,12 +1,16 @@
 import type { NextConfig } from "next";
 
-const isProd = process.env.NODE_ENV === "production";
+const isGithubActionsBuild = process.env.GITHUB_ACTIONS === "true";
+const repoName = process.env.GITHUB_REPOSITORY?.split("/")[1];
+const basePath =
+	isGithubActionsBuild && repoName ? `/${repoName}` : "";
 
 const nextConfig: NextConfig = {
 	output: "export",
+	trailingSlash: true,
 	images: { unoptimized: true },
-	basePath: isProd ? "/lpb-v1" : "",
-	assetPrefix: isProd ? "/lpb-v1/" : "",
+	basePath,
+	assetPrefix: basePath ? `${basePath}/` : "",
 };
 
 export default nextConfig;
