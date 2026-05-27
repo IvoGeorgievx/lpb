@@ -425,6 +425,14 @@ export const getThemeCssVariables = (themeId: ThemeId) => {
 		"--lpb-font-body": theme.typography.body,
 		"--lpb-font-heading": theme.typography.heading,
 		"--lpb-letter-spacing": theme.typography.letterSpacing,
+		"--lpb-scrollbar-track":
+			`color-mix(in srgb, ${theme.tokens.background} 86%, ${theme.tokens.card})`,
+		"--lpb-scrollbar-thumb":
+			`color-mix(in srgb, ${theme.tokens.muted} 68%, ${theme.tokens.border})`,
+		"--lpb-scrollbar-thumb-hover":
+			`color-mix(in srgb, ${theme.tokens.accent} 58%, ${theme.tokens.foreground})`,
+		"--lpb-scrollbar-thumb-border":
+			`color-mix(in srgb, ${theme.tokens.background} 82%, ${theme.tokens.card})`,
 	};
 };
 
@@ -460,5 +468,13 @@ export const getBuilderCssVariables = (themeId: ThemeId) => {
 		"--sidebar-foreground": theme.tokens.foreground,
 		"--sidebar-primary": theme.tokens.primary,
 		"--sidebar-primary-foreground": theme.tokens.card,
+		"--scrollbar-track":
+			`color-mix(in srgb, ${theme.tokens.background} 86%, ${theme.tokens.card})`,
+		"--scrollbar-thumb":
+			`color-mix(in srgb, ${theme.tokens.muted} 68%, ${theme.tokens.border})`,
+		"--scrollbar-thumb-hover":
+			`color-mix(in srgb, ${theme.tokens.accent} 58%, ${theme.tokens.foreground})`,
+		"--scrollbar-thumb-border":
+			`color-mix(in srgb, ${theme.tokens.background} 82%, ${theme.tokens.card})`,
 	};
 };

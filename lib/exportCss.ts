@@ -37,12 +37,34 @@ body {
 	width: 100%;
 	max-width: 100%;
 	overflow-x: hidden;
+	scrollbar-width: thin;
+	scrollbar-color: var(--lpb-scrollbar-thumb) var(--lpb-scrollbar-track);
 }
 
 *,
 *::before,
 *::after {
 	box-sizing: border-box;
+}
+
+::-webkit-scrollbar {
+	width: 11px;
+	height: 11px;
+}
+
+::-webkit-scrollbar-track {
+	background: var(--lpb-scrollbar-track);
+	border-radius: 6px;
+}
+
+::-webkit-scrollbar-thumb {
+	background: var(--lpb-scrollbar-thumb);
+	border-radius: 6px;
+	border: 2px solid var(--lpb-scrollbar-thumb-border);
+}
+
+::-webkit-scrollbar-thumb:hover {
+	background: var(--lpb-scrollbar-thumb-hover);
 }
 
 body {

@@ -16,7 +16,7 @@ export function EmbedEditor({ props }: EmbedEditorProps) {
 	const bulletText = (props.contentBullets ?? []).join("\n");
 
 	return (
-		<div className="p-4 w-full flex flex-col gap-5">
+		<div className="w-full flex flex-col gap-5">
 			<div className="flex flex-col gap-2">
 				<Label>Embed URL</Label>
 				<Input

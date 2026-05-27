@@ -61,7 +61,7 @@ export function HeroEditor({ props }: HeroEditorProps) {
 	if (!item) return;
 
 	return (
-		<div key={item.id} className="p-4 w-full">
+		<div key={item.id} className="w-full">
 			<Tabs defaultValue="appearance" className="w-full">
 				<TabsList className="grid w-full grid-cols-1">
 					<TabsTrigger value="appearance">Appearance</TabsTrigger>

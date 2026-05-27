@@ -81,7 +81,7 @@ export function HeaderEditor({ props }: HeaderEditorProps) {
 	);
 	if (!item) return null;
 	return (
-		<div key={item.id} className="p-4 w-full">
+		<div key={item.id} className="w-full">
 			<Tabs defaultValue="layout" className="w-full">
 				<TabsList className="grid w-full grid-cols-2">
 					<TabsTrigger value="layout">Layout</TabsTrigger>

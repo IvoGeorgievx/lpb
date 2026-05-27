@@ -123,6 +123,35 @@
 		@apply border-border outline-ring/50;
 	}
 
+	html,
+	body,
+	.app-canvas-shell,
+	.app-editor-panel,
+	.app-sidebar {
+		scrollbar-width: thin;
+		scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+	}
+
+	::-webkit-scrollbar {
+		width: 11px;
+		height: 11px;
+	}
+
+	::-webkit-scrollbar-track {
+		background: var(--scrollbar-track);
+		border-radius: 6px;
+	}
+
+	::-webkit-scrollbar-thumb {
+		background: var(--scrollbar-thumb);
+		border-radius: 6px;
+		border: 2px solid var(--scrollbar-thumb-border);
+	}
+
+	::-webkit-scrollbar-thumb:hover {
+		background: var(--scrollbar-thumb-hover);
+	}
+
 	@layer base {
 		h1,
 		h2,
