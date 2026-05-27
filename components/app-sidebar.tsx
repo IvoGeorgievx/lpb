@@ -8,8 +8,8 @@ import {
 	SidebarGroupLabel,
 	SidebarHeader,
 } from "@/components/ui/sidebar";
-import { useDraggable, useDroppable } from "@dnd-kit/react";
-import { ReactElement, useEffect, useState } from "react";
+import { useDragOperation, useDraggable, useDroppable } from "@dnd-kit/react";
+import { ReactElement, useEffect, useRef, useState } from "react";
 import { FooterBlock } from "./blocks/FooterBlock";
 import Header from "./blocks/HeaderBlock";
 import HeroBlock from "./blocks/HeroBlock";
@@ -20,6 +20,7 @@ import { SectionSeparatorBlock } from "./blocks/SectionSeparatorBlock";
 import { TestimonialBlock } from "./blocks/TestimonialBlock";
 import { DroppedItem } from "@/app/page";
 import { generateHTML } from "@/lib/export";
+import { cn } from "@/lib/utils";
 import { Button } from "./ui/button";
 import { Eye, Monitor, Smartphone } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
@@ -29,23 +30,110 @@ interface BuildingComponents {
 	label: string;
 }
 
+function BlockPreview({ id }: { id: string }) {
+	switch (id) {
+		case "header":
+			return (
+				<div className="space-y-2 p-1">
+					<div className="h-6 w-full rounded bg-slate-300 dark:bg-slate-700" />
+					<div className="h-2 w-full rounded bg-slate-200 dark:bg-slate-800" />
+					<div className="h-2 w-full rounded bg-slate-200 dark:bg-slate-800" />
+					<div className="h-2 w-full rounded bg-slate-200 dark:bg-slate-800" />
+				</div>
+			);
+		case "hero":
+			return (
+				<div className="space-y-2 p-1">
+					<div className="h-8 w-full rounded bg-slate-300 dark:bg-slate-700" />
+					<div className="h-5 mx-auto w-16 rounded-md bg-slate-300 dark:bg-slate-700" />
+				</div>
+			);
+		case "cta":
+			return (
+				<div className="rounded-lg border border-slate-300/80 dark:border-slate-700 p-1">
+					<div className="space-y-2">
+						<div className="h-2 w-full rounded bg-slate-300 dark:bg-slate-700" />
+						<div className="h-2 w-full rounded bg-slate-200 dark:bg-slate-800" />
+						<div className="h-4  mx-auto w-14 rounded-md bg-slate-300 dark:bg-slate-700" />
+					</div>
+				</div>
+			);
+		case "embed":
+			return (
+				<div className="space-y-2 p-1">
+					<div className="h-10 w-full rounded-lg border border-slate-300 bg-slate-100 dark:border-slate-700 dark:bg-slate-800" />
+				</div>
+			);
+		case "product":
+			return (
+				<div className="grid grid-cols-3 gap-2 p-1">
+					<div className="h-8 w-full rounded bg-slate-300 dark:bg-slate-700" />
+					<div className="h-8 w-full rounded bg-slate-300 dark:bg-slate-700" />
+					<div className="h-8 w-full rounded bg-slate-300 dark:bg-slate-700" />
+				</div>
+			);
+		case "separator":
+			return (
+				<div className="flex h-8 items-center p-1">
+					<div className="h-px w-full bg-slate-300 dark:bg-slate-700" />
+				</div>
+			);
+		case "testimonial":
+			return (
+				<div className="rounded-lg border border-slate-300/80 dark:border-slate-700 p-1">
+					<div className="space-y-2">
+						<div className="h-2 w-full rounded bg-slate-200 dark:bg-slate-800" />
+						<div className="h-2 w-5/6 rounded bg-slate-200 dark:bg-slate-800" />
+						<div className="mt-1 h-2 w-1/3 rounded bg-slate-300 dark:bg-slate-700" />
+					</div>
+				</div>
+			);
+		case "footer":
+			return (
+				<div className="space-y-2 p-1">
+					<div className="h-2 w-full rounded bg-slate-200 dark:bg-slate-800" />
+					<div className="h-2 w-full rounded bg-slate-200 dark:bg-slate-800" />
+					<div className="h-2 w-full rounded bg-slate-200 dark:bg-slate-800" />
+					<div className="h-6 w-full rounded bg-slate-300 dark:bg-slate-700" />
+				</div>
+			);
+		default:
+			return (
+				<div className="h-8 w-full rounded bg-slate-200 dark:bg-slate-800" />
+			);
+	}
+}
+
 function DraggableItem({ id, label }: { id: string; label: string }) {
-	const { ref } = useDraggable({ id });
+	const { ref, isDragging } = useDraggable({ id });
 
 	return (
-		<button
+		<div
 			ref={ref}
-			className="w-full p-4 border rounded-2xl cursor-grab active:cursor-grabbing bg-white dark:bg-zinc-900 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition"
+			className={cn(
+				"w-full cursor-grab rounded-2xl border border-border bg-card p-3 text-card-foreground transition active:cursor-grabbing",
+				"hover:bg-muted/50",
+				isDragging && "scale-[0.99] opacity-75",
+			)}
 		>
-			{label}
-		</button>
+			<div className="mb-2 flex items-center justify-between">
+				<p className="text-sm font-medium">{label}</p>
+				<span className="text-[10px] uppercase tracking-[0.12em] text-muted-foreground">
+					drag
+				</span>
+			</div>
+			<BlockPreview id={id} />
+		</div>
 	);
 }
 
 export function AppSidebar({ items }: { items: DroppedItem[] }) {
 	const [open, setOpen] = useState(false);
 	const [mode, setMode] = useState<"desktop" | "mobile">("desktop");
-	const sidebarDrop = useDroppable({ id: "sidebar-remove" });
+	const sidebarRemoveRef = useRef<HTMLDivElement | null>(null);
+	useDroppable({ id: "sidebar-remove", element: sidebarRemoveRef });
+	const { target } = useDragOperation();
+	const isSidebarDropTarget = target?.id === "sidebar-remove";
 
 	useEffect(() => {
 		const handleKeyDown = (e: KeyboardEvent) => {
@@ -82,8 +170,8 @@ export function AppSidebar({ items }: { items: DroppedItem[] }) {
 	];
 	return (
 		<>
-			<div ref={sidebarDrop.ref}>
-				<Sidebar className="app-sidebar fixed left-0 top-0 z-50 h-screen border-r border-slate-200/70 bg-background/95 backdrop-blur-xl dark:border-zinc-800 dark:bg-slate-950/95">
+			<div ref={sidebarRemoveRef}>
+				<Sidebar className="app-sidebar fixed left-0 top-0 z-50 h-screen border-r border-border bg-background/95 backdrop-blur-xl">
 					<SidebarHeader />
 					<SidebarContent>
 						<SidebarGroup>
@@ -101,9 +189,9 @@ export function AppSidebar({ items }: { items: DroppedItem[] }) {
 						<SidebarGroup>
 							<div
 								className={`mx-2 mt-2 rounded-lg border border-dashed px-3 py-2 text-xs transition ${
-									sidebarDrop.isDropTarget
+									isSidebarDropTarget
 										? "border-red-500 bg-red-50 text-red-700"
-										: "border-slate-300 text-slate-500 dark:border-slate-700 dark:text-slate-400"
+										: "border-border text-muted-foreground"
 								}`}
 							>
 								Drop block here to remove

@@ -24,7 +24,6 @@ import { EditorContext } from "@/context/EditorContext";
 import { PageContext, usePage } from "@/context/PageContext";
 import { exportToHTML } from "@/lib/export";
 import { DragDropProvider, useDraggable, useDroppable } from "@dnd-kit/react";
-import { label } from "motion/react-client";
 import {
 	ComponentType,
 	ReactNode,
@@ -373,9 +372,9 @@ function CanvasItem({
 			style={{ opacity: draggable.isDragging ? 0.75 : 1 }}
 			className={`w-full cursor-grab transition ${
 				selectedBlock?.id === item.id
-					? "border-2 border-blue-500"
+					? "border-2 border-primary"
 					: "border-transparent"
-			} ${droppable.isDropTarget ? "bg-slate-100" : "bg-transparent"}`}
+			} ${droppable.isDropTarget ? "bg-accent/40" : "bg-transparent"}`}
 			onClick={() => selectedItem(item)}
 		>
 			<Renderer item={item} />
@@ -404,7 +403,7 @@ function DroppableZone({
 	return (
 		<div
 			ref={ref}
-			className="w-full flex flex-col items-center pt-4 bg-zinc-50 dark:bg-black min-h-[90vh] relative"
+			className="w-full min-h-[90vh] relative flex flex-col items-center pt-4 bg-background"
 		>
 			{items.length > 0 ? (
 				items.map((item) => (
@@ -416,7 +415,7 @@ function DroppableZone({
 					/>
 				))
 			) : (
-				<div className="text-center text-zinc-500">Drop here</div>
+				<div className="text-center text-muted-foreground">Drop here</div>
 			)}
 			{children}
 		</div>
@@ -482,20 +481,20 @@ export default function Home() {
 
 	if (isDesktop === null) {
 		return (
-			<div className="min-h-screen w-full bg-slate-950 text-slate-100 flex items-center justify-center">
-				<div className="text-sm text-slate-300">Loading editor...</div>
+			<div className="min-h-screen w-full bg-background text-foreground flex items-center justify-center">
+				<div className="text-sm text-muted-foreground">Loading editor...</div>
 			</div>
 		);
 	}
 
 	if (!isDesktop) {
 		return (
-			<div className="min-h-screen w-full bg-slate-950 text-slate-100 flex items-center justify-center p-6">
-				<div className="max-w-xl w-full rounded-2xl border border-slate-800 bg-slate-900/70 p-8 text-center">
+			<div className="min-h-screen w-full bg-background text-foreground flex items-center justify-center p-6">
+				<div className="max-w-xl w-full rounded-2xl border border-border bg-card/90 p-8 text-center">
 					<h1 className="text-3xl font-bold tracking-tight">
 						Desktop Required
 					</h1>
-					<p className="mt-3 text-slate-300 leading-relaxed">
+					<p className="mt-3 text-muted-foreground leading-relaxed">
 						This landing page builder is currently optimized for desktop only.
 						Please open it on a larger screen to continue editing.
 					</p>

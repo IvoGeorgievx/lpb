@@ -5,7 +5,6 @@ import {
 	DroppedItem,
 } from "@/app/page";
 import { ProductCard } from "@/components/blocks/ProductBlock";
-import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Page, usePage } from "@/context/PageContext";
 
@@ -68,8 +67,74 @@ const withOrderedBlocks = (
 	const orderedBlocks = buildOrderedBlocks(prev.blocks);
 	return {
 		...prev,
-		blocks: mapper(orderedBlocks),
+	blocks: mapper(orderedBlocks),
 	};
+};
+
+type ThemePreviewCardProps = {
+	label: string;
+	description: string;
+	fontFamily: string;
+	gradient: string;
+	foreground: string;
+	borderClass: string;
+	swatches: [string, string, string];
+	onClick: () => void;
+};
+
+const ThemePreviewCard = ({
+	label,
+	description,
+	fontFamily,
+	gradient,
+	foreground,
+	borderClass,
+	swatches,
+	onClick,
+}: ThemePreviewCardProps) => {
+	return (
+		<div
+			role="button"
+			tabIndex={0}
+			onClick={onClick}
+			onKeyDown={(event) => {
+				if (event.key === "Enter" || event.key === " ") {
+					event.preventDefault();
+					onClick();
+				}
+			}}
+			className={`w-full cursor-pointer rounded-2xl border p-3 shadow-sm transition hover:scale-[1.01] hover:shadow-md ${borderClass}`}
+			style={{ background: gradient, fontFamily }}
+		>
+			<div className="flex items-start justify-between gap-3">
+				<div>
+					<div className="text-sm font-semibold" style={{ color: foreground }}>
+						{label}
+					</div>
+					<div
+						className="mt-1 text-xs leading-relaxed opacity-90"
+						style={{ color: foreground }}
+					>
+						{description}
+					</div>
+				</div>
+				<div className="flex shrink-0 items-center gap-1.5">
+					{swatches.map((swatch, index) => (
+						<span
+							key={`${label}-${index}`}
+							className="h-4 w-4 rounded-full border border-black/10"
+							style={{ background: swatch }}
+						/>
+					))}
+				</div>
+			</div>
+			<div className="mt-3 rounded-lg bg-white/25 p-2 backdrop-blur-[1px]">
+				<div className="h-2 w-2/3 rounded bg-black/20" />
+				<div className="mt-1.5 h-1.5 w-full rounded bg-black/15" />
+				<div className="mt-1.5 h-1.5 w-4/5 rounded bg-black/15" />
+			</div>
+		</div>
+	);
 };
 
 export const GlobalEditor = () => {
@@ -1214,87 +1279,82 @@ export const GlobalEditor = () => {
 		<div className="flex flex-col gap-4">
 			<Label>Choose Predefined Styles.</Label>
 
-			<Button
+			<ThemePreviewCard
+				label="Elegant"
+				description="Soft neutrals with polished contrast."
+				fontFamily={THEME_FONTS.elegant}
+				gradient="linear-gradient(120deg, #f8fafc 0%, #eef2ff 55%, #e2e8f0 100%)"
+				foreground="#0f172a"
+				borderClass="border-slate-300"
+				swatches={["#f8fafc", "#e2e8f0", "#0f172a"]}
 				onClick={applyElegantTheme}
-				className="border border-slate-300 text-slate-900 shadow-sm hover:opacity-95"
-				style={{
-					background:
-						"linear-gradient(120deg, #f8fafc 0%, #eef2ff 55%, #e2e8f0 100%)",
-					fontFamily: THEME_FONTS.elegant,
-				}}
-			>
-				Elegant
-			</Button>
+			/>
 
-			<Button
+			<ThemePreviewCard
+				label="Dark Neon"
+				description="Deep base with vivid accent glow."
+				fontFamily={THEME_FONTS.dark}
+				gradient="linear-gradient(120deg, #020617 0%, #111827 65%, #1f2937 100%)"
+				foreground="#f8fafc"
+				borderClass="border-violet-500/60"
+				swatches={["#020617", "#1f2937", "#7c3aed"]}
 				onClick={applyDarkTheme}
-				className="border border-violet-500/60 text-slate-100 shadow-sm hover:opacity-95"
-				style={{
-					background:
-						"linear-gradient(120deg, #020617 0%, #111827 65%, #1f2937 100%)",
-					fontFamily: THEME_FONTS.dark,
-				}}
-			>
-				Dark Neon
-			</Button>
+			/>
 
-			<Button
+			<ThemePreviewCard
+				label="Brutalist"
+				description="Hard edges, loud contrast, direct rhythm."
+				fontFamily={THEME_FONTS.brutalist}
+				gradient="linear-gradient(120deg, #facc15 0%, #f59e0b 100%)"
+				foreground="#111111"
+				borderClass="border-2 border-black"
+				swatches={["#facc15", "#000000", "#ffffff"]}
 				onClick={applyBrutalistTheme}
-				className="border-2 border-black text-black shadow-sm hover:opacity-95"
-				style={{
-					background: "linear-gradient(120deg, #facc15 0%, #f59e0b 100%)",
-					fontFamily: THEME_FONTS.brutalist,
-				}}
-			>
-				Brutalist
-			</Button>
+			/>
 
-			<Button
+			<ThemePreviewCard
+				label="Playful"
+				description="High-energy gradients and expressive tones."
+				fontFamily={THEME_FONTS.playful}
+				gradient="linear-gradient(90deg, #f472b6 0%, #a855f7 55%, #6366f1 100%)"
+				foreground="#ffffff"
+				borderClass="border-pink-300/70"
+				swatches={["#f472b6", "#a855f7", "#6366f1"]}
 				onClick={applyPlayfulTheme}
-				className="border border-pink-300/70 text-white shadow-sm hover:opacity-95"
-				style={{
-					background:
-						"linear-gradient(90deg, #f472b6 0%, #a855f7 55%, #6366f1 100%)",
-					fontFamily: THEME_FONTS.playful,
-				}}
-			>
-				Playful
-			</Button>
+			/>
 
-			<Button
+			<ThemePreviewCard
+				label="Minimal"
+				description="Clean spacing and restrained neutrals."
+				fontFamily={THEME_FONTS.minimal}
+				gradient="#ffffff"
+				foreground="#0f172a"
+				borderClass="border-slate-300"
+				swatches={["#ffffff", "#f8fafc", "#111827"]}
 				onClick={applyMinimalTheme}
-				className="border border-slate-300 text-slate-900 shadow-sm hover:opacity-95"
-				style={{
-					background: "#ffffff",
-					fontFamily: THEME_FONTS.minimal,
-				}}
-			>
-				Minimal
-			</Button>
+			/>
 
-			<Button
+			<ThemePreviewCard
+				label="Sunset"
+				description="Warm gradients with cinematic depth."
+				fontFamily={THEME_FONTS.sunset}
+				gradient="linear-gradient(105deg, #f97316 0%, #fb7185 48%, #f59e0b 100%)"
+				foreground="#fff7ed"
+				borderClass="border-orange-300/80"
+				swatches={["#f97316", "#fb7185", "#f59e0b"]}
 				onClick={applySunsetTheme}
-				className="border border-orange-300/80 text-amber-50 shadow-sm hover:opacity-95"
-				style={{
-					background:
-						"linear-gradient(105deg, #f97316 0%, #fb7185 48%, #f59e0b 100%)",
-					fontFamily: THEME_FONTS.sunset,
-				}}
-			>
-				Sunset
-			</Button>
+			/>
 
-			<Button
+			<ThemePreviewCard
+				label="Oceanic"
+				description="Calm blue spectrum with crisp highlights."
+				fontFamily={THEME_FONTS.oceanic}
+				gradient="linear-gradient(120deg, #0f4c5c 0%, #0284c7 52%, #0ea5e9 100%)"
+				foreground="#ecfeff"
+				borderClass="border-sky-300/80"
+				swatches={["#0f4c5c", "#0284c7", "#0ea5e9"]}
 				onClick={applyOceanicTheme}
-				className="border border-sky-300/80 text-cyan-50 shadow-sm hover:opacity-95"
-				style={{
-					background:
-						"linear-gradient(120deg, #0f4c5c 0%, #0284c7 52%, #0ea5e9 100%)",
-					fontFamily: THEME_FONTS.oceanic,
-				}}
-			>
-				Oceanic
-			</Button>
+			/>
 		</div>
 	);
 };

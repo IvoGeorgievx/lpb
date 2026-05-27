@@ -2,21 +2,12 @@ import { TestimonialBlockProps } from "@/components/blocks/TestimonialBlock";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-	Select,
-	SelectContent,
-	SelectItem,
-	SelectTrigger,
-	SelectValue,
-} from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useEditor } from "@/context/EditorContext";
 
 interface TestimonialEditorProps {
 	props: TestimonialBlockProps;
 }
-
-type CarouselType = "default" | "fade";
 
 export const TestimonialEditor = ({ props }: TestimonialEditorProps) => {
 	const slides = props.carousel?.slides || [];
@@ -95,36 +86,7 @@ export const TestimonialEditor = ({ props }: TestimonialEditorProps) => {
 			</TabsList>
 
 			<TabsContent value="settings" className="mt-4 flex flex-col gap-6">
-				<div className="flex flex-col gap-2">
-					<Label>Carousel Type</Label>
-
-					<Select
-						value={
-							(item.props as TestimonialBlockProps).carousel?.type || "default"
-						}
-						onValueChange={(type: CarouselType) => {
-							onPropsChange({
-								id: item.id,
-								props: {
-									...props,
-									carousel: {
-										...props.carousel,
-										type,
-									},
-								},
-							});
-						}}
-					>
-						<SelectTrigger className="w-full">
-							<SelectValue placeholder="Select type" />
-						</SelectTrigger>
-
-						<SelectContent>
-							<SelectItem value="default">Default</SelectItem>
-							<SelectItem value="fade">Fade</SelectItem>
-						</SelectContent>
-					</Select>
-				</div>
+				<div className="flex flex-col gap-2"></div>
 
 				<div className="flex flex-col gap-6">
 					{slides.map((slide, index) => (
