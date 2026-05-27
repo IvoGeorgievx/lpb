@@ -32,6 +32,19 @@ export const exportCss = `
 	}
 }
 
+html,
+body {
+	width: 100%;
+	max-width: 100%;
+	overflow-x: hidden;
+}
+
+*,
+*::before,
+*::after {
+	box-sizing: border-box;
+}
+
 body {
   font-family: var(--lpb-font-body);
   margin: 0;

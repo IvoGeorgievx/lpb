@@ -31,6 +31,7 @@ export const FooterBlock = ({
 		<footer
 			style={{
 				width: "100%",
+				boxSizing: "border-box",
 				display: "flex",
 				justifyContent: "center",
 				alignItems: "stretch",
