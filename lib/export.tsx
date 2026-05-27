@@ -2,8 +2,12 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { DroppedItem } from "@/app/page";
 import { COMPONENT_MAP } from "@/app/page";
 import { exportCss } from "./exportCss";
+import { DEFAULT_THEME_ID, serializeThemeCssVariables, ThemeId } from "./theme";
 
-export const generateHTML = (items: DroppedItem[]) => {
+export const generateHTML = (
+	items: DroppedItem[],
+	activeTheme: ThemeId = DEFAULT_THEME_ID,
+) => {
 	const htmlContent = items
 		.map((item) => {
 			const Component = COMPONENT_MAP[item.type];
@@ -13,6 +17,7 @@ export const generateHTML = (items: DroppedItem[]) => {
 			return renderToStaticMarkup(<Component {...item.props} />);
 		})
 		.join("\n");
+	const themeVars = serializeThemeCssVariables(activeTheme);
 
 	return `
 <!DOCTYPE html>
@@ -31,19 +36,25 @@ export const generateHTML = (items: DroppedItem[]) => {
 <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Baloo+2:wght@400;500;700;800&family=Cormorant+Garamond:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=Nunito+Sans:wght@400;600;700;800&family=Playfair+Display:wght@500;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
 
   <style>
+    :root {
+      ${themeVars}
+    }
     ${exportCss}
   </style>
 </head>
 
-<body style="margin:0;">
+<body style="margin:0; background: var(--lpb-background); color: var(--lpb-foreground); font-family: var(--lpb-font-body);">
 ${htmlContent}
 </body>
 </html>
 `;
 };
 
-export const exportToHTML = (items: DroppedItem[]) => {
-	const html = generateHTML(items);
+export const exportToHTML = (
+	items: DroppedItem[],
+	activeTheme: ThemeId = DEFAULT_THEME_ID,
+) => {
+	const html = generateHTML(items, activeTheme);
 
 	const blob = new Blob([html], { type: "text/html" });
 

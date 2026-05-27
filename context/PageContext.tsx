@@ -1,6 +1,7 @@
 "use client";
 
 import type { DroppedItem } from "@/app/page";
+import { DEFAULT_THEME_ID, ThemeId } from "@/lib/theme";
 import {
 	createContext,
 	type Dispatch,
@@ -13,6 +14,7 @@ import {
 
 export interface Page {
 	blocks: DroppedItem[];
+	activeTheme: ThemeId;
 }
 
 interface PageContextValue {
@@ -22,6 +24,7 @@ interface PageContextValue {
 
 const initialPage: Page = {
 	blocks: [],
+	activeTheme: DEFAULT_THEME_ID,
 };
 
 export const PageContext = createContext<PageContextValue | null>(null);

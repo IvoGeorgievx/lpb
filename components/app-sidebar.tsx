@@ -19,6 +19,7 @@ import ProductBlock from "./blocks/ProductBlock";
 import { SectionSeparatorBlock } from "./blocks/SectionSeparatorBlock";
 import { TestimonialBlock } from "./blocks/TestimonialBlock";
 import { DroppedItem } from "@/app/page";
+import { ThemeId } from "@/lib/theme";
 import { generateHTML } from "@/lib/export";
 import { cn } from "@/lib/utils";
 import { Button } from "./ui/button";
@@ -127,7 +128,13 @@ function DraggableItem({ id, label }: { id: string; label: string }) {
 	);
 }
 
-export function AppSidebar({ items }: { items: DroppedItem[] }) {
+export function AppSidebar({
+	items,
+	activeTheme,
+}: {
+	items: DroppedItem[];
+	activeTheme: ThemeId;
+}) {
 	const [open, setOpen] = useState(false);
 	const [mode, setMode] = useState<"desktop" | "mobile">("desktop");
 	const sidebarRemoveRef = useRef<HTMLDivElement | null>(null);
@@ -149,7 +156,7 @@ export function AppSidebar({ items }: { items: DroppedItem[] }) {
 		};
 	}, []);
 
-	const html = generateHTML(items);
+	const html = generateHTML(items, activeTheme);
 	const components: BuildingComponents[] = [
 		{ component: <Header />, id: "header", label: "Header" },
 		{ component: <HeroBlock />, id: "hero", label: "Hero" },

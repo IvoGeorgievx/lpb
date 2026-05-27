@@ -23,6 +23,12 @@ import { SidebarProvider } from "@/components/ui/sidebar";
 import { EditorContext } from "@/context/EditorContext";
 import { PageContext, usePage } from "@/context/PageContext";
 import { exportToHTML } from "@/lib/export";
+import {
+	DEFAULT_THEME_ID,
+	getBuilderCssVariables,
+	getThemePreset,
+	ThemeId,
+} from "@/lib/theme";
 import { DragDropProvider, useDraggable, useDroppable } from "@dnd-kit/react";
 import {
 	ComponentType,
@@ -61,282 +67,302 @@ export type DroppedItem<T extends BlockType = BlockType> = {
 
 type UpdatePayload = { id: string } & Pick<DroppedItem, "props">;
 
-export const defaultProps: BlockPropsMap = {
-	header: {
-		logoText: "Aether Studio",
+export const getThemeDefaultProps = (themeId: ThemeId): BlockPropsMap => {
+	const theme = getThemePreset(themeId);
+	const blockTheme = theme.blockOverrides;
+	const baseCardStyle = {
+		borderRadius: theme.scales.radius,
+		padding: theme.scales.cardPadding,
+		boxShadow: theme.scales.shadowSoft,
+	} as const;
+	const now = Date.now();
+
+	return {
+		header: {
+			logoText: blockTheme?.header?.logoText ?? "Atelier Studio",
+			cta: {
+				text: blockTheme?.header?.ctaText ?? "Book a Demo",
+				paddingX: 20,
+				paddingY: 10,
+				backgroundColor: blockTheme?.header?.ctaBackground ?? theme.tokens.card,
+				radius: 999,
+				link: "#",
+				color: blockTheme?.header?.ctaColor ?? theme.tokens.primary,
+			},
+			style: {
+				height: 80,
+				padding: 12,
+				color: blockTheme?.header?.color ?? theme.tokens.foreground,
+				fontFamily: theme.typography.body,
+				background:
+					blockTheme?.header?.background ??
+					`linear-gradient(120deg, ${theme.tokens.primary}, ${theme.tokens.foreground})`,
+				border: `1px solid ${theme.tokens.border}`,
+				boxShadow: theme.scales.shadowSoft,
+			},
+		},
+		hero: {
+			title: "Hero section",
+			style: {
+				height: "50vh",
+				background:
+					blockTheme?.hero?.background ??
+					`linear-gradient(120deg, ${theme.tokens.primary}, ${theme.tokens.foreground})`,
+				fontFamily: theme.typography.body,
+			},
+			heading:
+				blockTheme?.hero?.heading ??
+				"Design pages that feel undeniably premium",
+			subheading:
+				blockTheme?.hero?.subheading ??
+				"Build high-converting, editorial-grade landing pages with complete control.",
+			headingAnimation: "fade-in",
+			headingFontSize: 46,
+			subheadingFontSize: 22,
+			subHeadingAnimation: "fade-in",
+			headingWeight: theme.typography.headingWeight,
+			subheadingWeight: theme.typography.bodyWeight,
+			headingColor: blockTheme?.hero?.headingColor ?? theme.tokens.card,
+			subheadingColor: blockTheme?.hero?.subheadingColor ?? "#e2e8f0",
+			preset: {
+				layout: "center",
+				textAlign: "center",
+				showImage: true,
+				imagePosition: "background",
+			},
+			cta: {
+				text: blockTheme?.hero?.ctaText ?? "Start Free",
+				bgColor: blockTheme?.hero?.ctaBackground ?? theme.tokens.card,
+				paddingX: 20,
+				paddingY: 12,
+				radius: 999,
+				fontSize: 16,
+				border: false,
+				textColor: blockTheme?.hero?.ctaColor ?? theme.tokens.primary,
+				boxShadow: {
+					shadowBlur: 16,
+					shadowIntensity: 0.24,
+				},
+			},
+		},
 		cta: {
-			text: "Start Free",
-			paddingX: 18,
-			paddingY: 10,
-			backgroundColor: "#ffffff",
-			radius: 999,
-			link: "#",
-			color: "#0f172a",
-		},
-		style: {
-			height: 80,
-			padding: 12,
-			color: "#ffffff",
-			background:
-				"radial-gradient(800px 220px at 10% -40%, rgba(148,163,184,0.35), transparent), linear-gradient(120deg, #0f172a, #1e293b 60%, #334155)",
-			border: "1px solid rgba(255,255,255,0.14)",
-			boxShadow: "0 16px 34px rgba(15,23,42,0.22)",
-		},
-	},
-	hero: {
-		title: "Hero section",
-		style: {
-			height: "50vh",
-			background:
-				"radial-gradient(1200px 320px at 15% -40%, rgba(148,163,184,0.32), transparent), linear-gradient(120deg, #0f172a, #1e293b 58%, #334155)",
-		},
-		heading: "Design pages that feel undeniably premium",
-		subheading:
-			"Build high-converting, editorial-grade landing pages with complete control.",
-		headingAnimation: "fade-in",
-		headingFontSize: 44,
-		subheadingFontSize: 22,
-		subHeadingAnimation: "fade-in",
-		headingWeight: 700,
-		subheadingWeight: 400,
-		headingColor: "#ffffff",
-		subheadingColor: "#e2e8f0",
-		preset: {
-			layout: "center",
-			textAlign: "center",
-			showImage: true,
-			imagePosition: "background",
-		},
-		cta: {
-			text: "Start Free",
-			bgColor: "#ffffff",
-			paddingX: 20,
-			paddingY: 12,
-			radius: 999,
-			fontSize: 16,
-			border: true,
-			textColor: "#00000",
-			boxShadow: {
-				shadowBlur: 16,
-				shadowIntensity: 0.24,
+			heading:
+				blockTheme?.cta?.heading ??
+				"Ship a stronger first impression in hours",
+			subheading:
+				blockTheme?.cta?.subheading ??
+				"Start from polished sections, refine your story quickly, and launch with confidence.",
+			button: {
+				text: blockTheme?.cta?.buttonText ?? "Request Access",
+				link: "#",
+				backgroundColor: blockTheme?.cta?.buttonBackground ?? theme.tokens.card,
+				color: blockTheme?.cta?.buttonColor ?? theme.tokens.primary,
+				radius: 999,
+				paddingX: 24,
+				paddingY: 12,
+			},
+			style: {
+				fontFamily: theme.typography.body,
+				background:
+					blockTheme?.cta?.background ??
+					`linear-gradient(120deg, ${theme.tokens.primary}, ${theme.tokens.foreground})`,
+				borderTop: `1px solid ${theme.tokens.border}`,
+				borderBottom: `1px solid ${theme.tokens.border}`,
 			},
 		},
-	},
-	cta: {
-		heading: "Ship a stronger first impression in hours",
-		subheading:
-			"Start from polished sections, refine your story quickly, and launch with confidence.",
-		button: {
-			text: "Start Free",
-			link: "#",
-			backgroundColor: "#ffffff",
-			color: "#0f172a",
-			radius: 999,
-			paddingX: 24,
-			paddingY: 12,
+		embed: {
+			src: "",
+			title: "Embedded content",
+			height: 520,
+			loading: "lazy",
+			allowFullScreen: true,
+			showContentPanel: false,
+			contentHeading: "Why this embed matters",
+			contentParagraph:
+				"Use this area to add context before users interact with the embedded content.",
+			contentBullets: [
+				"Highlight key outcomes",
+				"Add short setup notes",
+				"Include one clear call to action",
+			],
 		},
-		style: {
-			background:
-				"radial-gradient(900px 280px at 15% -35%, rgba(148,163,184,0.25), transparent), linear-gradient(120deg, #0b1220 0%, #1e293b 62%, #334155 100%)",
-			borderTop: "1px solid rgba(255,255,255,0.15)",
-			borderBottom: "1px solid rgba(255,255,255,0.15)",
-		},
-	},
-	embed: {
-		src: "",
-		title: "Embedded content",
-		height: 520,
-		loading: "lazy",
-		allowFullScreen: true,
-		showContentPanel: false,
-		contentHeading: "Why this embed matters",
-		contentParagraph:
-			"Use this area to add context before users interact with the embedded content.",
-		contentBullets: [
-			"Highlight key outcomes",
-			"Add short setup notes",
-			"Include one clear call to action",
-		],
-	},
-	product: {
-		background: "#f8fafc",
-		cards: [
-			{
-				id: String(Date.now()),
-				iconClass: "lucide lucide-award",
-				heading: {
-					content: "Pro Flow Subscription",
-					fontSize: 22,
-					fontWeight: 700,
-					color: "#0f172a",
-				},
-				subheading: {
-					content:
-						"Everything your team needs to build beautiful landing pages.",
-					fontSize: 15,
-					color: "#475569",
-				},
-				style: {
-					background: "#ffffff",
-					borderRadius: 24,
-					padding: 24,
-					minHeight: 320,
-					boxShadow: "0 16px 36px rgba(15,23,42,0.08)",
-				},
-				additionalContent: [
-					{
-						content: "Unlimited sections, templates, and export options.",
-						fontSize: 14,
-						color: "#475569",
-					},
-					{
-						content: "Priority support and full design control.",
-						fontSize: 14,
-						color: "#475569",
-					},
-				],
-				variant: "featured",
-			},
-			{
-				id: String(Date.now() + 1),
-				iconClass: "lucide lucide-rocket",
-				heading: {
-					content: "Starter Plan",
-					fontSize: 20,
-					fontWeight: 600,
-					color: "#0f172a",
-				},
-				subheading: {
-					content: "A lightweight plan for individuals and small teams.",
-					fontSize: 14,
-					color: "#475569",
-				},
-				style: {
-					background: "#eff6ff",
-					borderRadius: 24,
-					padding: 24,
-					minHeight: 300,
-					boxShadow: "0 16px 36px rgba(15,23,42,0.08)",
-				},
-				additionalContent: [
-					{
-						content: "Affordable monthly pricing.",
-						fontSize: 14,
-						color: "#475569",
-					},
-					{
-						content: "Easy setup and quick deployment.",
-						fontSize: 14,
-						color: "#475569",
-					},
-				],
-				variant: "default",
-			},
-			{
-				id: String(Date.now() + 2),
-				iconClass: "lucide lucide-briefcase",
-				heading: {
-					content: "Enterprise",
-					fontSize: 20,
-					fontWeight: 600,
-					color: "#0f172a",
-				},
-				subheading: {
-					content: "Custom solutions for high-growth businesses.",
-					fontSize: 14,
-					color: "#475569",
-				},
-				style: {
-					background: "#ffffff",
-					borderRadius: 24,
-					padding: 24,
-					minHeight: 300,
-					boxShadow: "0 16px 36px rgba(15,23,42,0.08)",
-				},
-				additionalContent: [
-					{
-						content: "Dedicated onboarding and integrations.",
-						fontSize: 14,
-						color: "#475569",
-					},
-					{
-						content: "Team-based security and analytics.",
-						fontSize: 14,
-						color: "#475569",
-					},
-				],
-				variant: "outlined",
-			},
-		],
-	},
-	footer: {
-		layout: {
-			columns: 2,
-		},
-		copyright: "(c) 2026 Aether Studio. All rights reserved.",
-		style: {
-			height: "22vh",
-			color: "#e2e8f0",
-		},
-		links: [
-			{
-				label: "Facebook",
-				href: "",
-			},
-			{
-				label: "Instagram",
-				href: "",
-			},
-			{
-				label: "LinkedIn",
-				href: "",
-			},
-			{
-				label: "Youtube",
-				href: "",
-			},
-		],
-		background:
-			"radial-gradient(820px 220px at 12% -35%, rgba(148,163,184,0.2), transparent), linear-gradient(120deg, #020617, #0f172a 62%, #1e293b)",
-	},
-	separator: {
-		flipY: true,
-		fill: "",
-	},
-	testimonial: {
-		style: {
-			background:
-				"radial-gradient(820px 220px at 12% -35%, rgba(148,163,184,0.2), transparent), linear-gradient(120deg, #020617, #0f172a 62%, #1e293b)",
-		},
-		carousel: {
-			type: "default",
-			slides: [
+		product: {
+			background: blockTheme?.product?.background ?? theme.tokens.background,
+			cards: [
 				{
-					heading: "“This builder made our launch feel effortless.”",
-					subheading:
-						"Every team member can update content, and the polished testimonial section now feels like a product page.",
-					author: "Maya Carter, VP of Marketing",
-					bgColor: "linear-gradient(160deg, #ffffff 0%, #f8fafc 100%)",
+					id: String(now),
+					iconClass: "lucide lucide-award",
+					heading: {
+						content: "Pro Flow Subscription",
+						fontSize: 22,
+						fontWeight: theme.typography.headingWeight,
+						color: blockTheme?.product?.headingColor ?? theme.tokens.foreground,
+					},
+					subheading: {
+						content:
+							"Everything your team needs to build beautiful landing pages.",
+						fontSize: 15,
+						color: blockTheme?.product?.subheadingColor ?? theme.tokens.muted,
+					},
+					style: {
+						background: blockTheme?.product?.cardPrimary ?? theme.tokens.card,
+						minHeight: 320,
+						...baseCardStyle,
+					},
+					additionalContent: [
+						{
+							content: "Unlimited sections, templates, and export options.",
+							fontSize: 14,
+							color: blockTheme?.product?.subheadingColor ?? theme.tokens.muted,
+						},
+						{
+							content: "Priority support and full design control.",
+							fontSize: 14,
+							color: blockTheme?.product?.subheadingColor ?? theme.tokens.muted,
+						},
+					],
+					variant: "featured",
 				},
 				{
-					heading: "“We shipped assets faster with the new content blocks.”",
-					subheading:
-						"The carousel helps stories land stronger and gives our homepage a much more confident rhythm.",
-					author: "Jordan Kim, Design Lead",
-					bgColor: "linear-gradient(160deg, #f8fafc 0%, #eef2ff 100%)",
+					id: String(now + 1),
+					iconClass: "lucide lucide-rocket",
+					heading: {
+						content: "Starter Plan",
+						fontSize: 20,
+						fontWeight: theme.typography.headingWeight,
+						color: blockTheme?.product?.headingColor ?? theme.tokens.foreground,
+					},
+					subheading: {
+						content: "A lightweight plan for individuals and small teams.",
+						fontSize: 14,
+						color: blockTheme?.product?.subheadingColor ?? theme.tokens.muted,
+					},
+					style: {
+						background:
+							blockTheme?.product?.cardSecondary ?? theme.tokens.background,
+						minHeight: 300,
+						...baseCardStyle,
+					},
+					additionalContent: [
+						{
+							content: "Affordable monthly pricing.",
+							fontSize: 14,
+							color: blockTheme?.product?.subheadingColor ?? theme.tokens.muted,
+						},
+						{
+							content: "Easy setup and quick deployment.",
+							fontSize: 14,
+							color: blockTheme?.product?.subheadingColor ?? theme.tokens.muted,
+						},
+					],
+					variant: "default",
 				},
 				{
-					heading:
-						"“The editing experience is simple, but the result feels premium.”",
-					subheading:
-						"Clients love the visual polish, and our team can keep the page updated without design support.",
-					author: "Lila Patel, Founder",
-					bgColor: "linear-gradient(160deg, #ffffff 0%, #f1f5f9 100%)",
+					id: String(now + 2),
+					iconClass: "lucide lucide-briefcase",
+					heading: {
+						content: "Enterprise",
+						fontSize: 20,
+						fontWeight: theme.typography.headingWeight,
+						color: blockTheme?.product?.headingColor ?? theme.tokens.foreground,
+					},
+					subheading: {
+						content: "Custom solutions for high-growth businesses.",
+						fontSize: 14,
+						color: blockTheme?.product?.subheadingColor ?? theme.tokens.muted,
+					},
+					style: {
+						background: blockTheme?.product?.cardPrimary ?? theme.tokens.card,
+						minHeight: 300,
+						...baseCardStyle,
+					},
+					additionalContent: [
+						{
+							content: "Dedicated onboarding and integrations.",
+							fontSize: 14,
+							color: blockTheme?.product?.subheadingColor ?? theme.tokens.muted,
+						},
+						{
+							content: "Team-based security and analytics.",
+							fontSize: 14,
+							color: blockTheme?.product?.subheadingColor ?? theme.tokens.muted,
+						},
+					],
+					variant: "outlined",
 				},
 			],
 		},
-	},
+		footer: {
+			layout: {
+				columns: 2,
+			},
+			copyright:
+				blockTheme?.footer?.copyright ??
+				"(c) 2026 Atelier Studio. Crafted with intention.",
+			style: {
+				height: "22vh",
+				color: blockTheme?.footer?.color ?? theme.tokens.card,
+				fontFamily: theme.typography.body,
+			},
+			links: [
+				{ label: "Facebook", href: "" },
+				{ label: "Instagram", href: "" },
+				{ label: "LinkedIn", href: "" },
+				{ label: "Youtube", href: "" },
+			],
+			background:
+				blockTheme?.footer?.background ??
+				`linear-gradient(120deg, ${theme.tokens.primary}, ${theme.tokens.foreground})`,
+		},
+		separator: {
+			flipY: true,
+			fill: theme.tokens.accent,
+		},
+		testimonial: {
+			style: {
+				background:
+					blockTheme?.testimonial?.background ??
+					`linear-gradient(120deg, ${theme.tokens.primary}, ${theme.tokens.foreground})`,
+			},
+			carousel: {
+				type: "default",
+				slides: [
+					{
+						heading: '"This builder made our launch feel effortless."',
+						subheading:
+							"Every team member can update content, and the polished testimonial section now feels like a product page.",
+						author: "Maya Carter, VP of Marketing",
+						bgColor:
+							blockTheme?.testimonial?.slidePrimary ??
+							"linear-gradient(160deg, #ffffff 0%, #f8fafc 100%)",
+					},
+					{
+						heading:
+							'"We shipped assets faster with the new content blocks."',
+						subheading:
+							"The carousel helps stories land stronger and gives our homepage a much more confident rhythm.",
+						author: "Jordan Kim, Design Lead",
+						bgColor:
+							blockTheme?.testimonial?.slideSecondary ??
+							"linear-gradient(160deg, #f8fafc 0%, #eef2ff 100%)",
+					},
+					{
+						heading:
+							'"The editing experience is simple, but the result feels premium."',
+						subheading:
+							"Clients love the visual polish, and our team can keep the page updated without design support.",
+						author: "Lila Patel, Founder",
+						bgColor:
+							blockTheme?.testimonial?.slidePrimary ??
+							"linear-gradient(160deg, #ffffff 0%, #f1f5f9 100%)",
+					},
+				],
+			},
+		},
+	};
 };
+
+export const defaultProps: BlockPropsMap = getThemeDefaultProps(DEFAULT_THEME_ID);
 
 export const COMPONENT_MAP: Record<BlockType, ComponentType> = {
 	header: Header,
@@ -424,6 +450,7 @@ function DroppableZone({
 
 export default function Home() {
 	const [items, setItems] = useState<DroppedItem[]>([]);
+	const [activeTheme, setActiveTheme] = useState<ThemeId>(DEFAULT_THEME_ID);
 	const [selectedBlock, setSelectedBlock] = useState<DroppedItem | undefined>(
 		undefined,
 	);
@@ -436,6 +463,13 @@ export default function Home() {
 		media.addEventListener("change", update);
 		return () => media.removeEventListener("change", update);
 	}, []);
+
+	useEffect(() => {
+		const themeVars = getBuilderCssVariables(activeTheme);
+		Object.entries(themeVars).forEach(([key, value]) => {
+			document.documentElement.style.setProperty(key, value);
+		});
+	}, [activeTheme]);
 
 	const updatePropsData = (data: UpdatePayload) => {
 		setItems((prev) =>
@@ -461,22 +495,33 @@ export default function Home() {
 	const activeBlock = items.find((it) => it.id === selectedBlock?.id);
 
 	const syncItemsFromPage = useCallback(
-		(nextPage: SetStateAction<{ blocks: DroppedItem[] }>) => {
+		(
+			nextPage: SetStateAction<{
+				blocks: DroppedItem[];
+				activeTheme: ThemeId;
+			}>,
+		) => {
 			if (typeof nextPage === "function") {
 				setItems((prevItems) => {
 					const resolved = (
-						nextPage as (prevState: { blocks: DroppedItem[] }) => {
+						nextPage as (prevState: {
 							blocks: DroppedItem[];
+							activeTheme: ThemeId;
+						}) => {
+							blocks: DroppedItem[];
+							activeTheme: ThemeId;
 						}
-					)({ blocks: prevItems });
+					)({ blocks: prevItems, activeTheme });
+					setActiveTheme(resolved.activeTheme);
 					return resolved.blocks;
 				});
 				return;
 			}
 
 			setItems(nextPage.blocks);
+			setActiveTheme(nextPage.activeTheme);
 		},
-		[],
+		[activeTheme],
 	);
 
 	if (isDesktop === null) {
@@ -505,7 +550,10 @@ export default function Home() {
 
 	return (
 		<PageContext.Provider
-			value={{ page: { blocks: items }, setPage: syncItemsFromPage }}
+			value={{
+				page: { blocks: items, activeTheme },
+				setPage: syncItemsFromPage,
+			}}
 		>
 			<DragDropProvider
 				onDragEnd={(event) => {
@@ -552,11 +600,12 @@ export default function Home() {
 
 					if (target?.id === "droppable" || targetIsCanvasItem) {
 						const type = String(source!.id) as BlockType;
+						const themeDefaults = getThemeDefaultProps(activeTheme);
 						const newItem: DroppedItem = {
 							id: `${type}-${Date.now()}`,
 							type,
 							timestamp: Date.now(),
-							props: defaultProps[type],
+							props: structuredClone(themeDefaults[type]),
 						};
 
 						setItems((prev) => {
@@ -579,7 +628,7 @@ export default function Home() {
 				}}
 			>
 				<SidebarProvider>
-					<AppSidebar items={items} />
+					<AppSidebar items={items} activeTheme={activeTheme} />
 					<div className="app-canvas-shell">
 						<div className="app-canvas w-full">
 							<DroppableZone
@@ -592,7 +641,7 @@ export default function Home() {
 					<div className="app-editor-panel p-4 flex flex-col">
 						<Button
 							variant="outline"
-							onClick={() => exportToHTML(items)}
+							onClick={() => exportToHTML(items, activeTheme)}
 							className="mb-4"
 						>
 							Export
@@ -613,3 +662,4 @@ export default function Home() {
 		</PageContext.Provider>
 	);
 }
+
