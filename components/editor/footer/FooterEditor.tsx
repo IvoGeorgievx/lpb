@@ -1,286 +1,139 @@
-import { FooterBlockProps } from "@/components/blocks/FooterBlock";
+import type { FooterBlockProps } from "@/components/blocks/FooterBlock";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useEditor } from "@/context/EditorContext";
-import { useCallback, useRef } from "react";
-import ColorPicker from "react-best-gradient-color-picker";
-import {
-	Popover,
-	PopoverContent,
-	PopoverTrigger,
-} from "@/components/ui/popover";
 import { Slider } from "@/components/ui/slider";
-export interface FooterEditorProps {
-	props: FooterBlockProps;
-}
+import { useEditor } from "@/context/EditorContext";
+import { MAX_DOCUMENT_ITEMS } from "@/lib/document";
+import { ColorField } from "../ColorField";
 
-export function FooterEditor({ props }: FooterEditorProps) {
+export function FooterEditor({ props }: { props: FooterBlockProps }) {
 	const { item, onPropsChange } = useEditor();
-	const timeoutRef = useRef<NodeJS.Timeout | null>(null);
-
-	const handleColorChange = useCallback(
-		(newColor: string) => {
-			if (timeoutRef.current) {
-				clearTimeout(timeoutRef.current);
-			}
-
-			timeoutRef.current = setTimeout(() => {
-				onPropsChange({
-					id: item!.id,
-					props: {
-						background: newColor,
-					},
-				});
-			}, 150);
-		},
-		[item, onPropsChange],
-	);
 	if (!item) return null;
-
-	const links = props.links || [];
-
-	const updateLink = (
-		index: number,
-		field: "label" | "href",
-		value: string,
-	) => {
-		const updatedLinks = links.map((link, i) =>
-			i === index
-				? {
-						...link,
-						[field]: value,
-					}
-				: link,
-		);
-
-		onPropsChange({
-			id: item.id,
-			props: {
-				...props,
-				links: updatedLinks,
-			},
-		});
-	};
-
-	const addLink = () => {
-		onPropsChange({
-			id: item.id,
-			props: {
-				...props,
-				links: [
-					...links,
-					{
-						label: "New Link",
-						href: "/",
-					},
-				],
-			},
-		});
-	};
-
-	const removeLink = (index: number) => {
-		onPropsChange({
-			id: item.id,
-			props: {
-				...props,
-				links: links.filter((_, i) => i !== index),
-			},
-		});
-	};
-
+	const update = (props: FooterBlockProps) =>
+		onPropsChange({ id: item.id, props });
+	const links = props.links ?? [];
+	const height = parseFloat(String(props.style?.minHeight ?? "20"));
 	return (
-		<Tabs defaultValue="layout" className="w-full">
-			<div className="border-b p-4">
-				<TabsList className="grid w-full grid-cols-1">
-					<TabsTrigger value="layout">Layout</TabsTrigger>
-				</TabsList>
-			</div>
-
-			<TabsContent value="layout" className="mt-0 p-4">
-				<div className="flex flex-col gap-6">
-					<div className="flex flex-col gap-2">
-						<Label>Background Color</Label>
-
-						<div>
-							<Popover>
-								<PopoverTrigger asChild>
-									<Button variant="outline" className="cursor-pointer">
-										Background
-									</Button>
-								</PopoverTrigger>
-								<PopoverContent className="w-full">
-									<ColorPicker
-										value={(item.props as FooterBlockProps).background || ""}
-										onChange={handleColorChange}
-									/>
-								</PopoverContent>
-							</Popover>
-						</div>
-						<div className="flex flex-col gap-2">
-							<Label>Height</Label>
-							<Slider
-								value={[
-									Number(
-										(item.props as FooterBlockProps).style?.height
-											?.toString()
-											.replace("vh", ""),
-									) ?? 0,
-								]}
-								min={20}
-								max={60}
-								step={1}
-								onValueChange={(val) => {
-									onPropsChange({
-										id: item.id,
-										props: {
-											...props,
-											style: {
-												...props.style,
-												height: `${val[0]}vh`,
-											},
-										},
-									});
-								}}
-							/>
-						</div>
-					</div>
-
-					<div className="flex flex-col gap-4">
-						<h3 className="font-medium">Logo</h3>
-
-						<div className="flex flex-col gap-2">
-							<Label>Logo Text</Label>
-							<Input
-								value={props.logo?.text || ""}
-								onChange={(e) =>
-									onPropsChange({
-										id: item.id,
-										props: {
-											...props,
-											logo: {
-												...props.logo,
-												text: e.target.value,
-											},
-										},
-									})
-								}
-								placeholder="Your Brand"
-							/>
-						</div>
-
-						<div className="flex flex-col gap-2">
-							<Label>Logo Image URL</Label>
-
-							<Input
-								value={props.logo?.image || ""}
-								onChange={(e) =>
-									onPropsChange({
-										id: item.id,
-										props: {
-											...props,
-											logo: {
-												...props.logo,
-												image: e.target.value,
-											},
-										},
-									})
-								}
-								placeholder="https://example.com/logo.png"
-							/>
-						</div>
-					</div>
-
-					<div className="flex flex-col gap-2">
-						<Label>Copyright</Label>
-						<Input
-							value={props.copyright || ""}
-							onChange={(e) =>
-								onPropsChange({
-									id: item.id,
-									props: {
-										...props,
-										copyright: e.target.value,
-									},
-								})
-							}
-							placeholder="© 2026 Your Company. All rights reserved."
-						/>
-					</div>
-
-					<div className="flex flex-col gap-2">
-						<Label>Text Color</Label>
-						<Input
-							value={(props.style?.color as string) || "#e2e8f0"}
-							onChange={(e) =>
-								onPropsChange({
-									id: item.id,
-									props: {
-										...props,
-										style: {
-											...props.style,
-											color: e.target.value,
-										},
-									},
-								})
-							}
-							placeholder="#e2e8f0"
-						/>
-					</div>
-
-					<div className="flex flex-col gap-4">
-						<div className="flex items-center justify-between">
-							<h3 className="font-medium">Links</h3>
-
-							<Button size="sm" onClick={addLink}>
-								Add Link
-							</Button>
-						</div>
-
-						<div className="flex flex-col gap-4">
-							{links.map((link, index) => (
-								<div
-									key={index}
-									className="flex flex-col gap-3 rounded-lg border p-4"
-								>
-									<div className="flex flex-col gap-2">
-										<Label>Label</Label>
-
-										<Input
-											value={link.label}
-											onChange={(e) =>
-												updateLink(index, "label", e.target.value)
-											}
-											placeholder="Home"
-										/>
-									</div>
-
-									<div className="flex flex-col gap-2">
-										<Label>Href</Label>
-
-										<Input
-											value={link.href}
-											onChange={(e) =>
-												updateLink(index, "href", e.target.value)
-											}
-											placeholder="/home"
-										/>
-									</div>
-
-									<Button
-										variant="destructive"
-										size="sm"
-										onClick={() => removeLink(index)}
-									>
-										Remove Link
-									</Button>
-								</div>
-							))}
-						</div>
-					</div>
-				</div>
-			</TabsContent>
-		</Tabs>
+		<div className="space-y-5">
+			<ColorField
+				background
+				id="footer-background"
+				label="Footer background"
+				value={props.background ?? "#111827"}
+				onChange={(background) => update({ background })}
+			/>
+			<Label htmlFor="footer-height">Minimum height: {height}vh</Label>
+			<Slider
+				id="footer-height"
+				value={[height]}
+				min={20}
+				max={60}
+				onValueChange={([height]) =>
+					update({ style: { minHeight: `${height}vh` } })
+				}
+			/>
+			<Label htmlFor="footer-logo">Logo text</Label>
+			<Input
+				id="footer-logo"
+				value={props.logo?.text ?? ""}
+				onChange={(event) =>
+					update({
+						logo: { ...props.logo, text: event.target.value },
+					})
+				}
+			/>
+			<Label htmlFor="footer-image">Logo image URL</Label>
+			<Input
+				id="footer-image"
+				value={props.logo?.image ?? ""}
+				placeholder="https://example.com/logo.png"
+				onChange={(event) =>
+					update({
+						logo: { ...props.logo, image: event.target.value },
+					})
+				}
+			/>
+			<Label htmlFor="footer-copyright">Copyright</Label>
+			<Input
+				id="footer-copyright"
+				value={props.copyright ?? ""}
+				onChange={(event) => update({ copyright: event.target.value })}
+			/>
+			<ColorField
+				id="footer-color"
+				label="Footer text color"
+				value={String(props.style?.color ?? "#e2e8f0")}
+				onChange={(color) => update({ style: { color } })}
+			/>
+			<h3 className="border-t pt-5 font-semibold">Links</h3>
+			{links.map((link, index) => (
+				<fieldset key={index} className="space-y-3 border-t pt-4">
+					<legend className="text-sm font-medium">
+						Link {index + 1}
+					</legend>
+					<Label htmlFor={`footer-link-${index}-label`}>Label</Label>
+					<Input
+						id={`footer-link-${index}-label`}
+						value={link.label}
+						onChange={(event) =>
+							update({
+								links: links.map((link, i) =>
+									i === index
+										? { ...link, label: event.target.value }
+										: link,
+								),
+							})
+						}
+					/>
+					<Label htmlFor={`footer-link-${index}-href`}>
+						Destination
+					</Label>
+					<Input
+						id={`footer-link-${index}-href`}
+						value={link.href}
+						onChange={(event) =>
+							update({
+								links: links.map((link, i) =>
+									i === index
+										? { ...link, href: event.target.value }
+										: link,
+								),
+							})
+						}
+					/>
+					<Button
+						variant="outline"
+						onClick={() =>
+							update({
+								links: links.filter((_, i) => i !== index),
+							})
+						}
+					>
+						Remove link {index + 1}
+					</Button>
+				</fieldset>
+			))}
+			<Button
+				variant="outline"
+				disabled={links.length >= MAX_DOCUMENT_ITEMS}
+				onClick={() => {
+					if (links.length < MAX_DOCUMENT_ITEMS)
+						update({
+							links: [
+								...links,
+								{ label: "New link", href: "#contact" },
+							],
+						});
+				}}
+			>
+				Add link
+			</Button>
+			{links.length >= MAX_DOCUMENT_ITEMS && (
+				<p role="status" className="text-sm text-muted-foreground">
+					Limit reached: {MAX_DOCUMENT_ITEMS} footer links.
+				</p>
+			)}
+		</div>
 	);
 }

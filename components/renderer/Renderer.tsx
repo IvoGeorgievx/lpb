@@ -1,8 +1,5 @@
-import { COMPONENT_MAP, DroppedItem } from "@/app/page";
+import { renderBlock, type DroppedItem } from "@/lib/blocks";
 
 export default function Renderer({ item }: { item: DroppedItem }) {
-	const Component = COMPONENT_MAP[item.type] as React.ElementType;
-	if (!Component) return null;
-
-	return <Component {...item.props} />;
+	return renderBlock(item);
 }

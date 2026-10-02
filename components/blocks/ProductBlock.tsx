@@ -1,3 +1,40 @@
+import {
+	Award,
+	Rocket,
+	Briefcase,
+	Check,
+	Star,
+	Heart,
+	Shield,
+	Zap,
+	Globe,
+	Leaf,
+	Circle,
+	type LucideIcon,
+} from "lucide-react";
+
+const ICONS: Record<string, LucideIcon> = {
+	award: Award,
+	rocket: Rocket,
+	briefcase: Briefcase,
+	check: Check,
+	star: Star,
+	heart: Heart,
+	shield: Shield,
+	zap: Zap,
+	globe: Globe,
+	leaf: Leaf,
+};
+function ProductIcon({ name, color }: { name: string; color?: string }) {
+	const key =
+		name
+			.trim()
+			.split(/\s+/)
+			.find((part) => /^(lucide-|icon-)/.test(part))
+			?.replace(/^(lucide-|icon-)/, "") ?? name;
+	const Icon = ICONS[key] ?? Circle;
+	return <Icon aria-hidden="true" style={color ? { color } : undefined} />;
+}
 export interface TextConfig {
 	content: string;
 	fontSize?: number | string;
@@ -8,11 +45,7 @@ export interface TextConfig {
 }
 
 export type ProductCardVariants =
-	| "default"
-	| "featured"
-	| "ghost"
-	| "outlined"
-	| "glass";
+	"default" | "featured" | "ghost" | "outlined" | "glass";
 
 export interface ProductCard {
 	id: string;
@@ -33,24 +66,6 @@ export interface ProductBlockProps extends React.ComponentPropsWithRef<"section"
 	background?: string;
 }
 
-const resolveLucideIconClass = (iconClass?: string) => {
-	if (!iconClass) return "";
-	const tokens = iconClass.trim().split(/\s+/);
-	const iconToken = tokens.find((token) => token.startsWith("icon-"));
-	if (iconToken) return `icon ${iconToken}`;
-
-	const lucideToken = tokens.find((token) => token.startsWith("lucide-"));
-	if (lucideToken) return `icon icon-${lucideToken.replace("lucide-", "")}`;
-
-	if (tokens.length === 1) {
-		const single = tokens[0].startsWith("lucide")
-			? tokens[0].replace("lucide-", "")
-			: tokens[0];
-		return `icon icon-${single}`;
-	}
-	return "";
-};
-
 export default function ProductBlock({
 	background,
 	cards,
@@ -59,6 +74,7 @@ export default function ProductBlock({
 	if (!cards) return null;
 	return (
 		<section
+			{...props}
 			className="product-block"
 			style={{
 				background,
@@ -72,10 +88,9 @@ export default function ProductBlock({
 					style={card.style}
 				>
 					{card.iconClass && (
-						<i
-							className={resolveLucideIconClass(card.iconClass)}
-							style={{ color: card.iconColor || "#ffffff" }}
-							aria-hidden="true"
+						<ProductIcon
+							name={card.iconClass}
+							color={card.iconColor}
 						/>
 					)}
 					{card.heading && (
@@ -103,41 +118,46 @@ export default function ProductBlock({
 							{card.subheading.content}
 						</p>
 					)}
-					{card.additionalContent && card.additionalContent.length > 0 && (
-						<div className="product-card-additional">
-							{card.additionalContent.map((contentPiece, idx) => {
-								const {
-									content,
-									color,
-									fontSize,
-									fontWeight,
-									iconClass,
-									iconColor,
-								} = contentPiece;
-								return (
-									<div className="product-card-additional-item" key={idx}>
-										{iconClass && (
-											<i
-												className={resolveLucideIconClass(iconClass)}
-												style={{ color: iconColor || "#334155" }}
-												aria-hidden="true"
-											/>
-										)}
-										<p
-											style={{
-												fontSize,
-												fontWeight,
-												color,
-												textAlign: "center",
-											}}
-										>
-											{content}
-										</p>
-									</div>
-								);
-							})}
-						</div>
-					)}
+					{card.additionalContent &&
+						card.additionalContent.length > 0 && (
+							<div className="product-card-additional">
+								{card.additionalContent.map(
+									(contentPiece, idx) => {
+										const {
+											content,
+											color,
+											fontSize,
+											fontWeight,
+											iconClass,
+											iconColor,
+										} = contentPiece;
+										return (
+											<div
+												className="product-card-additional-item"
+												key={idx}
+											>
+												{iconClass && (
+													<ProductIcon
+														name={iconClass}
+														color={iconColor}
+													/>
+												)}
+												<p
+													style={{
+														fontSize,
+														fontWeight,
+														color,
+														textAlign: "center",
+													}}
+												>
+													{content}
+												</p>
+											</div>
+										);
+									},
+								)}
+							</div>
+						)}
 				</div>
 			))}
 		</section>

@@ -17,6 +17,7 @@ function Label({
         className
       )}
       {...props}
+      id={props.id ?? (props.htmlFor ? `${props.htmlFor}-label` : undefined)}
     />
   )
 }

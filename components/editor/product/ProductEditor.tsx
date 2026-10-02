@@ -1,4 +1,4 @@
-import {
+import type {
 	ProductBlockProps,
 	ProductCard,
 	ProductCardVariants,
@@ -7,749 +7,497 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-	Popover,
-	PopoverContent,
-	PopoverTrigger,
-} from "@/components/ui/popover";
-import { Separator } from "@/components/ui/separator";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useEditor } from "@/context/EditorContext";
-import { ChangeEvent, useCallback, useRef, useState } from "react";
-import ColorPicker from "react-best-gradient-color-picker";
-interface ProductEditorProps {
-	props: ProductBlockProps;
-}
+import { usePage } from "@/context/PageContext";
+import { getThemePreset } from "@/lib/theme";
+import { Fragment, useState } from "react";
+import { ColorField } from "../ColorField";
+import { MAX_DOCUMENT_ITEMS } from "@/lib/document";
 
-const VARIANTS = ["default", "featured", "ghost", "outlined", "glass"];
+const VARIANTS: ProductCardVariants[] = [
+	"default",
+	"featured",
+	"ghost",
+	"outlined",
+	"glass",
+];
 
-export function ProductEditor({ props }: ProductEditorProps) {
+export function ProductEditor({ props }: { props: ProductBlockProps }) {
 	const { item, onPropsChange } = useEditor();
-	const timeoutRef = useRef<NodeJS.Timeout | null>(null);
-	const [selectedCardId, setSelectedCardId] = useState<string | null>(null);
-
-	const handleColorChange = useCallback(
-		(newColor: string) => {
-			if (timeoutRef.current) {
-				clearTimeout(timeoutRef.current);
-			}
-
-			timeoutRef.current = setTimeout(() => {
-				onPropsChange({
-					id: item!.id,
-					props: {
-						background: newColor,
-					},
-				});
-			}, 150);
-		},
-		[item, onPropsChange],
-	);
+	const { page } = usePage();
+	const [chosenId, setChosenId] = useState<string>();
 	if (!item) return null;
-
-	const cards = (item.props as ProductBlockProps).cards || [];
-
-	const selectedCard = cards.find((card) => card.id === selectedCardId);
-
-	const updateSelectedCard = (updater: (card: ProductCard) => ProductCard) => {
-		if (!selectedCardId) return;
-		onPropsChange({
-			id: item.id,
-			props: {
-				...props,
-				cards: cards.map((card) =>
-					card.id === selectedCardId ? updater(card) : card,
+	const theme = getThemePreset(page.activeTheme);
+	const cards = props.cards ?? [];
+	const card = cards.find((card) => card.id === chosenId) ?? cards[0];
+	const updateCards = (cards: ProductCard[]) =>
+		onPropsChange({ id: item.id, props: { cards } });
+	const updateCard = (change: Partial<ProductCard>) => {
+		if (card)
+			updateCards(
+				cards.map((entry) =>
+					entry.id === card.id ? { ...entry, ...change } : entry,
 				),
+			);
+	};
+	const updateStyle = (style: React.CSSProperties) =>
+		updateCard({ style: { ...card?.style, ...style } });
+	const updateText = (
+		key: "heading" | "subheading",
+		change: Partial<TextConfig>,
+	) =>
+		updateCard({
+			[key]: {
+				content: card?.[key]?.content ?? "",
+				...card?.[key],
+				...change,
 			},
 		});
-	};
-
+	const content = card?.additionalContent ?? [];
+	const updateContent = (index: number, change: Partial<TextConfig>) =>
+		updateCard({
+			additionalContent: content.map((entry, i) =>
+				i === index ? { ...entry, ...change } : entry,
+			),
+		});
 	const addCard = () => {
-		const newCard: ProductCard = {
-			id: String(Date.now()),
+		if (cards.length >= MAX_DOCUMENT_ITEMS) return;
+		const next: ProductCard = {
+			id: crypto.randomUUID(),
 			heading: { content: "New card" },
-			subheading: { content: "Subheading" },
-			style: { background: "#ffffff" },
+			subheading: { content: "Describe this feature." },
 			variant: "default",
 		};
-
-		onPropsChange({
-			id: item.id,
-			props: {
-				...props,
-				cards: [...(props.cards || []), newCard],
-			},
-		});
+		updateCards([...cards, next]);
+		setChosenId(next.id);
 	};
-
-	const removeCard = () => {
-		onPropsChange({
-			id: item.id,
-			props: {
-				...props,
-				cards: [...(props.cards || [])].slice(0, -1),
-			},
-		});
-	};
-
-	const handleHeadingChange = (
-		event: ChangeEvent<HTMLInputElement>,
-		headingType: "heading" | "subheading",
-	) => {
-		if (!selectedCard) return;
-		const newHeading = event.target.value;
-
-		const updatedCards = cards.map((card) => {
-			if (card.id !== selectedCard.id) return card;
-			return {
-				...card,
-				[headingType]: {
-					...card[headingType],
-					content: newHeading,
-				},
-			};
-		});
-
-		onPropsChange({
-			id: item.id,
-			props: {
-				...props,
-				cards: updatedCards,
-			},
-		});
-	};
-
-	const handleCardSelection = (card: ProductCard) => {
-		setSelectedCardId(card.id);
-	};
-
-	const addContent = () => {
-		if (!selectedCardId) return;
-
-		const newContent: TextConfig = {
-			content: "New content",
-			fontSize: 15,
-		};
-
-		const updatedCards = ((item.props as ProductBlockProps).cards || []).map(
-			(card) => {
-				if (card.id !== selectedCardId) return card;
-
-				return {
-					...card,
-					additionalContent: [...(card.additionalContent || []), newContent],
-				};
-			},
-		);
-
-		onPropsChange({
-			id: item.id,
-			props: {
-				...props,
-				cards: updatedCards,
-			},
-		});
-	};
-
-	const removeContent = () => {
-		if (!selectedCardId) return;
-
-		const updatedCards = ((item.props as ProductBlockProps).cards || []).map(
-			(card) => {
-				if (card.id !== selectedCardId) return card;
-
-				return {
-					...card,
-					additionalContent: (card.additionalContent || []).slice(0, -1),
-				};
-			},
-		);
-		onPropsChange({
-			id: item.id,
-			props: {
-				...props,
-				cards: updatedCards,
-			},
-		});
-	};
-
-	const handleAdditionalContent = (
-		event: ChangeEvent<HTMLInputElement>,
-		index: number,
-	) => {
-		if (!selectedCardId) return;
-
-		const newValue = event.target.value;
-
-		const updatedCards = ((item.props as ProductBlockProps).cards || []).map(
-			(card) => {
-				if (card.id !== selectedCardId) return card;
-
-				const updatedAdditionalContent = [...(card.additionalContent || [])];
-
-				updatedAdditionalContent[index] = {
-					...updatedAdditionalContent[index],
-					content: newValue,
-				};
-
-				return {
-					...card,
-					additionalContent: updatedAdditionalContent,
-				};
-			},
-		);
-
-		onPropsChange({
-			id: item.id,
-			props: {
-				...props,
-				cards: updatedCards,
-			},
-		});
-	};
-
-	const handleCardVariantChange = (variant: ProductCardVariants) => {
-		updateSelectedCard((card) => ({
-			...card,
-			variant,
-		}));
-	};
-
-	const handleCardIconClassChange = (value: string) => {
-		updateSelectedCard((card) => ({
-			...card,
-			iconClass: value,
-		}));
-	};
-
-	const handleCardIconColorChange = (value: string) => {
-		updateSelectedCard((card) => ({
-			...card,
-			iconColor: value,
-		}));
-	};
-
-	const handleAdditionalIconClassChange = (index: number, value: string) => {
-		updateSelectedCard((card) => {
-			const next = [...(card.additionalContent || [])];
-			next[index] = {
-				...next[index],
-				iconClass: value,
-			};
-			return { ...card, additionalContent: next };
-		});
-	};
-
-	const handleAdditionalIconColorChange = (index: number, value: string) => {
-		updateSelectedCard((card) => {
-			const next = [...(card.additionalContent || [])];
-			next[index] = {
-				...next[index],
-				iconColor: value,
-			};
-			return { ...card, additionalContent: next };
-		});
-	};
-
 	return (
-		<Tabs defaultValue="appearance" className="w-full p-4">
-			<TabsList className="grid w-full grid-cols-2">
-				<TabsTrigger value="appearance">Appearance</TabsTrigger>
-			</TabsList>
-			<TabsContent value="appearance">
-				<div className="w-full gap-4 flex flex-col mt-4">
-					<div className="p-2 rounded-md border flex ">
-						<div className="w-full">
-							<Popover>
-								<PopoverTrigger asChild>
-									<Button variant="outline" className="cursor-pointer">
-										Background
-									</Button>
-								</PopoverTrigger>
-								<PopoverContent className="w-full">
-									<ColorPicker
-										value={(item.props as ProductBlockProps).background || ""}
-										onChange={handleColorChange}
-									/>
-								</PopoverContent>
-							</Popover>
-						</div>
-					</div>
-					<div className="p-2 rounded-md border flex flex-col">
-						<div className="w-full flex gap-4 justify-around">
-							<Button variant="outline" onClick={addCard}>
-								Add Card
-							</Button>
-							{(item.props as ProductBlockProps)?.cards?.length ? (
-								<Button variant="outline" onClick={removeCard}>
-									Remove Card
-								</Button>
-							) : null}
-						</div>
-						<div className="grid grid-cols-2 gap-3 md:grid-cols-3 mt-2">
-							{cards &&
-								cards.map((card) => {
-									const isSelected = selectedCardId === card.id;
-
-									return (
-										<div
-											key={card.id}
-											onClick={() => handleCardSelection(card)}
-											className={`
-            rounded-2xl border p-4 text-left transition-all duration-200
-            hover:translate-y-0.5 cursor-pointer
-            ${
-							isSelected
-								? "border-primary bg-primary/10 shadow-md"
-								: "border-border/50 bg-muted/20 hover:border-primary/30"
+		<div className="product-editor space-y-6">
+			<ColorField
+				background
+				id="features-background"
+				label="Section background"
+				value={props.background ?? theme.tokens.background}
+				onChange={(background) =>
+					onPropsChange({ id: item.id, props: { background } })
+				}
+			/>
+			<div className="space-y-3">
+				<Label htmlFor="selected-feature-card">Card to edit</Label>
+				<select
+					id="selected-feature-card"
+					className="editor-select"
+					disabled={!card}
+					value={card?.id ?? ""}
+					onChange={(event) => setChosenId(event.target.value)}
+				>
+					{!cards.length && <option value="">No cards yet</option>}
+					{cards.map((card, index) => (
+						<option key={card.id} value={card.id}>
+							Card {index + 1} ·{" "}
+							{card.heading?.content || "Untitled"}
+						</option>
+					))}
+				</select>
+				<div className="flex flex-wrap gap-2">
+					<Button
+						variant="outline"
+						disabled={cards.length >= MAX_DOCUMENT_ITEMS}
+						onClick={addCard}
+					>
+						Add card
+					</Button>
+					<Button
+						variant="outline"
+						disabled={!card}
+						onClick={() =>
+							updateCards(
+								cards.filter((entry) => entry.id !== card?.id),
+							)
 						}
-          `}
-										>
-											<div className="space-y-2">
-												<div className="flex items-center justify-between">
-													<h4 className="font-medium line-clamp-1">
-														{card.heading?.content || "Untitled"}
-													</h4>
-
-													{card.variant && (
-														<span className="text-[10px] uppercase tracking-wide text-muted-foreground">
-															{card.variant}
-														</span>
-													)}
-												</div>
-
-												<p className="text-xs text-muted-foreground line-clamp-2">
-													{card.subheading?.content || "No subheading"}
-												</p>
-											</div>
-										</div>
-									);
-								})}
-						</div>
-					</div>
-					{selectedCard && (
-						<div className="rounded-2xl border border-border/40 bg-muted/30 p-5 space-y-6">
-							<div className="flex items-center justify-between">
-								<div>
-									<h3 className="text-lg font-semibold tracking-tight">
-										Edit Card
-									</h3>
-
-									<p className="text-sm text-muted-foreground">
-										Customize content and appearance.
-									</p>
-								</div>
-
-								<div className="rounded-full border border-primary/20 bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
-									{selectedCard.variant || "default"}
-								</div>
-							</div>
-
-							<div className="space-y-3">
-								<Label>Variant</Label>
-
-								<div className="grid grid-cols-2 gap-3">
-									{VARIANTS.map((variant) => {
-										const isActive = selectedCard.variant === variant;
-
-										return (
-											<div
-												key={variant}
-												onClick={() =>
-													handleCardVariantChange(
-														variant as ProductCardVariants,
-													)
-												}
-												className={`
-								rounded-2xl border p-4 text-left transition-all duration-200
-								hover:scale-[1.02]
-								hover:border-primary/40
-								${
-									isActive
-										? "border-primary bg-primary/10 shadow-sm"
-										: "border-border/50 bg-background/40"
-								}
-							`}
-											>
-												<div className="flex flex-col gap-2">
-													<div className="flex items-center justify-between">
-														<span className="text-sm font-medium capitalize">
-															{variant}
-														</span>
-
-														{isActive && (
-															<div className="h-2 w-2 rounded-full bg-primary" />
-														)}
-													</div>
-
-													<div
-														className={`
-										h-14 overflow-hidden rounded-xl border
-										${
-											variant === "glass"
-												? "border-white/10 bg-white/5 backdrop-blur-md"
-												: variant === "outlined"
-													? "border-white/20 bg-transparent"
-													: variant === "ghost"
-														? "border-transparent bg-transparent"
-														: variant === "featured"
-															? "border-primary/30 bg-primary/20"
-															: "bg-muted"
-										}
-									`}
-													>
-														<div className="flex flex-col gap-1 p-2">
-															<div className="h-2 w-16 rounded bg-white/40" />
-															<div className="h-2 w-10 rounded bg-white/20" />
-														</div>
-													</div>
-												</div>
-											</div>
-										);
-									})}
-								</div>
-							</div>
-
-							<Separator />
-
-							<div className="space-y-4">
-								<div>
-									<h4 className="text-sm font-medium">Card Style</h4>
-									<p className="mt-1 text-xs text-muted-foreground">
-										These override any values applied by global presets.
-									</p>
-								</div>
-
-								<div className="grid gap-4 md:grid-cols-2">
-									<div className="space-y-2">
-										<Label>Card Background</Label>
-										<Input
-											type="color"
-											value={
-												selectedCard.style?.background?.toString() || "#ffffff"
-											}
-											onChange={(e) =>
-												updateSelectedCard((card) => ({
-													...card,
-													style: { ...card.style, background: e.target.value },
-												}))
-											}
-										/>
-									</div>
-									<div className="space-y-2">
-										<Label>Card Border</Label>
-										<Input
-											value={selectedCard.style?.border?.toString() || ""}
-											placeholder="1px solid #e2e8f0"
-											onChange={(e) =>
-												updateSelectedCard((card) => ({
-													...card,
-													style: { ...card.style, border: e.target.value },
-												}))
-											}
-										/>
-									</div>
-									<div className="space-y-2">
-										<Label>Border Radius (px)</Label>
-										<Input
-											type="number"
-											value={Number(selectedCard.style?.borderRadius || 0)}
-											onChange={(e) =>
-												updateSelectedCard((card) => ({
-													...card,
-													style: {
-														...card.style,
-														borderRadius: Number(e.target.value || 0),
-													},
-												}))
-											}
-										/>
-									</div>
-									<div className="space-y-2">
-										<Label>Card Shadow</Label>
-										<Input
-											value={selectedCard.style?.boxShadow?.toString() || ""}
-											placeholder="0 10px 30px rgba(0,0,0,0.04)"
-											onChange={(e) =>
-												updateSelectedCard((card) => ({
-													...card,
-													style: { ...card.style, boxShadow: e.target.value },
-												}))
-											}
-										/>
-									</div>
-								</div>
-							</div>
-
-							<Separator />
-
-							<div className="space-y-4">
-								<div>
-									<h4 className="text-sm font-medium">Content</h4>
-
-									<p className="mt-1 text-xs text-muted-foreground">
-										Edit the primary card copy.
-									</p>
-								</div>
-
-								<div className="grid gap-4 md:grid-cols-2">
-									<div className="space-y-2">
-										<Label htmlFor="card-icon-class">Card Icon Class</Label>
-										<Input
-											id="card-icon-class"
-											placeholder="lucide lucide-award"
-											className="h-11 rounded-xl"
-											value={selectedCard.iconClass || ""}
-											onChange={(e) =>
-												handleCardIconClassChange(e.target.value)
-											}
-										/>
-									</div>
-									<div className="space-y-2">
-										<Label htmlFor="card-icon-color">Card Icon Color</Label>
-										<Input
-											id="card-icon-color"
-											type="color"
-											value={selectedCard.iconColor || "#ffffff"}
-											onChange={(e) =>
-												handleCardIconColorChange(e.target.value)
-											}
-										/>
-									</div>
-									<div className="space-y-2">
-										<Label htmlFor="card-heading">Heading</Label>
-
-										<Input
-											id="card-heading"
-											placeholder="Card Heading"
-											className="h-11 rounded-xl"
-											value={
-												(item.props as ProductBlockProps).cards?.find(
-													(card) => card.id === selectedCard?.id,
-												)?.heading?.content ?? ""
-											}
-											onChange={(e) => handleHeadingChange(e, "heading")}
-										/>
-									</div>
-
-									<div className="space-y-2">
-										<Label htmlFor="card-subheading">Subheading</Label>
-
-										<Input
-											id="card-subheading"
-											placeholder="Card Subheading"
-											className="h-11 rounded-xl"
-											value={
-												(item.props as ProductBlockProps)?.cards?.find(
-													(card) => card.id === selectedCard.id,
-												)?.subheading?.content ?? ""
-											}
-											onChange={(e) => handleHeadingChange(e, "subheading")}
-										/>
-									</div>
-								</div>
-
-								<div className="grid gap-4 md:grid-cols-3">
-									<div className="space-y-2">
-										<Label>Heading Color</Label>
-										<Input
-											type="color"
-											value={selectedCard.heading?.color || "#0f172a"}
-											onChange={(e) =>
-												updateSelectedCard((card) => ({
-													...card,
-													heading: {
-														...card.heading,
-														content: card.heading?.content || "",
-														color: e.target.value,
-													},
-												}))
-											}
-										/>
-									</div>
-									<div className="space-y-2">
-										<Label>Subheading Color</Label>
-										<Input
-											type="color"
-											value={selectedCard.subheading?.color || "#475569"}
-											onChange={(e) =>
-												updateSelectedCard((card) => ({
-													...card,
-													subheading: {
-														...card.subheading,
-														content: card.subheading?.content || "",
-														color: e.target.value,
-													},
-												}))
-											}
-										/>
-									</div>
-									<div className="space-y-2">
-										<Label>Heading Weight</Label>
-										<Input
-											type="number"
-											min={300}
-											max={900}
-											step={100}
-											value={Number(selectedCard.heading?.fontWeight || 700)}
-											onChange={(e) =>
-												updateSelectedCard((card) => ({
-													...card,
-													heading: {
-														...card.heading,
-														content: card.heading?.content || "",
-														fontWeight: Number(e.target.value || 700),
-													},
-												}))
-											}
-										/>
-									</div>
-								</div>
-							</div>
-
-							<Separator />
-
-							<div className="space-y-4">
-								<div className="flex items-start justify-between gap-4">
-									<div>
-										<h4 className="text-sm font-medium">Additional Content</h4>
-
-										<p className="mt-1 text-xs text-muted-foreground">
-											Add supporting text, features or metadata.
-										</p>
-									</div>
-
-									<div className="flex gap-2">
-										<Button
-											variant="secondary"
-											size="sm"
-											onClick={addContent}
-											className="rounded-xl"
-										>
-											Add
-										</Button>
-
-										<Button
-											variant="outline"
-											size="sm"
-											onClick={removeContent}
-											className="rounded-xl"
-										>
-											Remove
-										</Button>
-									</div>
-								</div>
-
-								{selectedCard.additionalContent?.length ? (
-									<div className="space-y-3">
-										{selectedCard.additionalContent.map(
-											(additionalItem, idx) => (
-												<div
-													key={idx}
-													className="rounded-xl border border-border/40 bg-background/40 p-3"
-												>
-													<div className="flex items-center gap-3">
-														<div className="h-2 w-2 rounded-full bg-primary" />
-
-														<Input
-															value={additionalItem.content}
-															onChange={(e) => handleAdditionalContent(e, idx)}
-															className="border-none shadow-none focus-visible:ring-0"
-														/>
-													</div>
-													<div className="mt-3 space-y-3">
-														<div className="grid gap-3 md:grid-cols-3">
-															<Input
-																type="color"
-																value={additionalItem.color || "#64748b"}
-																onChange={(e) =>
-																	updateSelectedCard((card) => {
-																		const next = [
-																			...(card.additionalContent || []),
-																		];
-																		next[idx] = {
-																			...next[idx],
-																			color: e.target.value,
-																		};
-																		return { ...card, additionalContent: next };
-																	})
-																}
-															/>
-															<Input
-																type="number"
-																value={Number(additionalItem.fontSize || 14)}
-																onChange={(e) =>
-																	updateSelectedCard((card) => {
-																		const next = [
-																			...(card.additionalContent || []),
-																		];
-																		next[idx] = {
-																			...next[idx],
-																			fontSize: Number(e.target.value || 14),
-																		};
-																		return { ...card, additionalContent: next };
-																	})
-																}
-															/>
-															<Input
-																type="number"
-																min={300}
-																max={900}
-																step={100}
-																value={Number(additionalItem.fontWeight || 500)}
-																onChange={(e) =>
-																	updateSelectedCard((card) => {
-																		const next = [
-																			...(card.additionalContent || []),
-																		];
-																		next[idx] = {
-																			...next[idx],
-																			fontWeight: Number(e.target.value || 500),
-																		};
-																		return { ...card, additionalContent: next };
-																	})
-																}
-															/>
-														</div>
-														<div className="grid gap-3 md:grid-cols-2">
-															<Input
-																placeholder="lucide lucide-check"
-																value={additionalItem.iconClass || ""}
-																onChange={(e) =>
-																	handleAdditionalIconClassChange(
-																		idx,
-																		e.target.value,
-																	)
-																}
-															/>
-															<Input
-																type="color"
-																value={additionalItem.iconColor || "#334155"}
-																onChange={(e) =>
-																	handleAdditionalIconColorChange(
-																		idx,
-																		e.target.value,
-																	)
-																}
-															/>
-														</div>
-													</div>
-												</div>
-											),
-										)}
-									</div>
-								) : (
-									<div className="rounded-xl border border-dashed border-border/60 p-6 text-center">
-										<p className="text-sm text-muted-foreground">
-											No additional content yet.
-										</p>
-									</div>
-								)}
-							</div>
-						</div>
-					)}
+					>
+						Remove selected card
+					</Button>
 				</div>
-			</TabsContent>
-		</Tabs>
+				{cards.length >= MAX_DOCUMENT_ITEMS && (
+					<p role="status" className="text-sm text-muted-foreground">
+						Limit reached: {MAX_DOCUMENT_ITEMS} cards per section.
+					</p>
+				)}
+			</div>
+			{card ? (
+				<Fragment key={card.id}>
+					<section
+						className="editor-section"
+						aria-label="Card content"
+					>
+						<h3 className="font-semibold">Content</h3>
+						<div className="space-y-2">
+							<Label htmlFor="card-heading">Heading</Label>
+							<Input
+								id="card-heading"
+								className="h-10"
+								value={card.heading?.content ?? ""}
+								onChange={(event) =>
+									updateText("heading", {
+										content: event.target.value,
+									})
+								}
+							/>
+						</div>
+						<div className="space-y-2">
+							<Label htmlFor="card-subheading">Subheading</Label>
+							<textarea
+								id="card-subheading"
+								className="editor-textarea"
+								rows={3}
+								value={card.subheading?.content ?? ""}
+								onChange={(event) =>
+									updateText("subheading", {
+										content: event.target.value,
+									})
+								}
+							/>
+						</div>
+						<div className="space-y-2">
+							<Label htmlFor="card-icon-class">Icon name</Label>
+							<Input
+								id="card-icon-class"
+								className="h-10"
+								value={card.iconClass ?? ""}
+								placeholder="award, rocket, briefcase, check…"
+								onChange={(event) =>
+									updateCard({
+										iconClass: event.target.value,
+									})
+								}
+							/>
+						</div>
+						<ColorField
+							id="card-icon-color"
+							label="Icon color"
+							value={card.iconColor ?? theme.tokens.card}
+							onChange={(iconColor) => updateCard({ iconColor })}
+						/>
+					</section>
+					<section
+						className="editor-section"
+						aria-label="Card appearance"
+					>
+						<h3 className="font-semibold">Appearance</h3>
+						<div className="space-y-2">
+							<Label htmlFor="card-variant">Card style</Label>
+							<select
+								id="card-variant"
+								className="editor-select capitalize"
+								value={card.variant ?? "default"}
+								onChange={(event) =>
+									updateCard({
+										variant: event.target
+											.value as ProductCardVariants,
+									})
+								}
+							>
+								{VARIANTS.map((variant) => (
+									<option key={variant} value={variant}>
+										{variant[0].toUpperCase() +
+											variant.slice(1)}
+									</option>
+								))}
+							</select>
+						</div>
+						<ColorField
+							background
+							id="card-background"
+							label="Card background"
+							value={String(
+								card.style?.background ?? theme.tokens.card,
+							)}
+							onChange={(background) =>
+								updateStyle({ background })
+							}
+						/>
+						<div className="space-y-2">
+							<Label htmlFor="card-border">Border</Label>
+							<Input
+								id="card-border"
+								className="h-10"
+								value={String(
+									card.style?.border ??
+										`1px solid ${theme.tokens.border}`,
+								)}
+								onChange={(event) =>
+									updateStyle({ border: event.target.value })
+								}
+								placeholder="1px solid #dbe2ec"
+							/>
+						</div>
+						<div className="space-y-2">
+							<Label htmlFor="card-radius">
+								Corner radius (px)
+							</Label>
+							<Input
+								id="card-radius"
+								className="h-10"
+								type="number"
+								min={0}
+								value={Number(
+									card.style?.borderRadius ??
+										theme.scales.radius,
+								)}
+								onChange={(event) =>
+									updateStyle({
+										borderRadius: Math.max(
+											0,
+											Number(event.target.value),
+										),
+									})
+								}
+							/>
+						</div>
+						<div className="space-y-2">
+							<Label htmlFor="card-shadow">Shadow</Label>
+							<Input
+								id="card-shadow"
+								className="h-10"
+								value={String(
+									card.style?.boxShadow ??
+										theme.scales.shadowSoft,
+								)}
+								onChange={(event) =>
+									updateStyle({
+										boxShadow: event.target.value,
+									})
+								}
+								placeholder="0 10px 30px rgba(0,0,0,0.1)"
+							/>
+						</div>
+					</section>
+					<section
+						className="editor-section"
+						aria-label="Card typography"
+					>
+						<h3 className="font-semibold">Typography</h3>
+						<ColorField
+							id="card-heading-color"
+							label="Heading color"
+							value={
+								card.heading?.color ?? theme.tokens.foreground
+							}
+							onChange={(color) =>
+								updateText("heading", { color })
+							}
+						/>
+						<ColorField
+							id="card-subheading-color"
+							label="Subheading color"
+							value={card.subheading?.color ?? theme.tokens.muted}
+							onChange={(color) =>
+								updateText("subheading", { color })
+							}
+						/>
+						<div className="space-y-2">
+							<Label htmlFor="card-weight">Heading weight</Label>
+							<select
+								id="card-weight"
+								className="editor-select"
+								value={
+									card.heading?.fontWeight ??
+									theme.typography.headingWeight
+								}
+								onChange={(event) =>
+									updateText("heading", {
+										fontWeight: Number(event.target.value),
+									})
+								}
+							>
+								{[300, 400, 500, 600, 700, 800, 900].map(
+									(weight) => (
+										<option key={weight} value={weight}>
+											{weight}
+										</option>
+									),
+								)}
+							</select>
+						</div>
+					</section>
+					<section
+						className="editor-section"
+						aria-label="Additional card content"
+					>
+						<h3 className="font-semibold">Additional content</h3>
+						<p className="text-sm text-muted-foreground">
+							Supporting details for this card.
+						</p>
+						{content.map((entry, index) => (
+							<fieldset
+								key={index}
+								className="min-w-0 space-y-4 border-t pt-4"
+							>
+								<legend className="text-sm font-medium">
+									Detail {index + 1}
+								</legend>
+								<div className="space-y-2">
+									<Label htmlFor={`detail-${index}-text`}>
+										Text
+									</Label>
+									<textarea
+										id={`detail-${index}-text`}
+										className="editor-textarea"
+										rows={2}
+										value={entry.content}
+										onChange={(event) =>
+											updateContent(index, {
+												content: event.target.value,
+											})
+										}
+									/>
+								</div>
+								<ColorField
+									id={`detail-${index}-color`}
+									label={`Detail ${index + 1} text color`}
+									value={
+										entry.color ?? theme.tokens.foreground
+									}
+									onChange={(color) =>
+										updateContent(index, { color })
+									}
+								/>
+								<div className="editor-field-grid">
+									<div className="space-y-2">
+										<Label htmlFor={`detail-${index}-size`}>
+											Text size (px)
+										</Label>
+										<Input
+											id={`detail-${index}-size`}
+											className="h-10"
+											type="number"
+											min={1}
+											value={Number(entry.fontSize ?? 14)}
+											onChange={(event) =>
+												updateContent(index, {
+													fontSize: Math.max(
+														1,
+														Number(
+															event.target.value,
+														),
+													),
+												})
+											}
+										/>
+									</div>
+									<div className="space-y-2">
+										<Label
+											htmlFor={`detail-${index}-weight`}
+										>
+											Text weight
+										</Label>
+										<select
+											id={`detail-${index}-weight`}
+											className="editor-select"
+											value={entry.fontWeight ?? 500}
+											onChange={(event) =>
+												updateContent(index, {
+													fontWeight: Number(
+														event.target.value,
+													),
+												})
+											}
+										>
+											{[
+												300, 400, 500, 600, 700, 800,
+												900,
+											].map((weight) => (
+												<option
+													key={weight}
+													value={weight}
+												>
+													{weight}
+												</option>
+											))}
+										</select>
+									</div>
+								</div>
+								<div className="space-y-2">
+									<Label htmlFor={`detail-${index}-icon`}>
+										Icon name
+									</Label>
+									<Input
+										id={`detail-${index}-icon`}
+										className="h-10"
+										value={entry.iconClass ?? ""}
+										placeholder="check"
+										onChange={(event) =>
+											updateContent(index, {
+												iconClass: event.target.value,
+											})
+										}
+									/>
+								</div>
+								<ColorField
+									id={`detail-${index}-icon-color`}
+									label={`Detail ${index + 1} icon color`}
+									value={
+										entry.iconColor ??
+										theme.tokens.foreground
+									}
+									onChange={(iconColor) =>
+										updateContent(index, { iconColor })
+									}
+								/>
+								<Button
+									variant="outline"
+									onClick={() =>
+										updateCard({
+											additionalContent: content.filter(
+												(_, i) => i !== index,
+											),
+										})
+									}
+								>
+									Remove detail {index + 1}
+								</Button>
+							</fieldset>
+						))}
+						{!content.length && (
+							<p className="text-sm text-muted-foreground">
+								No supporting details yet.
+							</p>
+						)}
+						<Button
+							variant="outline"
+							disabled={content.length >= MAX_DOCUMENT_ITEMS}
+							onClick={() => {
+								if (content.length < MAX_DOCUMENT_ITEMS)
+									updateCard({
+										additionalContent: [
+											...content,
+											{
+												content: "New detail",
+												fontSize: 14,
+											},
+										],
+									});
+							}}
+						>
+							Add detail
+						</Button>
+						{content.length >= MAX_DOCUMENT_ITEMS && (
+							<p
+								role="status"
+								className="text-sm text-muted-foreground"
+							>
+								Limit reached: {MAX_DOCUMENT_ITEMS} details per
+								card.
+							</p>
+						)}
+					</section>
+				</Fragment>
+			) : (
+				<p className="text-sm text-muted-foreground">
+					Add a card to start editing.
+				</p>
+			)}
+		</div>
 	);
 }

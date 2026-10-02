@@ -5,6 +5,7 @@ interface Slide {
 	subheading?: string;
 	author?: string;
 	bgColor?: string;
+	textColor?: string;
 }
 
 interface Carousel {
@@ -24,11 +25,11 @@ export const TestimonialBlock = ({
 }: TestimonialBlockProps) => {
 	const fallbackSlides: Slide[] = [
 		{
-			heading: "Loved by fast-moving teams",
+			heading: "Add a customer story",
 			subheading:
-				"Everything is easier to maintain and our pages finally look intentional.",
-			author: "Alex Rivera, Product Marketing",
-			bgColor: "rgba(248,250,252,0.92)",
+				"Replace this placeholder with a real testimonial before publishing.",
+			author: "Example content",
+			bgColor: "var(--lpb-card)",
 		},
 	];
 	const slides =
@@ -41,7 +42,9 @@ export const TestimonialBlock = ({
 		<div
 			style={style}
 			className={
-				className ? `testimonial-block ${className}` : "testimonial-block"
+				className
+					? `testimonial-block ${className}`
+					: "testimonial-block"
 			}
 			{...props}
 		>
@@ -88,7 +91,8 @@ export const TestimonialBlock = ({
 									background:
 										slide.bgColor ??
 										"linear-gradient(160deg, #ffffff 0%, #f8fafc 100%)",
-									boxShadow: "0 16px 36px rgba(15,23,42,0.08)",
+									boxShadow:
+										"0 16px 36px rgba(15,23,42,0.08)",
 								}}
 								className="default-carousel-slide"
 								id={`${radioGroupId}-default-slide-${idx + 1}`}
@@ -99,7 +103,9 @@ export const TestimonialBlock = ({
 										fontSize: "clamp(1.2rem, 3vw, 2rem)",
 										lineHeight: 1.2,
 										fontWeight: 700,
-										color: "#0f172a",
+										color:
+											slide.textColor ??
+											"var(--lpb-foreground)",
 									}}
 								>
 									{slide.heading}
@@ -107,9 +113,12 @@ export const TestimonialBlock = ({
 								<p
 									style={{
 										margin: 0,
-										fontSize: "clamp(0.95rem, 1.8vw, 1.125rem)",
+										fontSize:
+											"clamp(0.95rem, 1.8vw, 1.125rem)",
 										lineHeight: 1.6,
-										color: "#334155",
+										color:
+											slide.textColor ??
+											"var(--lpb-muted)",
 									}}
 								>
 									{slide.subheading}
@@ -119,7 +128,9 @@ export const TestimonialBlock = ({
 										margin: 0,
 										fontSize: "clamp(0.85rem, 1.6vw, 1rem)",
 										fontStyle: "italic",
-										color: "#475569",
+										color:
+											slide.textColor ??
+											"var(--lpb-muted)",
 										textAlign: "right",
 									}}
 								>
@@ -129,23 +140,16 @@ export const TestimonialBlock = ({
 						))}
 					</div>
 
-					<div
-						className="default-carousel-nav"
-						style={{ display: "flex", justifyContent: "center", gap: 10 }}
-					>
+					<div className="default-carousel-nav">
 						{slides.map((_, idx) => (
 							<a
 								key={idx}
 								href={`#${radioGroupId}-default-slide-${idx + 1}`}
-								style={{
-									width: 10,
-									height: 10,
-									borderRadius: 999,
-									background: "rgba(100,116,139,0.45)",
-									textDecoration: "none",
-									display: "inline-block",
-								}}
-							/>
+								aria-label={`Show testimonial ${idx + 1}`}
+								className="testimonial-nav-item"
+							>
+								<span>{idx + 1}</span>
+							</a>
 						))}
 					</div>
 				</div>
@@ -158,6 +162,9 @@ export const TestimonialBlock = ({
 						maxWidth: 980,
 						minHeight: 320,
 						padding: "24px",
+						display: "flex",
+						flexDirection: "column",
+						gap: 16,
 					}}
 				>
 					{slides.map((_, idx) => (
@@ -167,7 +174,7 @@ export const TestimonialBlock = ({
 							name={`${radioGroupId}-fade`}
 							id={`${radioGroupId}-fade-slide-${idx + 1}`}
 							defaultChecked={idx === 0}
-							style={{ display: "none" }}
+							aria-label={`Show testimonial ${idx + 1}`}
 						/>
 					))}
 
@@ -183,7 +190,7 @@ export const TestimonialBlock = ({
 							<div
 								key={idx}
 								style={{
-									position: "absolute",
+									position: "relative",
 									inset: 0,
 									opacity: 0,
 									transition: "opacity .35s ease",
@@ -197,7 +204,8 @@ export const TestimonialBlock = ({
 									background:
 										slide.bgColor ??
 										"linear-gradient(160deg, #ffffff 0%, #f8fafc 100%)",
-									boxShadow: "0 16px 36px rgba(15,23,42,0.08)",
+									boxShadow:
+										"0 16px 36px rgba(15,23,42,0.08)",
 								}}
 								className="fade-slide"
 							>
@@ -207,7 +215,9 @@ export const TestimonialBlock = ({
 										fontSize: "clamp(1.2rem, 3vw, 2rem)",
 										lineHeight: 1.2,
 										fontWeight: 700,
-										color: "#0f172a",
+										color:
+											slide.textColor ??
+											"var(--lpb-foreground)",
 									}}
 								>
 									{slide.heading}
@@ -215,9 +225,12 @@ export const TestimonialBlock = ({
 								<p
 									style={{
 										margin: 0,
-										fontSize: "clamp(0.95rem, 1.8vw, 1.125rem)",
+										fontSize:
+											"clamp(0.95rem, 1.8vw, 1.125rem)",
 										lineHeight: 1.6,
-										color: "#334155",
+										color:
+											slide.textColor ??
+											"var(--lpb-muted)",
 									}}
 								>
 									{slide.subheading}
@@ -227,7 +240,9 @@ export const TestimonialBlock = ({
 										margin: 0,
 										fontSize: "clamp(0.85rem, 1.6vw, 1rem)",
 										fontStyle: "italic",
-										color: "#475569",
+										color:
+											slide.textColor ??
+											"var(--lpb-muted)",
 										textAlign: "right",
 									}}
 								>
@@ -237,30 +252,16 @@ export const TestimonialBlock = ({
 						))}
 					</div>
 
-					<div
-						className="fade-nav"
-						style={{
-							position: "absolute",
-							left: "50%",
-							bottom: 12,
-							transform: "translateX(-50%)",
-							display: "flex",
-							gap: 10,
-							zIndex: 3,
-						}}
-					>
+					<div className="fade-nav">
 						{slides.map((_, idx) => (
 							<label
 								key={idx}
 								htmlFor={`${radioGroupId}-fade-slide-${idx + 1}`}
-								style={{
-									width: 10,
-									height: 10,
-									borderRadius: 999,
-									background: "rgba(100,116,139,0.45)",
-									cursor: "pointer",
-								}}
-							/>
+								aria-label={`Show testimonial ${idx + 1}`}
+								className="testimonial-nav-item"
+							>
+								<span>{idx + 1}</span>
+							</label>
 						))}
 					</div>
 					<style>{`
@@ -268,11 +269,13 @@ export const TestimonialBlock = ({
 							.map(
 								(_, idx) => `
 						#${radioGroupId}-fade-slide-${idx + 1}:checked ~ .fade-slides .fade-slide:nth-child(${idx + 1}) {
-							opacity: 1;
+									opacity: 1;
+									visibility: visible;
 							z-index: 2;
 						}
 						#${radioGroupId}-fade-slide-${idx + 1}:checked ~ .fade-nav label:nth-child(${idx + 1}) {
-							background: rgba(15, 23, 42, 0.92);
+							background: var(--lpb-primary);
+							color: var(--lpb-card);
 						}
 						`,
 							)

@@ -1,11 +1,5 @@
 export type SeparatorType =
-	| "wave"
-	| "waves"
-	| "curve"
-	| "triangle"
-	| "tilt"
-	| "zigzag"
-	| "line";
+	"wave" | "waves" | "curve" | "triangle" | "tilt" | "zigzag" | "line";
 
 export interface SectionSeparatorBlockProps extends React.ComponentPropsWithRef<"div"> {
 	type?: SeparatorType;

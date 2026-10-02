@@ -25,55 +25,6 @@ export interface ThemeTypography {
 	letterSpacing: string;
 }
 
-export interface ThemeBlockOverrides {
-	header?: {
-		logoText?: string;
-		background?: string;
-		color?: string;
-		ctaText?: string;
-		ctaBackground?: string;
-		ctaColor?: string;
-	};
-	hero?: {
-		heading?: string;
-		subheading?: string;
-		background?: string;
-		headingColor?: string;
-		subheadingColor?: string;
-		ctaText?: string;
-		ctaBackground?: string;
-		ctaColor?: string;
-	};
-	cta?: {
-		heading?: string;
-		subheading?: string;
-		background?: string;
-		buttonText?: string;
-		buttonBackground?: string;
-		buttonColor?: string;
-	};
-	product?: {
-		background?: string;
-		cardPrimary?: string;
-		cardSecondary?: string;
-		headingColor?: string;
-		subheadingColor?: string;
-	};
-	testimonial?: {
-		background?: string;
-		slidePrimary?: string;
-		slideSecondary?: string;
-		headingColor?: string;
-		subheadingColor?: string;
-		authorColor?: string;
-	};
-	footer?: {
-		background?: string;
-		color?: string;
-		copyright?: string;
-	};
-}
-
 export interface ThemePreset {
 	id: string;
 	label: string;
@@ -81,7 +32,6 @@ export interface ThemePreset {
 	tokens: ThemeTokens;
 	scales: ThemeScales;
 	typography: ThemeTypography;
-	blockOverrides?: ThemeBlockOverrides;
 	preview: {
 		gradient: string;
 		foreground: string;
@@ -118,61 +68,6 @@ export const THEME_PRESETS = {
 			bodyWeight: 500,
 			headingWeight: 700,
 			letterSpacing: "-0.02em",
-		},
-		blockOverrides: {
-			header: {
-				logoText: "Atelier Studio",
-				background:
-					"radial-gradient(900px 260px at 12% -45%, rgba(216,178,110,0.25), transparent), linear-gradient(120deg, #101b33 0%, #1e293b 58%, #334155 100%)",
-				color: "#f8fafc",
-				ctaText: "Book a Demo",
-				ctaBackground: "#f8fafc",
-				ctaColor: "#102241",
-			},
-			hero: {
-				heading: "Design pages that feel undeniably premium",
-				subheading:
-					"Build high-converting, editorial-grade landing pages with complete control.",
-				background:
-					"radial-gradient(1120px 340px at 16% -40%, rgba(216,178,110,0.2), transparent), linear-gradient(120deg, #101b33 0%, #1e293b 60%, #334155 100%)",
-				headingColor: "#f8fafc",
-				subheadingColor: "#e2e8f0",
-				ctaText: "Start Free",
-				ctaBackground: "#f8fafc",
-				ctaColor: "#102241",
-			},
-			cta: {
-				heading: "Ship a stronger first impression in hours",
-				subheading:
-					"Start from polished sections, refine your story quickly, and launch with confidence.",
-				background:
-					"radial-gradient(960px 300px at 15% -35%, rgba(216,178,110,0.2), transparent), linear-gradient(120deg, #101b33 0%, #1f2d46 60%, #36455e 100%)",
-				buttonText: "Request Access",
-				buttonBackground: "#f8fafc",
-				buttonColor: "#102241",
-			},
-			product: {
-				background: "#f7f8fb",
-				cardPrimary: "#ffffff",
-				cardSecondary: "#eef2f7",
-				headingColor: "#0f172a",
-				subheadingColor: "#475569",
-			},
-			testimonial: {
-				background:
-					"radial-gradient(900px 260px at 12% -40%, rgba(216,178,110,0.18), transparent), linear-gradient(120deg, #101b33 0%, #1e293b 62%, #334155 100%)",
-				slidePrimary: "linear-gradient(160deg, #ffffff 0%, #f8fafc 100%)",
-				slideSecondary: "linear-gradient(160deg, #f8fafc 0%, #eef2f7 100%)",
-				headingColor: "#0f172a",
-				subheadingColor: "#334155",
-				authorColor: "#64748b",
-			},
-			footer: {
-				background:
-					"radial-gradient(900px 260px at 12% -40%, rgba(216,178,110,0.18), transparent), linear-gradient(120deg, #0b1220 0%, #1a2438 58%, #2f3f5a 100%)",
-				color: "#e5e7eb",
-				copyright: "(c) 2026 Atelier Studio. Crafted with intention.",
-			},
 		},
 		preview: {
 			gradient:
@@ -318,7 +213,8 @@ export const THEME_PRESETS = {
 			letterSpacing: "-0.01em",
 		},
 		preview: {
-			gradient: "linear-gradient(120deg, #ffffff 0%, #f8fafc 60%, #eef2f7 100%)",
+			gradient:
+				"linear-gradient(120deg, #ffffff 0%, #f8fafc 60%, #eef2f7 100%)",
 			foreground: "#0f172a",
 			borderClass: "border-slate-300",
 			swatches: ["#ffffff", "#f8fafc", "#111827"],
@@ -425,14 +321,10 @@ export const getThemeCssVariables = (themeId: ThemeId) => {
 		"--lpb-font-body": theme.typography.body,
 		"--lpb-font-heading": theme.typography.heading,
 		"--lpb-letter-spacing": theme.typography.letterSpacing,
-		"--lpb-scrollbar-track":
-			`color-mix(in srgb, ${theme.tokens.background} 86%, ${theme.tokens.card})`,
-		"--lpb-scrollbar-thumb":
-			`color-mix(in srgb, ${theme.tokens.muted} 68%, ${theme.tokens.border})`,
-		"--lpb-scrollbar-thumb-hover":
-			`color-mix(in srgb, ${theme.tokens.accent} 58%, ${theme.tokens.foreground})`,
-		"--lpb-scrollbar-thumb-border":
-			`color-mix(in srgb, ${theme.tokens.background} 82%, ${theme.tokens.card})`,
+		"--lpb-scrollbar-track": `color-mix(in srgb, ${theme.tokens.background} 86%, ${theme.tokens.card})`,
+		"--lpb-scrollbar-thumb": `color-mix(in srgb, ${theme.tokens.muted} 68%, ${theme.tokens.border})`,
+		"--lpb-scrollbar-thumb-hover": `color-mix(in srgb, ${theme.tokens.accent} 58%, ${theme.tokens.foreground})`,
+		"--lpb-scrollbar-thumb-border": `color-mix(in srgb, ${theme.tokens.background} 82%, ${theme.tokens.card})`,
 	};
 };
 
@@ -443,38 +335,76 @@ export const serializeThemeCssVariables = (themeId: ThemeId) => {
 		.join("\n");
 };
 
-export const getBuilderCssVariables = (themeId: ThemeId) => {
-	const theme = getThemePreset(themeId);
-	return {
-		"--background": theme.tokens.background,
-		"--foreground": theme.tokens.foreground,
-		"--card": theme.tokens.card,
-		"--card-foreground": theme.tokens.foreground,
-		"--popover": theme.tokens.card,
-		"--popover-foreground": theme.tokens.foreground,
-		"--primary": theme.tokens.primary,
-		"--primary-foreground": theme.tokens.card,
-		"--secondary": theme.tokens.card,
-		"--secondary-foreground": theme.tokens.foreground,
-		"--muted": theme.tokens.card,
-		"--muted-foreground": theme.tokens.muted,
-		"--accent": theme.tokens.accent,
-		"--accent-foreground": theme.tokens.foreground,
-		"--border": theme.tokens.border,
-		"--input": theme.tokens.border,
-		"--ring": theme.tokens.ring,
-		"--radius": `${theme.scales.radius / 16}rem`,
-		"--sidebar": theme.tokens.background,
-		"--sidebar-foreground": theme.tokens.foreground,
-		"--sidebar-primary": theme.tokens.primary,
-		"--sidebar-primary-foreground": theme.tokens.card,
-		"--scrollbar-track":
-			`color-mix(in srgb, ${theme.tokens.background} 86%, ${theme.tokens.card})`,
-		"--scrollbar-thumb":
-			`color-mix(in srgb, ${theme.tokens.muted} 68%, ${theme.tokens.border})`,
-		"--scrollbar-thumb-hover":
-			`color-mix(in srgb, ${theme.tokens.accent} 58%, ${theme.tokens.foreground})`,
-		"--scrollbar-thumb-border":
-			`color-mix(in srgb, ${theme.tokens.background} 82%, ${theme.tokens.card})`,
-	};
-};
+// Controls show concrete values, while the document keeps its theme bindings.
+export function resolveEditorProps<T>(props: T, themeId: ThemeId): T {
+	const vars: Record<string, string> = getThemeCssVariables(themeId);
+	function resolve(value: unknown, key = ""): unknown {
+		if (Array.isArray(value)) return value.map((entry) => resolve(entry));
+		if (value && typeof value === "object")
+			return Object.fromEntries(
+				Object.entries(value).map(([key, entry]) => [
+					key,
+					resolve(entry, key),
+				]),
+			);
+		if (
+			typeof value !== "string" ||
+			!/^(background.*|.*[Cc]olor|fill|stroke|border.*|boxShadow|font.*|padding.*|gap|radius)$/.test(
+				key,
+			)
+		)
+			return value;
+		const resolved = value.replace(
+			/var\((--lpb-[a-z-]+)\)/g,
+			(match, name) => vars[name] ?? match,
+		);
+		return /^(borderRadius|fontSize|padding.*|gap|radius)$/.test(key) &&
+			/^-?\d+(\.\d+)?px$/.test(resolved)
+			? parseFloat(resolved)
+			: resolved;
+	}
+	return resolve(props) as T;
+}
+
+export function preserveThemeBindings(
+	raw: unknown,
+	view: unknown,
+	next: unknown,
+): unknown {
+	if (Object.is(view, next)) return raw;
+	if (Array.isArray(next))
+		return next.map((entry, index) => {
+			const id =
+				entry && typeof entry === "object" && "id" in entry
+					? entry.id
+					: undefined;
+			const previousIndex = Array.isArray(view)
+				? id
+					? view.findIndex((value) => value?.id === id)
+					: view.includes(entry)
+						? view.indexOf(entry)
+						: index
+				: index;
+			return preserveThemeBindings(
+				Array.isArray(raw) ? raw[previousIndex] : undefined,
+				Array.isArray(view) ? view[previousIndex] : undefined,
+				entry,
+			);
+		});
+	if (next && typeof next === "object")
+		return Object.fromEntries(
+			Object.entries(next).map(([key, entry]) => [
+				key,
+				preserveThemeBindings(
+					raw && typeof raw === "object"
+						? (raw as Record<string, unknown>)[key]
+						: undefined,
+					view && typeof view === "object"
+						? (view as Record<string, unknown>)[key]
+						: undefined,
+					entry,
+				),
+			]),
+		);
+	return next;
+}

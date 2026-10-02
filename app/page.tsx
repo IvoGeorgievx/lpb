@@ -1,665 +1,597 @@
 "use client";
+import { useEffect, useMemo, useState, type CSSProperties } from "react";
+import { DragDropProvider, useDraggable, useDroppable } from "@dnd-kit/react";
+import {
+	ArrowUp,
+	ArrowDown,
+	GripVertical,
+	Trash2,
+	Undo2,
+	Redo2,
+	Download,
+	ArrowLeft,
+} from "lucide-react";
 import { AppSidebar } from "@/components/app-sidebar";
-import { CtaBlock, CtaBlockProps } from "@/components/blocks/CtaBlock";
-import { EmbedBlock, EmbedBlockProps } from "@/components/blocks/EmbedBlock";
-import { FooterBlock, FooterBlockProps } from "@/components/blocks/FooterBlock";
-import Header, { HeaderBlockProps } from "@/components/blocks/HeaderBlock";
-import HeroBlock, { HeroBlockProps } from "@/components/blocks/HeroBlock";
-import ProductBlock, {
-	ProductBlockProps,
-} from "@/components/blocks/ProductBlock";
-import {
-	SectionSeparatorBlock,
-	SectionSeparatorBlockProps,
-} from "@/components/blocks/SectionSeparatorBlock";
-import {
-	TestimonialBlock,
-	TestimonialBlockProps,
-} from "@/components/blocks/TestimonialBlock";
 import { Editor } from "@/components/editor/Editor";
 import Renderer from "@/components/renderer/Renderer";
 import { Button } from "@/components/ui/button";
-import { SidebarProvider } from "@/components/ui/sidebar";
+import { Preview } from "@/components/preview";
+import { PageContext } from "@/context/PageContext";
 import { EditorContext } from "@/context/EditorContext";
-import { PageContext, usePage } from "@/context/PageContext";
-import { exportToHTML } from "@/lib/export";
+import { useDocument } from "@/hooks/use-document";
 import {
-	DEFAULT_THEME_ID,
-	getBuilderCssVariables,
-	getThemePreset,
-	ThemeId,
-} from "@/lib/theme";
-import { DragDropProvider, useDraggable, useDroppable } from "@dnd-kit/react";
+	BLOCK_LABELS,
+	createBlock,
+	type DroppedItem,
+	type BlockType,
+} from "@/lib/blocks";
+import { EMPTY_PAGE, MAX_DOCUMENT_ITEMS, type Page } from "@/lib/document";
+import { createTemplate } from "@/lib/template";
+import { exportCss } from "@/lib/exportCss";
 import {
-	ComponentType,
-	ReactNode,
-	type SetStateAction,
-	useCallback,
-	useEffect,
-	useState,
-} from "react";
-
-export type BlockType =
-	| "header"
-	| "hero"
-	| "cta"
-	| "embed"
-	| "product"
-	| "footer"
-	| "separator"
-	| "testimonial";
-export type BlockPropsMap = {
-	header: HeaderBlockProps;
-	hero: HeroBlockProps;
-	cta: CtaBlockProps;
-	embed: EmbedBlockProps;
-	product: ProductBlockProps;
-	footer: FooterBlockProps;
-	separator: SectionSeparatorBlockProps;
-	testimonial: TestimonialBlockProps;
-};
-export type DroppedItem<T extends BlockType = BlockType> = {
-	id: string;
-	type: T;
-	timestamp: number;
-	props: BlockPropsMap[T];
-};
-
-type UpdatePayload = { id: string } & Pick<DroppedItem, "props">;
-
-export const getThemeDefaultProps = (themeId: ThemeId): BlockPropsMap => {
-	const theme = getThemePreset(themeId);
-	const blockTheme = theme.blockOverrides;
-	const baseCardStyle = {
-		borderRadius: theme.scales.radius,
-		padding: theme.scales.cardPadding,
-		boxShadow: theme.scales.shadowSoft,
-	} as const;
-	const now = Date.now();
-
-	return {
-		header: {
-			logoText: blockTheme?.header?.logoText ?? "Atelier Studio",
-			cta: {
-				text: blockTheme?.header?.ctaText ?? "Book a Demo",
-				paddingX: 20,
-				paddingY: 10,
-				backgroundColor: blockTheme?.header?.ctaBackground ?? theme.tokens.card,
-				radius: 999,
-				link: "#",
-				color: blockTheme?.header?.ctaColor ?? theme.tokens.primary,
-			},
-			style: {
-				height: 80,
-				padding: 12,
-				color: blockTheme?.header?.color ?? theme.tokens.foreground,
-				fontFamily: theme.typography.body,
-				background:
-					blockTheme?.header?.background ??
-					`linear-gradient(120deg, ${theme.tokens.primary}, ${theme.tokens.foreground})`,
-				border: `1px solid ${theme.tokens.border}`,
-				boxShadow: theme.scales.shadowSoft,
-			},
-		},
-		hero: {
-			title: "Hero section",
-			style: {
-				height: "50vh",
-				background:
-					blockTheme?.hero?.background ??
-					`linear-gradient(120deg, ${theme.tokens.primary}, ${theme.tokens.foreground})`,
-				fontFamily: theme.typography.body,
-			},
-			heading:
-				blockTheme?.hero?.heading ??
-				"Design pages that feel undeniably premium",
-			subheading:
-				blockTheme?.hero?.subheading ??
-				"Build high-converting, editorial-grade landing pages with complete control.",
-			headingAnimation: "fade-in",
-			headingFontSize: 46,
-			subheadingFontSize: 22,
-			subHeadingAnimation: "fade-in",
-			headingWeight: theme.typography.headingWeight,
-			subheadingWeight: theme.typography.bodyWeight,
-			headingColor: blockTheme?.hero?.headingColor ?? theme.tokens.card,
-			subheadingColor: blockTheme?.hero?.subheadingColor ?? "#e2e8f0",
-			preset: {
-				layout: "center",
-				textAlign: "center",
-				showImage: true,
-				imagePosition: "background",
-			},
-			cta: {
-				text: blockTheme?.hero?.ctaText ?? "Start Free",
-				bgColor: blockTheme?.hero?.ctaBackground ?? theme.tokens.card,
-				paddingX: 20,
-				paddingY: 12,
-				radius: 999,
-				fontSize: 16,
-				border: false,
-				textColor: blockTheme?.hero?.ctaColor ?? theme.tokens.primary,
-				boxShadow: {
-					shadowBlur: 16,
-					shadowIntensity: 0.24,
-				},
-			},
-		},
-		cta: {
-			heading:
-				blockTheme?.cta?.heading ??
-				"Ship a stronger first impression in hours",
-			subheading:
-				blockTheme?.cta?.subheading ??
-				"Start from polished sections, refine your story quickly, and launch with confidence.",
-			button: {
-				text: blockTheme?.cta?.buttonText ?? "Request Access",
-				link: "#",
-				backgroundColor: blockTheme?.cta?.buttonBackground ?? theme.tokens.card,
-				color: blockTheme?.cta?.buttonColor ?? theme.tokens.primary,
-				radius: 999,
-				paddingX: 24,
-				paddingY: 12,
-			},
-			style: {
-				fontFamily: theme.typography.body,
-				background:
-					blockTheme?.cta?.background ??
-					`linear-gradient(120deg, ${theme.tokens.primary}, ${theme.tokens.foreground})`,
-				borderTop: `1px solid ${theme.tokens.border}`,
-				borderBottom: `1px solid ${theme.tokens.border}`,
-			},
-		},
-		embed: {
-			src: "",
-			title: "Embedded content",
-			height: 520,
-			loading: "lazy",
-			allowFullScreen: true,
-			showContentPanel: false,
-			contentHeading: "Why this embed matters",
-			contentParagraph:
-				"Use this area to add context before users interact with the embedded content.",
-			contentBullets: [
-				"Highlight key outcomes",
-				"Add short setup notes",
-				"Include one clear call to action",
-			],
-		},
-		product: {
-			background: blockTheme?.product?.background ?? theme.tokens.background,
-			cards: [
-				{
-					id: String(now),
-					iconClass: "lucide lucide-award",
-					heading: {
-						content: "Pro Flow Subscription",
-						fontSize: 22,
-						fontWeight: theme.typography.headingWeight,
-						color: blockTheme?.product?.headingColor ?? theme.tokens.foreground,
-					},
-					subheading: {
-						content:
-							"Everything your team needs to build beautiful landing pages.",
-						fontSize: 15,
-						color: blockTheme?.product?.subheadingColor ?? theme.tokens.muted,
-					},
-					style: {
-						background: blockTheme?.product?.cardPrimary ?? theme.tokens.card,
-						minHeight: 320,
-						...baseCardStyle,
-					},
-					additionalContent: [
-						{
-							content: "Unlimited sections, templates, and export options.",
-							fontSize: 14,
-							color: blockTheme?.product?.subheadingColor ?? theme.tokens.muted,
-						},
-						{
-							content: "Priority support and full design control.",
-							fontSize: 14,
-							color: blockTheme?.product?.subheadingColor ?? theme.tokens.muted,
-						},
-					],
-					variant: "featured",
-				},
-				{
-					id: String(now + 1),
-					iconClass: "lucide lucide-rocket",
-					heading: {
-						content: "Starter Plan",
-						fontSize: 20,
-						fontWeight: theme.typography.headingWeight,
-						color: blockTheme?.product?.headingColor ?? theme.tokens.foreground,
-					},
-					subheading: {
-						content: "A lightweight plan for individuals and small teams.",
-						fontSize: 14,
-						color: blockTheme?.product?.subheadingColor ?? theme.tokens.muted,
-					},
-					style: {
-						background:
-							blockTheme?.product?.cardSecondary ?? theme.tokens.background,
-						minHeight: 300,
-						...baseCardStyle,
-					},
-					additionalContent: [
-						{
-							content: "Affordable monthly pricing.",
-							fontSize: 14,
-							color: blockTheme?.product?.subheadingColor ?? theme.tokens.muted,
-						},
-						{
-							content: "Easy setup and quick deployment.",
-							fontSize: 14,
-							color: blockTheme?.product?.subheadingColor ?? theme.tokens.muted,
-						},
-					],
-					variant: "default",
-				},
-				{
-					id: String(now + 2),
-					iconClass: "lucide lucide-briefcase",
-					heading: {
-						content: "Enterprise",
-						fontSize: 20,
-						fontWeight: theme.typography.headingWeight,
-						color: blockTheme?.product?.headingColor ?? theme.tokens.foreground,
-					},
-					subheading: {
-						content: "Custom solutions for high-growth businesses.",
-						fontSize: 14,
-						color: blockTheme?.product?.subheadingColor ?? theme.tokens.muted,
-					},
-					style: {
-						background: blockTheme?.product?.cardPrimary ?? theme.tokens.card,
-						minHeight: 300,
-						...baseCardStyle,
-					},
-					additionalContent: [
-						{
-							content: "Dedicated onboarding and integrations.",
-							fontSize: 14,
-							color: blockTheme?.product?.subheadingColor ?? theme.tokens.muted,
-						},
-						{
-							content: "Team-based security and analytics.",
-							fontSize: 14,
-							color: blockTheme?.product?.subheadingColor ?? theme.tokens.muted,
-						},
-					],
-					variant: "outlined",
-				},
-			],
-		},
-		footer: {
-			layout: {
-				columns: 2,
-			},
-			copyright:
-				blockTheme?.footer?.copyright ??
-				"(c) 2026 Atelier Studio. Crafted with intention.",
-			style: {
-				height: "22vh",
-				color: blockTheme?.footer?.color ?? theme.tokens.card,
-				fontFamily: theme.typography.body,
-			},
-			links: [
-				{ label: "Facebook", href: "" },
-				{ label: "Instagram", href: "" },
-				{ label: "LinkedIn", href: "" },
-				{ label: "Youtube", href: "" },
-			],
-			background:
-				blockTheme?.footer?.background ??
-				`linear-gradient(120deg, ${theme.tokens.primary}, ${theme.tokens.foreground})`,
-		},
-		separator: {
-			flipY: true,
-			fill: theme.tokens.accent,
-		},
-		testimonial: {
-			style: {
-				background:
-					blockTheme?.testimonial?.background ??
-					`linear-gradient(120deg, ${theme.tokens.primary}, ${theme.tokens.foreground})`,
-			},
-			carousel: {
-				type: "default",
-				slides: [
-					{
-						heading: '"This builder made our launch feel effortless."',
-						subheading:
-							"Every team member can update content, and the polished testimonial section now feels like a product page.",
-						author: "Maya Carter, VP of Marketing",
-						bgColor:
-							blockTheme?.testimonial?.slidePrimary ??
-							"linear-gradient(160deg, #ffffff 0%, #f8fafc 100%)",
-					},
-					{
-						heading:
-							'"We shipped assets faster with the new content blocks."',
-						subheading:
-							"The carousel helps stories land stronger and gives our homepage a much more confident rhythm.",
-						author: "Jordan Kim, Design Lead",
-						bgColor:
-							blockTheme?.testimonial?.slideSecondary ??
-							"linear-gradient(160deg, #f8fafc 0%, #eef2ff 100%)",
-					},
-					{
-						heading:
-							'"The editing experience is simple, but the result feels premium."',
-						subheading:
-							"Clients love the visual polish, and our team can keep the page updated without design support.",
-						author: "Lila Patel, Founder",
-						bgColor:
-							blockTheme?.testimonial?.slidePrimary ??
-							"linear-gradient(160deg, #ffffff 0%, #f1f5f9 100%)",
-					},
-				],
-			},
-		},
-	};
-};
-
-export const defaultProps: BlockPropsMap = getThemeDefaultProps(DEFAULT_THEME_ID);
-
-export const COMPONENT_MAP: Record<BlockType, ComponentType> = {
-	header: Header,
-	hero: HeroBlock,
-	cta: CtaBlock,
-	embed: EmbedBlock,
-	product: ProductBlock,
-	footer: FooterBlock,
-	separator: SectionSeparatorBlock,
-	testimonial: TestimonialBlock,
-};
+	generatePreviewHTML,
+	exportToHTML,
+	fontStylesheet,
+} from "@/lib/export";
+import { getThemeCssVariables } from "@/lib/theme";
 
 function CanvasItem({
 	item,
-	selectedBlock,
-	selectedItem,
+	selected,
+	select,
+	move,
+	remove,
+	first,
+	last,
 }: {
 	item: DroppedItem;
-	selectedBlock?: DroppedItem;
-	selectedItem: (item: DroppedItem) => void;
+	selected: boolean;
+	select: () => void;
+	move: (offset: number) => void;
+	remove: () => void;
+	first: boolean;
+	last: boolean;
 }) {
-	const draggable = useDraggable({ id: item.id });
-	const droppable = useDroppable({ id: item.id });
-
-	const setRefs = (node: HTMLElement | null) => {
-		draggable.ref(node);
-		droppable.ref(node);
-	};
-
+	const {
+		ref: dragRef,
+		handleRef,
+		isDragging,
+	} = useDraggable({ id: item.id });
+	const { ref: dropRef, isDropTarget } = useDroppable({ id: item.id });
 	return (
-		<div
-			ref={setRefs}
-			style={{ opacity: draggable.isDragging ? 0.75 : 1 }}
-			className={`w-full cursor-grab transition ${
-				selectedBlock?.id === item.id
-					? "border-2 border-primary"
-					: "border-transparent"
-			} ${droppable.isDropTarget ? "bg-accent/40" : "bg-transparent"}`}
-			onClick={() => selectedItem(item)}
+		<section
+			ref={(node) => {
+				dragRef(node);
+				dropRef(node);
+			}}
+			aria-label={`${BLOCK_LABELS[item.type]} section`}
+			className={`canvas-section ${selected ? "is-selected" : ""} ${isDropTarget ? "is-drop-target" : ""}`}
+			style={{ opacity: isDragging ? 0.6 : 1 }}
 		>
-			<Renderer item={item} />
-		</div>
+			<div className="block-controls">
+				<button
+					ref={handleRef}
+					aria-label={`Move ${BLOCK_LABELS[item.type]} by dragging`}
+					className="cursor-grab p-1"
+				>
+					<GripVertical size={15} />
+				</button>
+				<button
+					onClick={select}
+					className="mr-auto text-xs font-medium"
+					aria-pressed={selected}
+				>
+					Edit {BLOCK_LABELS[item.type]}
+				</button>
+				<button
+					disabled={first}
+					onClick={() => move(-1)}
+					aria-label={`Move ${BLOCK_LABELS[item.type]} up`}
+				>
+					<ArrowUp size={15} />
+				</button>
+				<button
+					disabled={last}
+					onClick={() => move(1)}
+					aria-label={`Move ${BLOCK_LABELS[item.type]} down`}
+				>
+					<ArrowDown size={15} />
+				</button>
+				<button
+					onClick={remove}
+					aria-label={`Remove ${BLOCK_LABELS[item.type]}`}
+				>
+					<Trash2 size={15} />
+				</button>
+			</div>
+			<div onClick={select}>
+				<div inert>
+					<Renderer item={item} />
+				</div>
+			</div>
+		</section>
 	);
 }
 
-function DroppableZone({
-	items,
-	children,
-	selectedItem,
-	selectedBlock,
+function Canvas({
+	page,
+	selected,
+	select,
+	move,
+	remove,
+	start,
+	started,
 }: {
-	items: DroppedItem[];
-	selectedItem: (item: DroppedItem) => void;
-	children?: ReactNode;
-	selectedBlock?: DroppedItem;
+	page: Page;
+	selected?: string;
+	select: (id: string) => void;
+	move: (id: string, offset: number) => void;
+	remove: (id: string) => void;
+	start: (blank: boolean) => void;
+	started: boolean;
 }) {
-	const { ref } = useDroppable({ id: "droppable" });
-	const { setPage } = usePage();
-
-	useEffect(() => {
-		setPage((prev) => ({ ...prev, blocks: items }));
-	}, [items, setPage]);
-
+	const { ref, isDropTarget } = useDroppable({ id: "droppable" });
+	const exampleHTML = useMemo(
+		() =>
+			!page.blocks.length && !started
+				? generatePreviewHTML(createTemplate())
+				: "",
+		[page.blocks.length, started],
+	);
 	return (
 		<div
 			ref={ref}
-			className="w-full min-h-[90vh] relative flex flex-col items-center pt-4 bg-background"
+			className={`app-canvas ${isDropTarget ? "is-drop-target" : ""}`}
 		>
-			{items.length > 0 ? (
-				items.map((item) => (
-					<CanvasItem
-						key={item.id}
-						item={item}
-						selectedBlock={selectedBlock}
-						selectedItem={selectedItem}
-					/>
-				))
+			{page.blocks.length ? (
+				<div
+					id="top"
+					className="lpb-page"
+					style={
+						getThemeCssVariables(page.activeTheme) as CSSProperties
+					}
+				>
+					{page.blocks.map((item, index) => (
+						<CanvasItem
+							key={item.id}
+							item={item}
+							selected={selected === item.id}
+							select={() => select(item.id)}
+							move={(offset) => move(item.id, offset)}
+							remove={() => remove(item.id)}
+							first={index === 0}
+							last={index === page.blocks.length - 1}
+						/>
+					))}
+				</div>
 			) : (
-				<div className="text-center text-muted-foreground">Drop here</div>
+				<div className="builder-welcome">
+					<h1>
+						{started
+							? "A fresh page. Your next idea."
+							: "Build a page. Take it with you."}
+					</h1>
+					<p>
+						Compose your landing page visually, then download one
+						HTML file. Host it wherever you like—no builder runtime
+						required.
+					</p>
+					<div className="flex flex-wrap gap-3">
+						<Button onClick={() => start(false)}>
+							Use the studio template
+						</Button>
+						{!started && (
+							<Button
+								variant="outline"
+								onClick={() => start(true)}
+							>
+								Start blank
+							</Button>
+						)}
+					</div>
+					{started ? (
+						<p className="text-sm">
+							Add a section with + in the library, or drag it
+							here.
+						</p>
+					) : (
+						<>
+							<p className="text-xs text-muted-foreground">
+								A starting point, not a blank promise. Example
+								page below.
+							</p>
+							<iframe
+								title="Studio template example"
+								tabIndex={-1}
+								sandbox=""
+								srcDoc={exampleHTML}
+								className="h-100 w-full rounded-lg border bg-white"
+							/>
+						</>
+					)}
+				</div>
 			)}
-			{children}
 		</div>
 	);
 }
 
 export default function Home() {
-	const [items, setItems] = useState<DroppedItem[]>([]);
-	const [activeTheme, setActiveTheme] = useState<ThemeId>(DEFAULT_THEME_ID);
-	const [selectedBlock, setSelectedBlock] = useState<DroppedItem | undefined>(
-		undefined,
-	);
-	const [isDesktop, setIsDesktop] = useState<boolean | null>(null);
-
+	const { page, setPage, undo, redo, canUndo, canRedo, ready, saveStatus } =
+		useDocument();
+	const [selected, setSelected] = useState<string>();
+	const [desktop, setDesktop] = useState<boolean | null>(null);
+	const [started, setStarted] = useState(false);
+	const [notice, setNotice] = useState("");
 	useEffect(() => {
-		const media = window.matchMedia("(min-width: 1024px)");
-		const update = () => setIsDesktop(media.matches);
+		const media = matchMedia("(min-width: 1024px)");
+		const update = () => setDesktop(media.matches);
 		update();
 		media.addEventListener("change", update);
 		return () => media.removeEventListener("change", update);
 	}, []);
-
-	useEffect(() => {
-		const themeVars = getBuilderCssVariables(activeTheme);
-		Object.entries(themeVars).forEach(([key, value]) => {
-			document.documentElement.style.setProperty(key, value);
+	const activeBlock = page.blocks.find((block) => block.id === selected);
+	const add = (type: BlockType) => {
+		if (page.blocks.length >= MAX_DOCUMENT_ITEMS) {
+			setNotice(
+				`A page can contain up to ${MAX_DOCUMENT_ITEMS} sections.`,
+			);
+			return;
+		}
+		const block = createBlock(type, page.blocks);
+		setPage((page) => ({ ...page, blocks: [...page.blocks, block] }));
+		setSelected(block.id);
+		setStarted(true);
+	};
+	const remove = (id: string) => {
+		setPage((page) => ({
+			...page,
+			blocks: page.blocks.filter((block) => block.id !== id),
+		}));
+		setNotice("Section removed. Use Undo to restore it.");
+	};
+	const move = (id: string, offset: number) =>
+		setPage((page) => {
+			const index = page.blocks.findIndex((block) => block.id === id);
+			const target = index + offset;
+			if (index < 0 || target < 0 || target >= page.blocks.length)
+				return page;
+			const blocks = [...page.blocks];
+			const [block] = blocks.splice(index, 1);
+			blocks.splice(target, 0, block);
+			return { ...page, blocks };
 		});
-	}, [activeTheme]);
-
-	const updatePropsData = (data: UpdatePayload) => {
-		setItems((prev) =>
-			prev.map((item) => {
-				if (item.id !== data.id) return item;
-				const newProps = {
-					...item.props,
-					...data.props,
-				};
-
-				if (data.props.style) {
-					newProps.style = {
-						...item.props.style,
-						...data.props.style,
-					};
-				}
-
-				return { ...item, props: newProps };
-			}),
+	const start = (blank: boolean) => {
+		if (
+			page.blocks.length &&
+			!confirm(
+				blank
+					? "Clear this page? You can undo this action."
+					: "Replace this page with the studio template? You can undo this action.",
+			)
+		)
+			return;
+		setPage(
+			blank
+				? { ...EMPTY_PAGE, activeTheme: page.activeTheme }
+				: createTemplate(page.activeTheme),
+		);
+		setStarted(true);
+		setSelected(undefined);
+		setNotice(
+			blank
+				? "Blank page ready. Add your first section."
+				: "Studio template ready. Select a section to make it yours.",
 		);
 	};
-
-	const activeBlock = items.find((it) => it.id === selectedBlock?.id);
-
-	const syncItemsFromPage = useCallback(
-		(
-			nextPage: SetStateAction<{
-				blocks: DroppedItem[];
-				activeTheme: ThemeId;
-			}>,
-		) => {
-			if (typeof nextPage === "function") {
-				setItems((prevItems) => {
-					const resolved = (
-						nextPage as (prevState: {
-							blocks: DroppedItem[];
-							activeTheme: ThemeId;
-						}) => {
-							blocks: DroppedItem[];
-							activeTheme: ThemeId;
-						}
-					)({ blocks: prevItems, activeTheme });
-					setActiveTheme(resolved.activeTheme);
-					return resolved.blocks;
-				});
-				return;
-			}
-
-			setItems(nextPage.blocks);
-			setActiveTheme(nextPage.activeTheme);
-		},
-		[activeTheme],
-	);
-
-	if (isDesktop === null) {
+	const download = () => {
+		try {
+			exportToHTML(page.blocks, page.activeTheme, page);
+			setNotice(
+				"Download started: index.html. Upload it to a static host. Fonts and embeds require internet access.",
+			);
+		} catch {
+			setNotice(
+				"Export failed. Your page is still here. Try again before closing the tab.",
+			);
+		}
+	};
+	if (desktop === null || !ready)
 		return (
-			<div className="min-h-screen w-full bg-background text-foreground flex items-center justify-center">
-				<div className="text-sm text-muted-foreground">Loading editor...</div>
+			<div className="flex min-h-screen items-center justify-center">
+				Loading your workspace…
 			</div>
 		);
-	}
-
-	if (!isDesktop) {
+	if (!desktop) {
+		const example = createTemplate();
 		return (
-			<div className="min-h-screen w-full bg-background text-foreground flex items-center justify-center p-6">
-				<div className="max-w-xl w-full rounded-2xl border border-border bg-card/90 p-8 text-center">
-					<h1 className="text-3xl font-bold tracking-tight">
-						Desktop Required
+			<>
+				<style>{exportCss}</style>
+				<link
+					rel="stylesheet"
+					href={fontStylesheet(example.activeTheme)}
+				/>
+				<div className="showcase-intro">
+					<h1>
+						Build a page.
+						<br />
+						Take it with you.
 					</h1>
-					<p className="mt-3 text-muted-foreground leading-relaxed">
-						This landing page builder is currently optimized for desktop only.
-						Please open it on a larger screen to continue editing.
+					<p>
+						A visual landing-page builder that exports one HTML
+						file. Your page, your hosting, no builder runtime.
+					</p>
+					<p className="text-sm">
+						Open on a desktop to edit. Explore the example below on
+						any screen.
+					</p>
+					<Button
+						onClick={() =>
+							exportToHTML(
+								example.blocks,
+								example.activeTheme,
+								example,
+							)
+						}
+					>
+						<Download size={16} />
+						Download example HTML
+					</Button>
+					<a
+						className="text-sm underline"
+						href="https://github.com/ivogeorgievx/lpb"
+						target="_blank"
+						rel="noreferrer"
+					>
+						How it’s built →
+					</a>
+				</div>
+				<div
+					className="lpb-page"
+					id="top"
+					style={
+						getThemeCssVariables(
+							example.activeTheme,
+						) as CSSProperties
+					}
+				>
+					{example.blocks.map((item) => (
+						<Renderer key={item.id} item={item} />
+					))}
+				</div>
+				<div className="showcase-intro">
+					<h2 className="text-xl font-semibold">
+						One file. A real starting point.
+					</h2>
+					<p>
+						Markup, styles, icons, and uploaded images travel
+						together. External fonts, images, and embeds need
+						internet access. The example is fictional; replace its
+						copy and contact details before publishing.
 					</p>
 				</div>
-			</div>
+			</>
 		);
 	}
-
 	return (
-		<PageContext.Provider
-			value={{
-				page: { blocks: items, activeTheme },
-				setPage: syncItemsFromPage,
-			}}
-		>
+		<PageContext.Provider value={{ page, setPage }}>
+			<style>{exportCss}</style>
+			<link rel="stylesheet" href={fontStylesheet(page.activeTheme)} />
+			<header className="builder-toolbar">
+				<div className="mr-auto">
+					<h1 className="text-sm font-semibold">
+						Landing Page Builder
+					</h1>
+					<p className="text-xs text-muted-foreground" role="status">
+						{saveStatus}
+					</p>
+					<div className="flex gap-3 text-xs">
+						<a
+							href="https://github.com/ivogeorgievx/lpb"
+							target="_blank"
+							rel="noreferrer"
+							className="underline"
+						>
+							Source / How it’s built
+						</a>
+						<a
+							href="example.html"
+							target="_blank"
+							rel="noreferrer"
+							className="underline"
+						>
+							Exported example
+						</a>
+					</div>
+				</div>
+				<Button
+					variant="ghost"
+					size="icon"
+					disabled={!canUndo}
+					onClick={undo}
+					aria-label="Undo"
+					title="Undo (Ctrl/Cmd+Z)"
+				>
+					<Undo2 size={18} />
+				</Button>
+				<Button
+					variant="ghost"
+					size="icon"
+					disabled={!canRedo}
+					onClick={redo}
+					aria-label="Redo"
+					title="Redo (Ctrl/Cmd+Shift+Z)"
+				>
+					<Redo2 size={18} />
+				</Button>
+				<Button variant="outline" onClick={() => start(false)}>
+					Use template
+				</Button>
+				<Button variant="ghost" onClick={() => start(true)}>
+					Start blank
+				</Button>
+				<Preview page={page} disabled={!page.blocks.length} />
+				<Button onClick={download} disabled={!page.blocks.length}>
+					<Download size={16} />
+					Export HTML
+				</Button>
+			</header>
 			<DragDropProvider
 				onDragEnd={(event) => {
 					if (event.canceled) return;
-
-					const { source, target } = event.operation;
-					const sourceId = String(source?.id || "");
-					const targetId = String(target?.id || "");
-					const sourceIsCanvasItem = items.some((item) => item.id === sourceId);
-					const targetIsCanvasItem = items.some((item) => item.id === targetId);
-
-					if (sourceIsCanvasItem) {
-						if (targetId === "sidebar-remove") {
-							setItems((prev) => prev.filter((item) => item.id !== sourceId));
-							setSelectedBlock((prev) =>
-								prev?.id === sourceId ? undefined : prev,
+					const sourceId = String(event.operation.source?.id ?? "");
+					const targetId = String(event.operation.target?.id ?? "");
+					const sourceIndex = page.blocks.findIndex(
+						(block) => block.id === sourceId,
+					);
+					if (sourceIndex >= 0) {
+						if (targetId === "sidebar-remove") remove(sourceId);
+						else if (
+							targetId === "droppable" ||
+							page.blocks.some((block) => block.id === targetId)
+						) {
+							const targetIndex =
+								targetId === "droppable"
+									? page.blocks.length - 1
+									: page.blocks.findIndex(
+											(block) => block.id === targetId,
+										);
+							move(sourceId, targetIndex - sourceIndex);
+						}
+					} else if (
+						Object.hasOwn(BLOCK_LABELS, sourceId) &&
+						(targetId === "droppable" ||
+							page.blocks.some((block) => block.id === targetId))
+					) {
+						if (page.blocks.length >= MAX_DOCUMENT_ITEMS) {
+							setNotice(
+								`A page can contain up to ${MAX_DOCUMENT_ITEMS} sections.`,
 							);
 							return;
 						}
-
-						setItems((prev) => {
-							const sourceIndex = prev.findIndex(
-								(item) => item.id === sourceId,
+						const block = createBlock(
+							sourceId as BlockType,
+							page.blocks,
+						);
+						setPage((page) => {
+							const blocks = [...page.blocks];
+							const index = blocks.findIndex(
+								(item) => item.id === targetId,
 							);
-							const targetIndex = targetIsCanvasItem
-								? prev.findIndex((item) => item.id === targetId)
-								: prev.length - 1;
-
-							if (
-								sourceIndex === -1 ||
-								targetIndex === -1 ||
-								sourceIndex === targetIndex
-							) {
-								return prev;
-							}
-
-							const next = [...prev];
-							const [moved] = next.splice(sourceIndex, 1);
-							next.splice(targetIndex, 0, moved);
-							return next;
+							blocks.splice(
+								index < 0 ? blocks.length : index,
+								0,
+								block,
+							);
+							return { ...page, blocks };
 						});
-						return;
-					}
-
-					if (target?.id === "droppable" || targetIsCanvasItem) {
-						const type = String(source!.id) as BlockType;
-						const themeDefaults = getThemeDefaultProps(activeTheme);
-						const newItem: DroppedItem = {
-							id: `${type}-${Date.now()}`,
-							type,
-							timestamp: Date.now(),
-							props: structuredClone(themeDefaults[type]),
-						};
-
-						setItems((prev) => {
-							if (targetIsCanvasItem) {
-								const targetIndex = prev.findIndex(
-									(item) => item.id === targetId,
-								);
-								if (targetIndex >= 0) {
-									const next = [...prev];
-									next.splice(targetIndex, 0, newItem);
-									return next;
-								}
-							}
-
-							return [...prev, newItem];
-						});
-
-						setSelectedBlock(newItem);
+						setSelected(block.id);
+						setStarted(true);
 					}
 				}}
 			>
-				<SidebarProvider>
-					<AppSidebar items={items} activeTheme={activeTheme} />
-					<div className="app-canvas-shell">
-						<div className="app-canvas w-full">
-							<DroppableZone
-								selectedItem={(item) => setSelectedBlock(item)}
-								items={items}
-								selectedBlock={selectedBlock}
-							/>
+				<AppSidebar
+					onAdd={add}
+					full={page.blocks.length >= MAX_DOCUMENT_ITEMS}
+				/>
+				<div className="app-canvas-shell">
+					<Canvas
+						page={page}
+						selected={selected}
+						select={setSelected}
+						move={move}
+						remove={remove}
+						start={start}
+						started={started}
+					/>
+				</div>
+				<aside
+					className="app-editor-panel p-5"
+					aria-label="Page and section settings"
+				>
+					{activeBlock && (
+						<div className="mb-5 space-y-3">
+							<Button
+								variant="outline"
+								className="w-full"
+								onClick={() => setSelected(undefined)}
+							>
+								<ArrowLeft size={16} />
+								Page settings
+							</Button>
+							<h2 className="font-semibold">
+								{BLOCK_LABELS[activeBlock.type]}
+							</h2>
 						</div>
-					</div>
-					<div className="app-editor-panel p-4 flex flex-col">
-						<Button
-							variant="outline"
-							onClick={() => exportToHTML(items, activeTheme)}
-							className="mb-4"
-						>
-							Export
-						</Button>
-						<EditorContext.Provider
-							value={{
-								item: activeBlock,
-								onPropsChange(payload) {
-									updatePropsData(payload);
-								},
-							}}
-						>
-							<Editor />
-						</EditorContext.Provider>
-					</div>
-				</SidebarProvider>
+					)}
+					<EditorContext.Provider
+						value={{
+							item: activeBlock,
+							onPropsChange: (data) => {
+								const focused = document.activeElement;
+								const field =
+									focused instanceof HTMLElement
+										? focused.closest(
+												"[data-slot='slider']",
+											)?.id || focused.id
+										: "";
+								const continuous =
+									focused instanceof HTMLTextAreaElement ||
+									(focused instanceof HTMLInputElement &&
+										!["checkbox", "radio", "file"].includes(
+											focused.type,
+										)) ||
+									focused?.getAttribute("role") === "slider";
+								const group =
+									continuous && field
+										? `${data.id}:${field}:${Object.keys(data.props).join(",")}`
+										: undefined;
+								setPage(
+									(page) => ({
+										...page,
+										blocks: page.blocks.map((block) =>
+											block.id === data.id
+												? ({
+														...block,
+														props: {
+															...block.props,
+															...data.props,
+															...(data.props.style
+																? {
+																		style: {
+																			...block
+																				.props
+																				.style,
+																			...data
+																				.props
+																				.style,
+																		},
+																	}
+																: {}),
+														},
+													} as DroppedItem)
+												: block,
+										),
+									}),
+									group,
+								);
+							},
+						}}
+					>
+						<Editor />
+					</EditorContext.Provider>
+				</aside>
 			</DragDropProvider>
+			{notice && (
+				<div className="builder-notice" role="status">
+					<span>{notice}</span>
+					<button
+						onClick={() => setNotice("")}
+						aria-label="Dismiss notification"
+					>
+						Dismiss
+					</button>
+				</div>
+			)}
 		</PageContext.Provider>
 	);
 }
-

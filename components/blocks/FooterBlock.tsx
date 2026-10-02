@@ -1,4 +1,5 @@
 /* eslint-disable @next/next/no-img-element */
+import { safeLink } from "@/lib/document";
 interface LayoutPreset {
 	columns: number;
 }
@@ -21,6 +22,7 @@ export const FooterBlock = ({
 	background,
 	copyright = "(c) 2026 Your Company. All rights reserved.",
 	style: footerStyles,
+	...props
 }: FooterBlockProps) => {
 	const mergedStyle = footerStyles ?? {};
 	const textColor = (mergedStyle.color as string) ?? "#e2e8f0";
@@ -29,6 +31,8 @@ export const FooterBlock = ({
 
 	return (
 		<footer
+			className="page-footer"
+			{...props}
 			style={{
 				width: "100%",
 				boxSizing: "border-box",
@@ -92,7 +96,7 @@ export const FooterBlock = ({
 					) : null}
 					<div
 						style={{
-							color: "rgba(226, 232, 240, 0.85)",
+							color: textColor,
 							fontSize: 13,
 							lineHeight: 1.5,
 							maxWidth: 420,
@@ -138,7 +142,7 @@ export const FooterBlock = ({
 							{links?.map((link, idx) => (
 								<a
 									key={idx}
-									href={link.href}
+									href={safeLink(link.href)}
 									style={{
 										color: linkColor,
 										textDecoration: "none",

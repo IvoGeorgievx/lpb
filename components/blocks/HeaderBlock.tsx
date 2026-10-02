@@ -1,5 +1,5 @@
 /* eslint-disable @next/next/no-img-element */
-import Image from "next/image";
+import { safeLink } from "@/lib/document";
 import React from "react";
 
 interface Link {
@@ -30,6 +30,7 @@ export interface HeaderBlockProps extends React.ComponentPropsWithRef<"header"> 
 	gap?: number;
 	animation?: string;
 	cta?: Cta;
+	showCta?: boolean;
 }
 
 export default function Header({
@@ -46,6 +47,7 @@ export default function Header({
 	style,
 	cta,
 	logoText,
+	showCta = true,
 	...props
 }: HeaderBlockProps) {
 	const hasLogoImage = Boolean(logo && style?.backgroundImage && !logoText);
@@ -126,29 +128,38 @@ export default function Header({
 						</p>
 					) : null}
 				</div>
-				{cta ? (
+				{links?.length ? (
+					<nav aria-label="Page navigation">
+						{links.map((link, index) => (
+							<a
+								key={index}
+								href={safeLink(link.url)}
+								style={{ marginInline: 8 }}
+							>
+								{link.label}
+							</a>
+						))}
+					</nav>
+				) : null}
+				{cta && showCta ? (
 					<a
-						href={cta.link}
+						href={safeLink(cta.link)}
 						style={{
 							textDecoration: "none",
+							paddingInline: cta.paddingX,
+							paddingBlock: cta.paddingY,
+							background: cta.backgroundColor,
+							borderRadius: cta.radius,
+							border: "none",
+							color: cta.color,
+							fontWeight: 600,
+							fontSize: 14,
+							cursor: "pointer",
+							boxShadow: "0 8px 20px rgba(15, 23, 42, 0.18)",
+							flexShrink: 0,
 						}}
 					>
-						<button
-							style={{
-								paddingInline: cta.paddingX,
-								paddingBlock: cta.paddingY,
-								background: cta.backgroundColor,
-								borderRadius: cta.radius,
-								border: "none",
-								color: cta.color,
-								fontWeight: 600,
-								fontSize: 14,
-								cursor: "pointer",
-								boxShadow: "0 8px 20px rgba(15, 23, 42, 0.18)",
-							}}
-						>
-							{cta.text}
-						</button>
+						{cta.text}
 					</a>
 				) : null}
 			</div>

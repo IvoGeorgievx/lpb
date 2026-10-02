@@ -16,6 +16,10 @@
 # next.js
 /.next/
 /out/
+/public/example.html
+/.playwright-mcp/
+/test-results/
+/playwright-report/
 
 # production
 /build

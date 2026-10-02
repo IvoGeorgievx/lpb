@@ -1,22 +1,15 @@
-import { BlockPropsMap, BlockType, DroppedItem } from "@/app/page";
-import { useEditor } from "@/context/EditorContext";
-import { AnimatePresence, motion } from "motion/react";
-import { HeroBlockProps } from "../blocks/HeroBlock";
-import { CtaBlockProps } from "../blocks/CtaBlock";
-import { EmbedBlockProps } from "../blocks/EmbedBlock";
+import { BlockPropsMap, BlockType, DroppedItem } from "@/lib/blocks";
+import { EditorContext, useEditor } from "@/context/EditorContext";
+import { usePage } from "@/context/PageContext";
+import { resolveEditorProps, preserveThemeBindings } from "@/lib/theme";
 import { HeaderEditor } from "./header/HeaderEditor";
 import { HeroEditor } from "./hero/HeroEditor";
 import { CtaEditor } from "./cta/CtaEditor";
 import { EmbedEditor } from "./embed/EmbedEditor";
 import { ProductEditor } from "./product/ProductEditor";
-import { ProductBlockProps } from "../blocks/ProductBlock";
-import { HeaderBlockProps } from "../blocks/HeaderBlock";
 import { FooterEditor } from "./footer/FooterEditor";
-import { FooterBlockProps } from "../blocks/FooterBlock";
 import { SeparatorEditor } from "./separator/SeparatorEditor";
-import { SectionSeparatorBlockProps } from "../blocks/SectionSeparatorBlock";
 import { TestimonialEditor } from "./testimonial/TestimonialEditor";
-import { TestimonialBlockProps } from "../blocks/TestimonialBlock";
 import { GlobalEditor } from "./global/GlobalEditor";
 
 export type UpdatePayload<T extends BlockType = BlockType> = {
@@ -25,28 +18,36 @@ export type UpdatePayload<T extends BlockType = BlockType> = {
 };
 
 export function Editor() {
-	const { item } = useEditor();
+	const { item, onPropsChange } = useEditor();
+	const { page } = usePage();
+	// Resolving style tokens changes values, never the block type or property shape.
+	const view = item
+		? ({
+				...item,
+				props: resolveEditorProps(item.props, page.activeTheme),
+			} as DroppedItem)
+		: undefined;
 
+	if (!item || !view) return <GlobalEditor />;
 	return (
-		<AnimatePresence mode="wait">
-			{item ? (
-				<motion.div
-					key={item.id || item.type}
-					initial={{ opacity: 0, y: 20, scale: 0.95 }}
-					animate={{ opacity: 1, y: 0, scale: 1 }}
-					exit={{ opacity: 0, y: 10, scale: 0.95 }}
-					transition={{
-						duration: 0.15,
-						ease: [0.16, 1, 0.3, 1],
-					}}
-					className="w-full"
-				>
-					{renderEditorContent(item)}
-				</motion.div>
-			) : (
-				<GlobalEditor />
-			)}
-		</AnimatePresence>
+		<div key={item.id} className="w-full">
+			<EditorContext.Provider
+				value={{
+					item: view,
+					onPropsChange: (update) =>
+						onPropsChange({
+							...update,
+							props: preserveThemeBindings(
+								item.props,
+								view.props,
+								update.props,
+							) as DroppedItem["props"],
+						}),
+				}}
+			>
+				{renderEditorContent(view)}
+			</EditorContext.Provider>
+		</div>
 	);
 }
 
@@ -54,21 +55,21 @@ function renderEditorContent(item: DroppedItem) {
 	const { type, props } = item;
 	switch (type) {
 		case "header":
-			return <HeaderEditor props={props as HeaderBlockProps} />;
+			return <HeaderEditor props={props} />;
 		case "hero":
-			return <HeroEditor props={props as HeroBlockProps} />;
+			return <HeroEditor props={props} />;
 		case "product":
-			return <ProductEditor props={props as ProductBlockProps} />;
+			return <ProductEditor props={props} />;
 		case "cta":
-			return <CtaEditor props={props as CtaBlockProps} />;
+			return <CtaEditor props={props} />;
 		case "embed":
-			return <EmbedEditor props={props as EmbedBlockProps} />;
+			return <EmbedEditor props={props} />;
 		case "footer":
-			return <FooterEditor props={props as FooterBlockProps} />;
+			return <FooterEditor props={props} />;
 		case "separator":
-			return <SeparatorEditor props={props as SectionSeparatorBlockProps} />;
+			return <SeparatorEditor props={props} />;
 		case "testimonial":
-			return <TestimonialEditor props={props as TestimonialBlockProps} />;
+			return <TestimonialEditor props={props} />;
 		default:
 			return null;
 	}

@@ -1,4 +1,4 @@
-import { DroppedItem } from "@/app/page";
+import { DroppedItem } from "@/lib/blocks";
 import { UpdatePayload } from "@/components/editor/Editor";
 import { createContext, useContext } from "react";
 

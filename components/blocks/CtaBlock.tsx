@@ -1,4 +1,5 @@
 import React from "react";
+import { safeLink } from "@/lib/document";
 
 export interface CtaBlockProps extends React.ComponentPropsWithRef<"section"> {
 	heading?: string;
@@ -87,28 +88,24 @@ export const CtaBlock = ({
 					{subheading}
 				</p>
 				<a
-					className="cta-block-link"
-					href={button.link}
-					style={{ textDecoration: "none" }}
+					className="cta-block-link cta-block-button"
+					href={safeLink(button.link)}
+					style={{
+						textDecoration: "none",
+						marginTop: 8,
+						paddingInline: button.paddingX,
+						paddingBlock: button.paddingY,
+						border: "none",
+						borderRadius: button.radius,
+						background: button.backgroundColor,
+						color: button.color,
+						fontSize: 15,
+						fontWeight: 700,
+						cursor: "pointer",
+						boxShadow: "0 12px 24px rgba(15,23,42,0.2)",
+					}}
 				>
-					<button
-						className="cta-block-button"
-						style={{
-							marginTop: 8,
-							paddingInline: button.paddingX,
-							paddingBlock: button.paddingY,
-							border: "none",
-							borderRadius: button.radius,
-							background: button.backgroundColor,
-							color: button.color,
-							fontSize: 15,
-							fontWeight: 700,
-							cursor: "pointer",
-							boxShadow: "0 12px 24px rgba(15,23,42,0.2)",
-						}}
-					>
-						{button.text}
-					</button>
+					{button.text}
 				</a>
 			</div>
 		</section>

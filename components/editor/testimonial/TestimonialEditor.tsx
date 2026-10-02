@@ -1,166 +1,173 @@
-import { TestimonialBlockProps } from "@/components/blocks/TestimonialBlock";
+import type { TestimonialBlockProps } from "@/components/blocks/TestimonialBlock";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useEditor } from "@/context/EditorContext";
+import { usePage } from "@/context/PageContext";
+import { getThemePreset } from "@/lib/theme";
+import { ColorField } from "../ColorField";
 
-interface TestimonialEditorProps {
-	props: TestimonialBlockProps;
-}
-
-export const TestimonialEditor = ({ props }: TestimonialEditorProps) => {
-	const slides = props.carousel?.slides || [];
+export function TestimonialEditor({ props }: { props: TestimonialBlockProps }) {
 	const { item, onPropsChange } = useEditor();
-
+	const { page } = usePage();
 	if (!item) return null;
-
+	const colors = getThemePreset(page.activeTheme).tokens;
+	const slides = props.carousel?.slides ?? [];
+	const update = (next: TestimonialBlockProps) =>
+		onPropsChange({ id: item.id, props: next });
+	const updateSlides = (next: typeof slides) =>
+		update({
+			carousel: { type: props.carousel?.type ?? "default", slides: next },
+		});
 	const updateSlide = (
 		index: number,
-		field: "heading" | "subheading" | "author" | "bgColor",
+		key: "heading" | "subheading" | "author" | "bgColor" | "textColor",
 		value: string,
-	) => {
-		const updatedSlides = slides.map((slide, i) =>
-			i === index
-				? {
-						...slide,
-						[field]: value,
-					}
-				: slide,
+	) =>
+		updateSlides(
+			slides.map((slide, i) =>
+				i === index ? { ...slide, [key]: value } : slide,
+			),
 		);
-
-		onPropsChange({
-			id: item.id,
-			props: {
-				...props,
-				carousel: {
-					...props.carousel,
-					type: props.carousel?.type || "default",
-					slides: updatedSlides,
-				},
-			},
-		});
-	};
-
-	const addSlide = () => {
-		const newSlide = {
-			heading: "test heading",
-			subheading: "test subheading",
-			author: "test author",
-			bgColor: "#333333",
-		};
-
-		onPropsChange({
-			id: item.id,
-			props: {
-				...props,
-				carousel: {
-					...props.carousel,
-					type: props.carousel?.type || "default",
-					slides: [...slides, newSlide],
-				},
-			} as TestimonialBlockProps,
-		});
-	};
-
-	const removeSlide = () => {
-		const currentSlides = props.carousel?.slides || [];
-
-		onPropsChange({
-			id: item.id,
-			props: {
-				...props,
-				carousel: {
-					...props.carousel,
-					type: props.carousel?.type || "default",
-					slides: currentSlides.slice(0, -1),
-				},
-			},
-		});
-	};
-
 	return (
-		<Tabs defaultValue="settings" className="w-full p-4">
-			<TabsList className="grid w-full grid-cols-1">
-				<TabsTrigger value="settings">Settings</TabsTrigger>
-			</TabsList>
-
-			<TabsContent value="settings" className="mt-4 flex flex-col gap-6">
-				<div className="flex flex-col gap-2"></div>
-
-				<div className="flex flex-col gap-6">
-					{slides.map((slide, index) => (
-						<div
-							key={index}
-							className="rounded-lg border p-4 flex flex-col gap-4"
-						>
-							<h3 className="font-medium">Slide {index + 1}</h3>
-
-							<div className="flex flex-col gap-2">
-								<Label>Heading</Label>
-								<Input
-									value={slide.heading}
-									onChange={(e) =>
-										updateSlide(index, "heading", e.target.value)
-									}
-									placeholder="Enter heading"
-								/>
-							</div>
-
-							<div className="flex flex-col gap-2">
-								<Label>Subheading</Label>
-								<Input
-									value={slide.subheading}
-									onChange={(e) =>
-										updateSlide(index, "subheading", e.target.value)
-									}
-									placeholder="Enter subheading"
-								/>
-							</div>
-
-							<div className="flex flex-col gap-2">
-								<Label>Author</Label>
-								<Input
-									value={slide.author}
-									onChange={(e) => updateSlide(index, "author", e.target.value)}
-									placeholder="Enter author"
-								/>
-							</div>
-
-							<div className="flex flex-col gap-2">
-								<Label>Background Color</Label>
-
-								<div className="flex items-center gap-2">
-									<Input
-										type="color"
-										value={slide.bgColor}
-										onChange={(e) =>
-											updateSlide(index, "bgColor", e.target.value)
-										}
-										className="h-10 w-16 p-1"
-									/>
-
-									<Input
-										value={slide.bgColor}
-										onChange={(e) =>
-											updateSlide(index, "bgColor", e.target.value)
-										}
-										placeholder="#333333"
-									/>
-								</div>
-							</div>
-						</div>
-					))}
-				</div>
-
-				<Button disabled={slides.length >= 9} onClick={addSlide}>
-					Add Slide
-				</Button>
-
-				<Button disabled={slides.length === 0} onClick={removeSlide}>
-					Remove Slide
-				</Button>
-			</TabsContent>
-		</Tabs>
+		<div className="space-y-6">
+			<ColorField
+				background
+				id="testimonial-background"
+				label="Section background"
+				value={String(props.style?.background ?? colors.background)}
+				onChange={(background) => update({ style: { background } })}
+			/>
+			<div className="space-y-2">
+				<Label htmlFor="carousel-type">Carousel style</Label>
+				<select
+					id="carousel-type"
+					className="h-10 w-full rounded-md border bg-transparent px-3 text-sm"
+					value={props.carousel?.type ?? "default"}
+					onChange={(event) =>
+						update({
+							carousel: {
+								slides,
+								type: event.target.value as "default" | "fade",
+							},
+						})
+					}
+				>
+					<option value="default">Scroll</option>
+					<option value="fade">Fade</option>
+				</select>
+			</div>
+			{slides.map((slide, index) => (
+				<fieldset
+					key={index}
+					className="min-w-0 space-y-4 border-t pt-5"
+				>
+					<legend className="px-1 text-sm font-semibold">
+						Testimonial {index + 1}
+					</legend>
+					<div className="space-y-2">
+						<Label htmlFor={`testimonial-${index}-heading`}>
+							Heading
+						</Label>
+						<textarea
+							id={`testimonial-${index}-heading`}
+							aria-label={`Testimonial ${index + 1} heading`}
+							className="editor-textarea"
+							rows={2}
+							value={slide.heading ?? ""}
+							onChange={(event) =>
+								updateSlide(
+									index,
+									"heading",
+									event.target.value,
+								)
+							}
+						/>
+					</div>
+					<div className="space-y-2">
+						<Label htmlFor={`testimonial-${index}-description`}>
+							Description
+						</Label>
+						<textarea
+							id={`testimonial-${index}-description`}
+							aria-label={`Testimonial ${index + 1} description`}
+							className="editor-textarea"
+							rows={3}
+							value={slide.subheading ?? ""}
+							onChange={(event) =>
+								updateSlide(
+									index,
+									"subheading",
+									event.target.value,
+								)
+							}
+						/>
+					</div>
+					<div className="space-y-2">
+						<Label htmlFor={`testimonial-${index}-author`}>
+							Author
+						</Label>
+						<Input
+							id={`testimonial-${index}-author`}
+							aria-label={`Testimonial ${index + 1} author`}
+							className="h-10"
+							value={slide.author ?? ""}
+							onChange={(event) =>
+								updateSlide(index, "author", event.target.value)
+							}
+						/>
+					</div>
+					<ColorField
+						background
+						id={`testimonial-${index}-background`}
+						label={`Testimonial ${index + 1} background`}
+						value={slide.bgColor ?? colors.card}
+						onChange={(value) =>
+							updateSlide(index, "bgColor", value)
+						}
+					/>
+					<ColorField
+						id={`testimonial-${index}-color`}
+						label={`Testimonial ${index + 1} text color`}
+						value={slide.textColor ?? colors.foreground}
+						onChange={(value) =>
+							updateSlide(index, "textColor", value)
+						}
+					/>
+					<Button
+						variant="outline"
+						onClick={() =>
+							updateSlides(slides.filter((_, i) => i !== index))
+						}
+					>
+						Remove testimonial {index + 1}
+					</Button>
+				</fieldset>
+			))}
+			{!slides.length && (
+				<p className="text-sm text-muted-foreground">
+					Add a testimonial to edit its content and colors.
+				</p>
+			)}
+			<Button
+				variant="outline"
+				className="w-full"
+				disabled={slides.length >= 9}
+				onClick={() =>
+					updateSlides([
+						...slides,
+						{
+							heading: "Your customer’s story",
+							subheading:
+								"Replace this example with a real testimonial.",
+							author: "Customer name",
+							bgColor: "var(--lpb-card)",
+						},
+					])
+				}
+			>
+				Add testimonial
+			</Button>
+		</div>
 	);
-};
+}

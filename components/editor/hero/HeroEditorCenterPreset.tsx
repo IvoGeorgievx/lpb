@@ -1,109 +1,120 @@
-import { HeroBlockProps } from "@/components/blocks/HeroBlock";
+import type { HeroBlockProps } from "@/components/blocks/HeroBlock";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Separator } from "@/components/ui/separator";
+import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import { useEditor } from "@/context/EditorContext";
-import { ChangeEvent, useRef } from "react";
+import { validateImage } from "@/lib/document";
+import { useState } from "react";
 
-export const HeroEditorCenterPreset = () => {
+export function HeroEditorCenterPreset() {
 	const { item, onPropsChange } = useEditor();
-	const fileUploadRef = useRef<HTMLInputElement>(null);
-	if (!item) return;
-
-	const handleFileUpload = (event: ChangeEvent<HTMLInputElement>) => {
-		const file = event.target.files?.[0];
-		if (!file) return;
-		const tempUrl = URL.createObjectURL(file);
-
-		onPropsChange({
-			id: item.id,
-			props: { style: { backgroundImage: tempUrl } },
-		});
-	};
+	const [error, setError] = useState("");
+	const [reading, setReading] = useState(false);
+	if (!item) return null;
+	const props = item.props as HeroBlockProps;
 	return (
-		<div className="flex flex-col gap-5">
-			<div className="w-full mt-5">
-				<div className="p-4 rounded-lg border bg-white shadow-sm">
-					<Label htmlFor="upload-div">Background Image</Label>
-
-					<div
-						id="upload-div"
-						className="mt-2 border-2 border-dashed rounded-lg p-6 text-center text-gray-400 cursor-pointer hover:bg-gray-100"
-						onClick={() => fileUploadRef.current?.click()}
-					>
-						Click or drag image to upload
-					</div>
-
-					<Input
-						id="pic-upload"
-						ref={fileUploadRef}
-						type="file"
-						className="hidden"
-						onChange={handleFileUpload}
-					/>
-				</div>
-			</div>
-			<Label htmlFor="overlay-slider">Overlay</Label>
+		<div className="flex flex-col gap-4 border-t pt-4">
+			<Label htmlFor="hero-image">Background image</Label>
+			<Input
+				id="hero-image"
+				type="file"
+				accept="image/jpeg,image/png,image/webp,image/gif"
+				disabled={reading}
+				aria-describedby="hero-image-help hero-image-error"
+				onChange={(event) => {
+					const file = event.target.files?.[0];
+					if (!file) return;
+					setError("");
+					try {
+						validateImage(file);
+						setReading(true);
+						const reader = new FileReader();
+						reader.onload = () => {
+							onPropsChange({
+								id: item.id,
+								props: {
+									style: {
+										backgroundImage: `url("${reader.result}")`,
+									},
+								},
+							});
+							setReading(false);
+						};
+						reader.onerror = () => {
+							setError(
+								"Could not read this image. Choose another file and try again.",
+							);
+							setReading(false);
+						};
+						reader.readAsDataURL(file);
+					} catch (cause) {
+						setError((cause as Error).message);
+					}
+					event.target.value = "";
+				}}
+			/>
+			<p id="hero-image-help" className="text-xs text-muted-foreground">
+				JPG, PNG, WebP or GIF, up to 1 MB. Included in your HTML
+				download.
+			</p>
+			<p
+				id="hero-image-error"
+				role="alert"
+				className="text-sm text-destructive"
+			>
+				{error}
+			</p>
+			{reading && <p role="status">Reading image…</p>}
+			{props.style?.backgroundImage && (
+				<Button
+					variant="outline"
+					onClick={() =>
+						onPropsChange({
+							id: item.id,
+							props: { style: { backgroundImage: undefined } },
+						})
+					}
+				>
+					Remove image
+				</Button>
+			)}
+			<Label htmlFor="overlay-slider">
+				Dark overlay: {Math.round((props.overlayStrength ?? 0) * 100)}%
+			</Label>
 			<Slider
 				id="overlay-slider"
-				value={[(item?.props as HeroBlockProps)?.overlayStrength || 0]}
+				aria-label="Dark overlay"
+				value={[props.overlayStrength ?? 0]}
 				min={0}
 				max={1}
 				step={0.05}
-				onValueChange={(v) =>
-					onPropsChange({
-						id: item.id,
-						props: {
-							overlayStrength: v[0],
-						},
-					})
+				onValueChange={([overlayStrength]) =>
+					onPropsChange({ id: item.id, props: { overlayStrength } })
 				}
 			/>
-			<div className="w-full flex gap-4">
-				<div className="w-full">
-					<Label htmlFor="shadow-intensity-slider" className="mb-4">
-						Shadow Intensity
-					</Label>
-					<Slider
-						id="shadow-intensity-slider"
-						value={[(item?.props as HeroBlockProps)?.shadowIntensity || 0]}
-						min={0}
-						max={1}
-						step={0.05}
-						onValueChange={(v) =>
-							onPropsChange({
-								id: item.id,
-								props: {
-									shadowIntensity: v[0],
-								},
-							})
-						}
-					/>
-				</div>
-				<div className="w-full">
-					<Label htmlFor="shadow-blur-slider" className="mb-4">
-						Shadow Blur
-					</Label>
-					<Slider
-						id="shadow-blur-slider"
-						value={[(item?.props as HeroBlockProps)?.shadowBlur || 0]}
-						min={0}
-						max={100}
-						step={1}
-						onValueChange={(v) =>
-							onPropsChange({
-								id: item.id,
-								props: {
-									shadowBlur: v[0],
-								},
-							})
-						}
-					/>
-				</div>
-			</div>
-
-			<Separator />
+			<Label htmlFor="shadow-intensity-slider">Shadow intensity</Label>
+			<Slider
+				id="shadow-intensity-slider"
+				value={[props.shadowIntensity ?? 0]}
+				min={0}
+				max={1}
+				step={0.05}
+				onValueChange={([shadowIntensity]) =>
+					onPropsChange({ id: item.id, props: { shadowIntensity } })
+				}
+			/>
+			<Label htmlFor="shadow-blur-slider">Shadow blur</Label>
+			<Slider
+				id="shadow-blur-slider"
+				value={[props.shadowBlur ?? 0]}
+				min={0}
+				max={100}
+				step={1}
+				onValueChange={([shadowBlur]) =>
+					onPropsChange({ id: item.id, props: { shadowBlur } })
+				}
+			/>
 		</div>
 	);
-};
+}

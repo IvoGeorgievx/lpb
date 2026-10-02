@@ -12,6 +12,7 @@ function Input({ className, type, ...props }: React.ComponentProps<"input">) {
         className
       )}
       {...props}
+      value={type === "color" && props.value !== undefined && !/^#[0-9a-f]{6}$/i.test(String(props.value)) ? "#000000" : type === "number" && typeof props.value === "number" && !Number.isFinite(props.value) ? "" : props.value}
     />
   )
 }

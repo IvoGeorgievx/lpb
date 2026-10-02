@@ -4,7 +4,8 @@ import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { useEditor } from "@/context/EditorContext";
 import { Switch } from "@/components/ui/switch";
-import type { ChangeEvent } from "react";
+import { useState, type ChangeEvent } from "react";
+import { MAX_DOCUMENT_ITEMS } from "@/lib/document";
 
 interface EmbedEditorProps {
 	props: EmbedBlockProps;
@@ -12,14 +13,16 @@ interface EmbedEditorProps {
 
 export function EmbedEditor({ props }: EmbedEditorProps) {
 	const { item, onPropsChange } = useEditor();
+	const [bulletError, setBulletError] = useState("");
 	if (!item) return null;
 	const bulletText = (props.contentBullets ?? []).join("\n");
 
 	return (
 		<div className="w-full flex flex-col gap-5">
 			<div className="flex flex-col gap-2">
-				<Label>Embed URL</Label>
+				<Label htmlFor="embed-src">Embed URL</Label>
 				<Input
+					id="embed-src"
 					value={props.src || ""}
 					onChange={(e) =>
 						onPropsChange({
@@ -35,8 +38,9 @@ export function EmbedEditor({ props }: EmbedEditorProps) {
 			</div>
 
 			<div className="flex flex-col gap-2">
-				<Label>Iframe Title</Label>
+				<Label htmlFor="embed-title">Iframe Title</Label>
 				<Input
+					id="embed-title"
 					value={props.title || ""}
 					onChange={(e) =>
 						onPropsChange({
@@ -54,6 +58,7 @@ export function EmbedEditor({ props }: EmbedEditorProps) {
 			<div className="flex flex-col gap-2">
 				<Label>Height: {props.height ?? 520}px</Label>
 				<Slider
+					aria-label="Embed height"
 					value={[props.height ?? 520]}
 					min={240}
 					max={1000}
@@ -107,8 +112,9 @@ export function EmbedEditor({ props }: EmbedEditorProps) {
 			{props.showContentPanel ? (
 				<>
 					<div className="flex flex-col gap-2">
-						<Label>Panel Heading</Label>
+						<Label htmlFor="embed-heading">Panel Heading</Label>
 						<Input
+							id="embed-heading"
 							value={props.contentHeading || ""}
 							onChange={(e) =>
 								onPropsChange({
@@ -124,8 +130,9 @@ export function EmbedEditor({ props }: EmbedEditorProps) {
 					</div>
 
 					<div className="flex flex-col gap-2">
-						<Label>Panel Paragraph</Label>
+						<Label htmlFor="embed-paragraph">Panel Paragraph</Label>
 						<textarea
+							id="embed-paragraph"
 							className="min-h-22 rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
 							value={props.contentParagraph || ""}
 							onChange={(e: ChangeEvent<HTMLTextAreaElement>) =>
@@ -142,21 +149,47 @@ export function EmbedEditor({ props }: EmbedEditorProps) {
 					</div>
 
 					<div className="flex flex-col gap-2">
-						<Label>Bullet points (one per line)</Label>
+						<Label htmlFor="embed-bullets">
+							Bullet points (one per line)
+						</Label>
 						<textarea
+							id="embed-bullets"
 							className="min-h-24 rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
 							value={bulletText}
-							onChange={(e: ChangeEvent<HTMLTextAreaElement>) =>
+							onChange={(e: ChangeEvent<HTMLTextAreaElement>) => {
+								const bullets = e.target.value.split("\n");
+								if (bullets.length > MAX_DOCUMENT_ITEMS) {
+									setBulletError(
+										`Use no more than ${MAX_DOCUMENT_ITEMS} bullet points.`,
+									);
+									return;
+								}
+								setBulletError("");
 								onPropsChange({
 									id: item.id,
 									props: {
 										...props,
-										contentBullets: e.target.value.split("\n"),
+										contentBullets: bullets,
 									},
-								})
+								});
+							}}
+							aria-invalid={!!bulletError}
+							aria-describedby={
+								bulletError ? "embed-bullets-error" : undefined
 							}
-							placeholder={"First point\nSecond point\nThird point"}
+							placeholder={
+								"First point\nSecond point\nThird point"
+							}
 						/>
+						{bulletError && (
+							<p
+								id="embed-bullets-error"
+								role="alert"
+								className="text-sm text-destructive"
+							>
+								{bulletError}
+							</p>
+						)}
 					</div>
 				</>
 			) : null}

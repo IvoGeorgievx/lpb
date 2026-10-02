@@ -1,4 +1,5 @@
 import React from "react";
+import { safeEmbed } from "@/lib/document";
 
 export interface EmbedBlockProps extends React.ComponentPropsWithRef<"section"> {
 	src?: string;
@@ -33,10 +34,12 @@ export const EmbedBlock = ({
 		(line) => line.trim().length > 0,
 	);
 
-	const embedFrame = src ? (
+	const safeSrc = safeEmbed(src);
+	const embedFrame = safeSrc ? (
 		<>
 			<iframe
-				src={src}
+				src={safeSrc}
+				sandbox="allow-scripts allow-same-origin allow-presentation allow-popups"
 				title={title}
 				loading={loading}
 				allowFullScreen={allowFullScreen}
@@ -58,7 +61,7 @@ export const EmbedBlock = ({
 				}}
 			>
 				<a
-					href={src}
+					href={safeSrc}
 					target="_blank"
 					rel="noreferrer"
 					style={{
@@ -173,7 +176,7 @@ export const EmbedBlock = ({
 				<div
 					style={{
 						flex: showContentPanel ? "1.6 1 480px" : "1 1 100%",
-						minWidth: 320,
+						minWidth: "min(320px, 100%)",
 						borderRadius: 16,
 						overflow: "hidden",
 						border: "1px solid rgba(148,163,184,0.35)",

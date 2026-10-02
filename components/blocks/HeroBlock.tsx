@@ -1,65 +1,48 @@
-type Layout = "center";
-type ImagePosition = "left" | "right" | "background";
-type TextAlign = "center" | "right" | "left";
-
-interface HeroBlockPresets {
-	layout: Layout;
-	textAlign: TextAlign;
-	showImage: boolean;
-	imagePosition: ImagePosition;
-}
-type GenericAnimation = "fade-in" | "slide-right" | "slide-left";
+import { safeLink } from "@/lib/document";
+type Animation = "fade-in" | "slide-right" | "slide-left";
 type FontStyle = "normal" | "italic";
-
-type CtaOptions = {
-	bgColor?: string;
-	paddingX?: number;
-	paddingY?: number;
-	animation?: GenericAnimation;
-	text?: string;
-	textColor?: string;
-	border?: boolean;
-	radius?: number;
-	fontSize?: number;
-	boxShadow?: {
-		shadowBlur?: number;
-		shadowIntensity?: number;
-	};
-};
-
 export interface HeroBlockProps extends React.ComponentPropsWithRef<"div"> {
-	image?: string;
-	title?: string;
+	heading?: string;
+	subheading?: string;
 	headingFontSize?: number;
 	headingColor?: string;
 	headingWeight?: number;
 	headingStyle?: FontStyle;
-	headingAnimation?: GenericAnimation;
+	headingAnimation?: Animation;
 	subheadingFontSize?: number;
 	subheadingColor?: string;
 	subheadingWeight?: number;
 	subheadingStyle?: FontStyle;
-	subHeadingAnimation?: GenericAnimation;
-	animationEnabled?: boolean;
-	animation?: GenericAnimation;
-	overlay?: number;
-	bgType?: "color" | "gradient" | "image" | "transparent";
-	preset?: HeroBlockPresets;
-	heading?: string;
-	subheading?: string;
-	cta?: CtaOptions;
+	subHeadingAnimation?: Animation;
+	preset?: {
+		layout: "center";
+		textAlign: "center" | "left" | "right";
+		showImage: boolean;
+		imagePosition: "left" | "right" | "background";
+	};
 	overlayStrength?: number;
 	shadowBlur?: number;
 	shadowIntensity?: number;
+	cta?: {
+		link?: string;
+		text?: string;
+		bgColor?: string;
+		textColor?: string;
+		paddingX?: number;
+		paddingY?: number;
+		radius?: number;
+		fontSize?: number;
+		border?: boolean;
+		animation?: Animation;
+		boxShadow?: { shadowBlur?: number; shadowIntensity?: number };
+	};
 }
-
+const animations = {
+	"fade-in": "animate-fade-in",
+	"slide-left": "animate-slide-in-left",
+	"slide-right": "animate-slide-in-right",
+};
 export default function HeroBlock({
-	preset = {
-		layout: "center",
-		textAlign: "center",
-		showImage: true,
-		imagePosition: "background",
-	},
 	heading,
 	subheading,
 	headingFontSize,
@@ -67,94 +50,109 @@ export default function HeroBlock({
 	headingWeight,
 	headingStyle,
 	headingAnimation,
-	subHeadingAnimation,
-	subheadingColor,
 	subheadingFontSize,
+	subheadingColor,
 	subheadingWeight,
-	shadowBlur,
-	shadowIntensity,
 	subheadingStyle,
-
-	cta = {
-		// text: "CTA Button",
-		paddingX: 12,
-		paddingY: 8,
-		border: false,
-		fontSize: 16,
-	},
+	subHeadingAnimation,
+	preset,
+	overlayStrength = 0,
+	shadowBlur = 0,
+	shadowIntensity = 0,
+	cta,
+	style,
+	className,
 	...props
 }: HeroBlockProps) {
-	const animationMap = {
-		"fade-in": "animate-fade-in",
-		"slide-left": "animate-slide-in-left",
-		"slide-right": "animate-slide-in-right",
-	};
-
-	const getCtaButton = () => {
-		return (
-			<button
-				style={{
-					cursor: "pointer",
-					background: cta.bgColor,
-					paddingInline: cta.paddingX,
-					paddingBlock: cta.paddingY,
-					border: cta.border ? "1px solid" : "",
-					borderRadius: cta.radius,
-					fontSize: cta.fontSize,
-					boxShadow: `inset 0 0 ${cta.boxShadow?.shadowBlur}px rgba(0,0,0,${cta.boxShadow?.shadowIntensity})`,
-					color: cta.textColor,
-					fontWeight: 700,
-				}}
-				className={(cta?.animation && animationMap[cta.animation]) || ""}
-			>
-				{cta.text}
-			</button>
-		);
-	};
-
 	return (
-		<div
-			className={
-				props.className ? `hero-block ${props.className}` : "hero-block"
-			}
-		>
+		<div className={`hero-block ${className ?? ""}`} {...props}>
 			<div
 				className="hero-block-surface"
 				style={{
-					...props.style,
-					justifyContent: "center",
-					alignItems: "center",
+					...style,
 					display: "flex",
 					flexDirection: "column",
-					gap: 16,
+					alignItems: "center",
+					justifyContent: "center",
+					gap: 24,
+					position: "relative",
+					textAlign: preset?.textAlign ?? "center",
+					backgroundSize: "cover",
+					backgroundPosition: "center",
 					boxShadow: `inset 0 0 ${shadowBlur}px rgba(0,0,0,${shadowIntensity})`,
 				}}
 			>
+				{overlayStrength > 0 && (
+					<div
+						aria-hidden="true"
+						style={{
+							position: "absolute",
+							inset: 0,
+							background: `rgba(0,0,0,${overlayStrength})`,
+							pointerEvents: "none",
+						}}
+					/>
+				)}
 				<h1
+					className={
+						headingAnimation
+							? animations[headingAnimation]
+							: undefined
+					}
 					style={{
+						position: "relative",
 						fontSize: headingFontSize,
 						color: headingColor,
 						fontWeight: headingWeight,
 						fontStyle: headingStyle,
 					}}
-					className={(headingAnimation && animationMap[headingAnimation]) || ""}
 				>
 					{heading}
 				</h1>
-				<h2
+				<p
+					className={
+						subHeadingAnimation
+							? animations[subHeadingAnimation]
+							: undefined
+					}
 					style={{
+						position: "relative",
 						fontSize: subheadingFontSize,
 						color: subheadingColor,
 						fontWeight: subheadingWeight,
 						fontStyle: subheadingStyle,
 					}}
-					className={
-						(subHeadingAnimation && animationMap[subHeadingAnimation]) || ""
-					}
 				>
 					{subheading}
-				</h2>
-				{getCtaButton()}
+				</p>
+				{cta?.text && (
+					<a
+						href={safeLink(cta.link)}
+						className={
+							cta.animation
+								? animations[cta.animation]
+								: undefined
+						}
+						style={{
+							position: "relative",
+							display: "inline-block",
+							textDecoration: "none",
+							background: cta.bgColor,
+							color: cta.textColor,
+							paddingInline: cta.paddingX ?? 24,
+							paddingBlock: cta.paddingY ?? 12,
+							borderRadius: cta.radius,
+							border: cta.border
+								? "1px solid currentColor"
+								: undefined,
+							fontSize: cta.fontSize,
+							fontWeight: 700,
+							boxShadow: `0 4px ${cta.boxShadow?.shadowBlur ?? 0}px rgba(0,0,0,${cta.boxShadow?.shadowIntensity ?? 0})`,
+						}}
+					>
+						{cta.text}
+					</a>
+				)}
 			</div>
 		</div>
 	);

@@ -1,9 +1,7 @@
 @import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap");
-@import url("https://unpkg.com/lucide-static@latest/font/lucide.css");
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
-@import "./export.css";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -52,8 +50,8 @@
 }
 
 :root {
-	--app-sidebar-width: clamp(13.5rem, 16vw, 18rem);
-	--app-editor-width: clamp(20rem, 29vw, 33.125rem);
+	--app-sidebar-width: 13.5rem;
+	--app-editor-width: clamp(22rem, 30vw, 27rem);
 	--background: oklch(0.985 0.006 250);
 	--foreground: oklch(0.235 0.024 252);
 
@@ -180,7 +178,7 @@
 
 	.app-canvas-shell {
 		position: fixed;
-		inset-block: 0;
+		inset-block: 76px 0;
 		left: var(--app-sidebar-width);
 		right: var(--app-editor-width);
 		overflow-y: auto;
@@ -190,8 +188,8 @@
 	.app-editor-panel {
 		position: fixed;
 		right: 0;
-		top: 0;
-		height: 100vh;
+		top: 76px;
+		height: calc(100vh - 76px);
 		width: var(--app-editor-width);
 		min-width: 0;
 		overflow-x: hidden;
@@ -208,16 +206,177 @@
 	.app-sidebar {
 		position: fixed;
 		left: 0;
-		top: 0;
-		height: 100vh;
+		top: 76px;
+		height: calc(100vh - 76px);
+		overflow-y: auto;
 		width: var(--app-sidebar-width);
 		z-index: 40;
 	}
 
 	@media (max-width: 1200px) {
 		:root {
-			--app-sidebar-width: 13.5rem;
-			--app-editor-width: 20rem;
+			--app-sidebar-width: 13rem;
+			--app-editor-width: 22rem;
 		}
+	}
+}
+
+.builder-toolbar {
+	position: fixed;
+	inset: 0 0 auto;
+	height: 76px;
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	padding: 12px 24px;
+	border-bottom: 1px solid var(--border);
+	background: var(--card);
+	z-index: 60;
+}
+.app-canvas {
+	padding: 24px 18px;
+}
+.canvas-section {
+	position: relative;
+	outline: 2px solid transparent;
+	outline-offset: -2px;
+}
+.canvas-section.is-selected {
+	outline-color: var(--primary);
+}
+.is-drop-target {
+	outline: 2px dashed var(--primary);
+	outline-offset: -2px;
+}
+.block-controls {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	padding: 6px 10px;
+	color: var(--foreground);
+	background: var(--card);
+	font-family: "Space Grotesk", sans-serif;
+	border-bottom: 1px solid var(--border);
+}
+.block-controls button {
+	padding: 4px;
+	cursor: pointer;
+	border-radius: 4px;
+}
+.block-controls button:disabled {
+	opacity: 0.35;
+	cursor: default;
+}
+.block-controls button:hover:not(:disabled) {
+	background: var(--muted);
+}
+.builder-welcome {
+	max-width: 720px;
+	margin: 28px auto;
+	display: flex;
+	flex-direction: column;
+	gap: 24px;
+	padding: 16px;
+}
+.builder-welcome h1 {
+	font-size: clamp(30px, 3vw, 46px);
+	line-height: 1.12;
+	letter-spacing: -0.035em;
+	text-wrap: balance;
+}
+.builder-welcome p {
+	max-width: 60ch;
+	line-height: 1.65;
+}
+.builder-notice {
+	position: fixed;
+	bottom: 20px;
+	left: calc(var(--app-sidebar-width) + 20px);
+	right: calc(var(--app-editor-width) + 20px);
+	display: flex;
+	gap: 16px;
+	justify-content: space-between;
+	padding: 16px;
+	background: var(--card);
+	border: 1px solid var(--border);
+	box-shadow: 0 8px 28px #142b4520;
+	border-radius: 10px;
+	font-size: 13px;
+	z-index: 65;
+}
+.builder-notice button {
+	text-decoration: underline;
+}
+.showcase-intro {
+	padding: 48px 24px;
+	max-width: 760px;
+	margin: auto;
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	gap: 24px;
+}
+.showcase-intro h1 {
+	font-size: clamp(38px, 8vw, 60px);
+	line-height: 1.1;
+	letter-spacing: -0.035em;
+}
+.showcase-intro p {
+	line-height: 1.65;
+}
+:focus-visible {
+	outline: 2px solid var(--ring);
+	outline-offset: 3px;
+}
+::selection {
+	background: var(--accent);
+	color: var(--foreground);
+}
+input,
+textarea {
+	caret-color: var(--primary);
+}
+.editor-section {
+	display: flex;
+	flex-direction: column;
+	gap: 16px;
+	min-width: 0;
+	border-top: 1px solid var(--border);
+	padding-top: 24px;
+}
+.editor-textarea {
+	display: block;
+	width: 100%;
+	min-width: 0;
+	resize: vertical;
+	border: 1px solid var(--input);
+	border-radius: 8px;
+	background: transparent;
+	padding: 10px 12px;
+	font-size: 14px;
+	line-height: 1.5;
+}
+.editor-select {
+	width: 100%;
+	min-width: 0;
+	height: 40px;
+	border: 1px solid var(--input);
+	border-radius: 8px;
+	background: transparent;
+	padding: 0 12px;
+	font-size: 14px;
+}
+.editor-field-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+	gap: 16px;
+}
+@media (prefers-reduced-motion: reduce) {
+	*,
+	*::before,
+	*::after {
+		animation-duration: 0.01ms !important;
+		transition-duration: 0.01ms !important;
+		scroll-behavior: auto !important;
 	}
 }
